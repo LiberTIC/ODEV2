@@ -7,8 +7,7 @@ CalDAV servers
 
 ## Prototypes
 
-- [polypodes/CalDAVClientPrototype](polypodes/CalDAVClientPrototype)
-
+- [polypodes/CalDAVClientPrototype](https://github.com/polypodes/CalDAVClientPrototype)
 
 ## Libraries
 
