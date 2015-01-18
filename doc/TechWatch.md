@@ -5,6 +5,10 @@ CalDAV servers
 - http://sabre.io
 - http://baikal-server.com
 
+## Prototypes
+
+- [polypodes/CalDAVClientPrototype](polypodes/CalDAVClientPrototype)
+
 
 ## Libraries
 
