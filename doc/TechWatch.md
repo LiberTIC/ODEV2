@@ -5,6 +5,10 @@ CalDAV servers
 - http://sabre.io
 - http://baikal-server.com
 
+CalDAV clients
+- Lightning de Mozilla
+- iCalendar d'Apple
+
 ## Prototypes
 
 - [polypodes/CalDAVClientPrototype](https://github.com/polypodes/CalDAVClientPrototype)
