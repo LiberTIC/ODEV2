@@ -26,10 +26,9 @@ $ sudo apt-get install calendarserver
 - I escaped the `umount` part 
 - I run `bin/run` instead of `/bin/dev`
 
-Escaping the Debian 64bit issue :
+Escaping the Debian 64bit issue, adding this into `/etc/caldavd/caldavd.plist`:
 
 ```xml
  <key>UseMetaFD</key>
  <false/>
-
 ```
