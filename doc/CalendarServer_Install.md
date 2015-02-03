@@ -19,6 +19,10 @@ deb http://old-releases.ubuntu.com/ubuntu quantal-security main universe multive
 
 ### [Follow this tutorial](https://www.deanspot.org/alex/2009/03/23/installing-apples-calendarserver-ubuntu.html)
 
+Using Python 2.x-dev + [pip](https://pip.pypa.io/en/latest/installing.html)
+
+Updated pip using `sudo pip install --upgrade setuptools`
+
 ```bash
 $ sudo apt-get install calendarserver
 ```
