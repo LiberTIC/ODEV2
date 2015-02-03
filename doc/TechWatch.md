@@ -14,6 +14,7 @@ CalDAV servers
 
 ### PHP CalDAV clients
 
+- [Davical PHP lib](http://www.davical.org) ([Git repo](http://repo.or.cz/w/davical.git) ; [example](http://www.aadl.org/node/261978))
 - [fruux/sabre-davclient](https://github.com/fruux/sabre-davclient)
 - [CloudManaged/sabre-davclient](https://github.com/CloudManaged/sabre-davclient): most recent fork of fruux/sabre-davclient
 - (oscar09/CalDAVClient)[https://github.com/oscar09/CalDAVClient)
