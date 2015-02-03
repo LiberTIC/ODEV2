@@ -25,8 +25,10 @@ $ sudo apt-get install calendarserver
 
 - I escaped the `umount` part 
 - I run `bin/run` instead of `/bin/dev`
+- I did use HTTP (changed port from `8008` to regular `8443`
 
-Escaping the Debian 64bit issue, adding this into `/etc/caldavd/caldavd.plist`:
+Because of the `[Errno 22] Invalid argument" in error.log when connecting to port 8008 on a fresh install` error, 
+following this [Debian bug forum thread](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=678525), I escaped the Debian 64bit issue, adding this into `/etc/caldavd/caldavd.plist`:
 
 ```xml
  <key>UseMetaFD</key>
