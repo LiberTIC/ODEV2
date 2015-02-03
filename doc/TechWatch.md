@@ -16,11 +16,13 @@ CalDAV servers
 
 - [Davical PHP lib](http://www.davical.org) ([Git repo](http://repo.or.cz/w/davical.git) ; [example](http://www.aadl.org/node/261978))
 - [fruux/sabre-davclient](https://github.com/fruux/sabre-davclient)
+- [fruux/sabre-vobject](https://github.com/fruux/sabre-vobject)
 - [CloudManaged/sabre-davclient](https://github.com/CloudManaged/sabre-davclient): most recent fork of fruux/sabre-davclient
 - (oscar09/CalDAVClient)[https://github.com/oscar09/CalDAVClient)
 - [BernsteinElektro/php-caldav-client](https://github.com/BernsteinElektro/php-caldav-client/blob/master/lib/BE/CalDav/Client.php)
 - [wvrzel/simpleCalDAV](https://github.com/wvrzel/simpleCalDAV)
 - [Simplest PHP client ever](http://trentrichardson.com/2012/06/22/put-caldav-events-to-calendar-in-php/)
+- [fzaninotto/Faker](https://github.com/fzaninotto/Faker)
 
 ### Feedbacks on PHP CalDAV Client
 
