@@ -19,6 +19,7 @@ CalDAV servers
 - (oscar09/CalDAVClient)[https://github.com/oscar09/CalDAVClient)
 - [BernsteinElektro/php-caldav-client](https://github.com/BernsteinElektro/php-caldav-client/blob/master/lib/BE/CalDav/Client.php)
 - [wvrzel/simpleCalDAV](https://github.com/wvrzel/simpleCalDAV)
+- [Simplest PHP client ever](http://trentrichardson.com/2012/06/22/put-caldav-events-to-calendar-in-php/)
 
 ### Feedbacks on PHP CalDAV Client
 
