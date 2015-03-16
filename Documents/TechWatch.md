@@ -16,8 +16,11 @@ CalDAV clients
 ## Libraries
 
 
-### PHP CalDAV clients
+### PHP CalDAV clients / ICS parsers
 
+- [iCalcreator/iCalcreator](https://github.com/iCalcreator/iCalcreator)
+- [hising/ics-generator](https://github.com/hising/ics-generator)
+- [jasvrcek/ICS](https://github.com/jasvrcek/ICS)
 - [Davical PHP lib](http://www.davical.org) ([Git repo](http://repo.or.cz/w/davical.git) ; [example](http://www.aadl.org/node/261978))
 - [fruux/sabre-davclient](https://github.com/fruux/sabre-davclient)
 - [fruux/sabre-vobject](https://github.com/fruux/sabre-vobject)
