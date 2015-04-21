@@ -27,6 +27,8 @@ Tutoriel: Comprendre CalDAV et l'appliquer
 4. [Les exceptions](#4-les-exceptions)
   * [Suppression d'occurence](#suppression-doccurence)
   * [Modification d'occurence](#modification-doccurence)
+  * [Exemple 3](#exemple-3)
+5. [Les requêtes CalDAV](#5-les-requ%C3%AAtes-caldav)
 
 
 
@@ -272,8 +274,8 @@ Avant d'ajouter de nombreuses exceptions, il est parfoit préférable de trouver
 
 #### Suppression d'occurence
 
-Il est possible d'ajouter une exception à un événement en ajoutant un champs `EXDATE` (ou `EXDATE;VALUE=DATE selon les clients).
-Par exemple, reprenons notre service comptabilité avec une réunion toutes les semaines le vendredi:
+Il est possible d'ajouter une exception à un événement en ajoutant un champs `EXDATE` (ou `EXDATE;VALUE=DATE selon les clients CalDAV).
+Par exemple, reprenons notre service comptabilité avec une réunion toutes les semaines le vendredi.
 
 Il s'avère que le 1er mai est un jour férié ! Pour ne pas ajouter un faux événement le 1er mai, nous devons ajouter une exception.
 ```
@@ -307,3 +309,54 @@ Nous aurons donc ce résultat:
 	[...]
 ```
 
+
+#### Exemple 3
+
+Si on reprend depuis le début, voici donc le calendrier permettant d'écrire les rendez-vous du service comptabilité avec les récurrences et exceptions qui vont avec:
+
+```
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Polypodes//CalInterne//FR
+
+	BEGIN:VEVENT 				<- vEvent décrivant la récurrence
+	UID:XXX-000-042
+	DTSTAMP:20150421T090945Z
+
+		SUMMARY:Réunion service comptabilité
+		DTSTART:20150427T083000Z
+		DTEND:20150427T093000Z
+		LOCATION:Salle de réunion D
+
+		RRULE:WEEKLY;BYDAY=FR
+
+		EXDATE;VALUE=DATE:20150501
+
+	END:VEVENT
+
+	BEGIN:VEVENT 				<- vEvent décrivant l'exception
+	UID:XXX-000-042
+	DTSTAMP:20150421T090945Z
+
+		RECURRENCE-ID:20150424T083000Z <- La date que l'on veut redéfinir
+
+		DTSTART:20150424T103000Z <- La réunion sera à 10h du même jour
+		DTEND:20150424T113000Z <- Et finira une heure plus tard
+
+	END:VEVENT
+
+END:VCALENDAR
+```
+
+(Rappel: Il ne faut pas employer de tabulation ni de ligne vide dans un vrai fichier iCalendar)
+
+
+*Pour plus d'information sur le format iCalendar: [RFC 5545](http://tools.ietf.org/html/rfc5545)*
+
+
+
+5) Les requêtes CalDAV
+----------------------
+
+
+**Cette partie est à effectuer**
