@@ -18,7 +18,8 @@ Tutoriel: Comprendre CalDAV et l'appliquer
   * [Données utiles](#donn%C3%A9es-utiles)
   * [Exemple](#exemple)
 3. [La récurrence](#3-la-r%C3%A9currence)
-
+  * [Récurrence simple](#r%C3%A9currence-simple)
+  * [Précisions simples](#pr%C3%A9cisions-simples)
 
 
 
@@ -107,6 +108,8 @@ Un objet **vEVENT** **peut** avoir un champ **Status** pouvant avoir comme valeu
 
 Un objet **vEVENT** doit renseigner l'heure et la date à laquelle il a été créé. Il s'agit du champs "DTSTAMP" au format UTC. Ex: `DTSTAMP:20150421T090945Z` défini le 21 avril 2015 à 11 heures 9 et 45 secondes à Europe/Paris (UTC+2).
 
+*(todo: ajouter support tzid)*
+
 #### Données utiles
 
 Un objet **vEVENT** ajoute un résumé de l'événement. Il est défini par la ligne `SUMMARY:{Le résumé de l'événement}`. Il s'agit de ce qui sera affiché dans le client.
@@ -142,12 +145,36 @@ END:VCALENDAR
 
 (Rappel: Il ne faut pas employer de tabulation ni de ligne vide dans un vrai fichier iCalendar)
 
+Note: Il est possible d'avoir plusieurs objets vEVENT dans un même vCALENDAR.
+
 
 3) La récurrence
 ----------------
 
-Les objets **vEVENT** peuvent ajouter une règle de récurrence. Par exemple, si on veut que notre réunion du service compta soit une 
+Les objets **vEVENT** peuvent ajouter une règle de récurrence. Par exemple, si on veut que notre réunion du service compta soit une réunion hebdomadaire.
 
 #### Récurrence simple
 
-Il est possible 
+Il est possible d'effectuer des récurrences simple du style: "Tous les jours", "Toutes les semaines", etc..
+
+Pour cela, il faut ajouter le champs **RRULE** dans l'objet **vEVENT**. Exemples:
+
+```
+RRULE:FREQ=DAILY
+RRULE:FREQ=WEEKLY
+RRULE:FREQ=YEARLY
+```
+
+#### Précisions simples
+
+Il est possible d'ajouter des précisions à la fréquence grâce à `BYMONTH`, `BYWEEKNO`, `BYDAY`, `BYHOUR`, `BYMINUTE`
+
+Les règles s'appliquent de gauche à droite. Exemple:
+
+```
+RRULE:FREQ=WEEKLY <- Toutes les semaines
+RRULE:FREQ=WEEKLY;BYMONTH=1,2,3,4,5,6,9,10,11,12 <- Toutes les semaines sauf durant juillet et août
+RRULE:FREQ=WEEKLY;BYMONTH=1,2,3,4,5,6,9,10,11,12;BYDAY=MO,WE <- Toutes les semaines, sauf l'été, le lundi et le mercredi
+```
+
+*Liste des précisions: [RFC 5545 Secion 3.3.10](http://tools.ietf.org/html/rfc5545#section-3.3.10)*
