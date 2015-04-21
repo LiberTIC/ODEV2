@@ -7,9 +7,11 @@ Modèle d'un Événement
 
 *Note 3: Le suffixe "X-" sera remplacé par "X-ODE-"*
 
+*Note 4: Activez le mode raw si vous n'arrivez pas à voir le tableau en entier*
+
 
 | Propriété       | Nom iCalendar    | Type     | Description                    | Source     | Avis              | Exemple                  |
-|:----------------|:-----------------|:--------:|:-------------------------------|:-----------|:------------------|-------------------------:|
+|:----------------|:-----------------|:--------:|:-------------------------------|:-----------|:------------------|:-------------------------|
 | Nom             | SUMMARY          | Texte    | Nom de l'événement             | iCalendar  | **Indispensable** | Concert Shakaponk        |
 | UID             | UID              | Nombre   | Identifiant Unique de l'event  | iCalendar  | **Indispensable** | SL-2015-XYZ-004          |
 | Date début      | DTSTART          | Date     | Date et heure de début         | iCalendar  | **Indispensable** | 2014-06-20 / 20:00       |
@@ -34,6 +36,8 @@ Modèle d'un Événement
 | Prix réduit     | X-PRICE-REDUCED  | Nombre   | Prix au tarif réduit           | N\A        | Important (Opt.)  | 7.5 (7.5 euros)          |
 | Prix enfant     | X-PRICE-CHILDREN | Nombre   | Prix au tarif enfant           | N\A        | Important (Opt.)  | 5 (5 euros)              |
 
+
+(Idées en vrac: contact/ville/categories/tags)
 
 Sources:
 * [RFC iCalendar](https://tools.ietf.org/html/rfc5545)
