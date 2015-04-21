@@ -23,6 +23,9 @@ Tutoriel: Comprendre CalDAV et l'appliquer
   * [Intervals](#intervals)
   * [Limites](#limites)
   * [Dates prédéfinis](#dates-pr%C3%A9d%C3%A9finis)
+  * [Exemple 2](#exemple-2)
+4. [Les exceptions](#4-les-exceptions)
+  * [Exception à l'unité](#exception-%C3%A0-lunit%C3%A9)
 
 
 
@@ -228,3 +231,75 @@ Il est possible, dans un objet **vEVENT**, de prédéfinir les dates de cet év�
 RDATE:20150421T123000Z <- Le 21/04/2015 à 12h30
 RDATE;VALUE=DATE:20150421,20150422,20150424 <- Les 21, 22 et 24 avril 2015
 ```
+
+
+#### Exemple 2
+
+Voici un exemple de calendrier avec le rendez-vous du service comptabilité toutes les deux semaines le lundi programmé pour 15 séances
+```
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Polypodes//CalInterne//FR
+
+	BEGIN:VEVENT
+	UID:123456789
+	DTSTAMP:20150421T090945Z
+
+		SUMMARY:Réunion service comptabilité
+		DTSTART:20150427T083000Z
+		DTEND:20150427T093000Z
+		LOCATION:Salle de réunion D
+
+		RRULE:WEEKLY;INTERVAL=2;BYDAY=MO;COUNT=15
+
+	END:VEVENT
+
+END:VCALENDAR
+```
+
+(Rappel: Il ne faut pas employer de tabulation ni de ligne vide dans un vrai fichier iCalendar)
+
+
+4) Les exceptions
+-----------------
+
+Il n'est pas rare de devoir ajouter des exceptions à des événements. Par exemple: Réunion de l'équipe comptabilité, sauf le 1er mai, car c'est la fête du travail.
+
+Avant d'ajouter de nombreuses exceptions, il est parfoit préférable de trouver une règle de récurrence.
+
+
+#### Exception à l'unité
+
+Il est possible d'ajouter une exception à un événement en ajoutant un champs `EXDATE` (ou `EXDATE;VALUE=DATE selon les clients).
+Par exemple, reprenons notre service comptabilité avec une réunion toutes les semaines le vendredi:
+
+Il s'avère que le 1er mai est un jour férié ! Pour ne pas ajouter un faux événement le 1er mai, nous devons ajouter une exception.
+```
+EXDATE;VALUE=DATE:20150501
+```
+
+
+C'est bien, sauf que Bill Jobs, le CEO de la boîte a décidé de faire un discours devant ses salariés le 24 avril à 9h ! Il faut donc retarder la réunion ce jour là.
+
+Pour cela, il faut rajouter un objet **vEVENT** possédant le même **UID**. De plus, il faut ajouter le champs **RECURRENCE-ID** pour préciser qu'elle est l'occurence que nous voulons enlever.
+
+Nous aurons donc ce résultat:
+```
+	{Objet vEVENT de base}
+
+	[...]
+
+	BEGIN:VEVENT
+	UID:XXX-000-001
+	DTSTAMP:20150421T090945Z
+
+		RECURRENCE-ID:20150424T083000Z <- La date que l'on veut redéfinir
+
+		DTSTART:20150424T103000Z <- La réunion sera à 10h du même jour
+		DTEND:20150424T113000Z <- Et finira une heure plus tard
+
+	END:VEVENT
+
+	[...]
+```
+
