@@ -20,6 +20,7 @@ Tutoriel: Comprendre CalDAV et l'appliquer
 3. [La récurrence](#3-la-r%C3%A9currence)
   * [Récurrence simple](#r%C3%A9currence-simple)
   * [Précisions simples](#pr%C3%A9cisions-simples)
+  * [Intervals](#intervals)
 
 
 
@@ -160,9 +161,10 @@ Il est possible d'effectuer des récurrences simple du style: "Tous les jours", 
 Pour cela, il faut ajouter le champs **RRULE** dans l'objet **vEVENT**. Exemples:
 
 ```
-RRULE:FREQ=DAILY
-RRULE:FREQ=WEEKLY
-RRULE:FREQ=YEARLY
+RRULE:FREQ=DAILY <- Tous les jours
+RRULE:FREQ=WEEKLY <- Toutes les semaines
+RRULE:FREQ=MONTHLY <- Tous les mois
+RRULE:FREQ=YEARLY <- Tous les ans
 ```
 
 #### Précisions simples
@@ -178,3 +180,16 @@ RRULE:FREQ=WEEKLY;BYMONTH=1,2,3,4,5,6,9,10,11,12;BYDAY=MO,WE <- Toutes les semai
 ```
 
 *Liste des précisions: [RFC 5545 Secion 3.3.10](http://tools.ietf.org/html/rfc5545#section-3.3.10)*
+
+#### Intervals
+
+Il est possible d'ajouter un interval entre chaque occurence d'un même événement. Pour cela, il faut ajouter `INTERVAL=XX` à **RRULE**.
+Si l'interval n'est pas indiqué, alors la valeur par défaut est 1.
+
+Exemples:
+
+```
+RRULE:FREQ=MONTHLY;INTERVAL=3 <- Tous les trimestres
+RRULE:FREQ=DAILY;INTERVAL=10 <- Tous les 10 jours
+RRULE:FREQ=WEEKLY <- Toutes les semaines
+```
