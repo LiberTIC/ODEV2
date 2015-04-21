@@ -21,6 +21,8 @@ Tutoriel: Comprendre CalDAV et l'appliquer
   * [Récurrence simple](#r%C3%A9currence-simple)
   * [Précisions simples](#pr%C3%A9cisions-simples)
   * [Intervals](#intervals)
+  * [Limites](#limites)
+  * [Dates prédéfinis](#dates-pr%C3%A9d%C3%A9finis)
 
 
 
@@ -167,6 +169,7 @@ RRULE:FREQ=MONTHLY <- Tous les mois
 RRULE:FREQ=YEARLY <- Tous les ans
 ```
 
+
 #### Précisions simples
 
 Il est possible d'ajouter des précisions à la fréquence grâce à `BYMONTH`, `BYWEEKNO`, `BYDAY`, `BYHOUR`, `BYMINUTE`
@@ -181,6 +184,7 @@ RRULE:FREQ=WEEKLY;BYMONTH=1,2,3,4,5,6,9,10,11,12;BYDAY=MO,WE <- Toutes les semai
 
 *Liste des précisions: [RFC 5545 Secion 3.3.10](http://tools.ietf.org/html/rfc5545#section-3.3.10)*
 
+
 #### Intervals
 
 Il est possible d'ajouter un interval entre chaque occurence d'un même événement. Pour cela, il faut ajouter `INTERVAL=XX` à **RRULE**.
@@ -192,4 +196,35 @@ Exemples:
 RRULE:FREQ=MONTHLY;INTERVAL=3 <- Tous les trimestres
 RRULE:FREQ=DAILY;INTERVAL=10 <- Tous les 10 jours
 RRULE:FREQ=WEEKLY <- Toutes les semaines
+```
+
+
+#### Limites
+
+Souvent, un événement, bien que récurrent, possède une limite. Il y a deux possibilités de préciser une limite:
+
+Par date avec `UNTIL`:
+```
+RRULE:FREQ=WEEKLY;UNTIL=20151231T235959Z <- Toutes les semaines jusqu'à fin 2015
+RRULE:FREQ=DAILY;UNTIL=20161003 <- Tous les jours jusqu'au 3 novembre 2016
+```
+
+Par nombre avec `COUNT`:
+```
+RRULE:FREQ=MONTHLY;COUNT=7 <- Tous les mois pour les 7 prochains mois
+RRULE:FREQ=DAILY;COUNT=2 <- Pour les deux prochains jours
+```
+
+UNTIL et COUNT ne peuvent pas être dans la même règle.
+
+Si UNTIL et COUNT ne sont pas indiqué, alors on peut considérer que la règle n'a pas de fin.
+
+
+#### Dates prédéfinis
+
+Il est possible, dans un objet **vEVENT**, de prédéfinir les dates de cet événement en utilisant `RDATE`. Ex:
+
+```
+RDATE:20150421T123000Z <- Le 21/04/2015 à 12h30
+RDATE;VALUE=DATE:20150421,20150422,20150424 <- Les 21, 22 et 24 avril 2015
 ```
