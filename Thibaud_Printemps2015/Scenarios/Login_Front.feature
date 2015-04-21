@@ -1,9 +1,9 @@
 # language: fr
 Fonctionnalité: Accéder au Front End
-				Afin de se connecter
-				En tant qu'utilisateur
-				Si je n'arrive pas à me connecter, je devrais pouvoir avoir des choix alternatifs
-				Tels que, réessayer, se créer un compte, réinitialiser son mot de passe
+		Afin de se connecter
+		En tant qu'utilisateur
+		Si je n'arrive pas à me connecter, je devrais pouvoir avoir des choix alternatifs
+		Tels que, réessayer, se créer un compte, réinitialiser son mot de passe
 
 	Scénario: Accéder à l'interface de connexion par clic
 		Étant donné que je suis à "/"
@@ -113,8 +113,8 @@ Fonctionnalité: Accéder au Front End
 		Étant donné que je suis à "/"
 		Quand je vais sur "/register"
 		Et que je saisis des identifiants de création
-			| login         | password      | password2     | email         |
-			| compteTestTmp | motDePasse123 | motDepasse789 | test@test.com |
+			| login          | password      | password2     | email         |
+			| compteTestTmp2 | motDePasse123 | motDepasse789 | test@test.com |
 		Et que je valide le formulaire
 		Alors je devrais voir "Les mots de passe ne correspondent pas"
 		Et je ne devrais pas voir "Vous avez reçu un email de confirmation"
@@ -125,8 +125,8 @@ Fonctionnalité: Accéder au Front End
 		Étant donné que je suis à "/"
 		Quand je vais sur "/register"
 		Et que je saisis des identifiants de création
-			| login         | password      | password2     | email          |
-			| compteTestTmp | motDePasse123 | motDepasse123 | deja@prise.com |
+			| login          | password      | password2     | email          |
+			| compteTestTmp2 | motDePasse123 | motDepasse123 | test@test.com |
 		Et que je valide le formulaire
 		Alors je devrais voir "L'adresse e-mail est déjà enregistré"
 		Et je ne devrais pas voir "Vous avez reçu un email de confirmation"
