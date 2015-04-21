@@ -25,7 +25,8 @@ Tutoriel: Comprendre CalDAV et l'appliquer
   * [Dates prédéfinis](#dates-pr%C3%A9d%C3%A9finis)
   * [Exemple 2](#exemple-2)
 4. [Les exceptions](#4-les-exceptions)
-  * [Exception à l'unité](#exception-%C3%A0-lunit%C3%A9)
+  * [Suppression d'occurence](#suppression-doccurence)
+  * [Modification d'occurence](#modification-doccurence)
 
 
 
@@ -101,6 +102,7 @@ PRODID:-//Polypodes//CalInterne//FR
 
 END:VCALENDAR
 ```
+
 
 #### Structure de l'Event
 
@@ -268,7 +270,7 @@ Il n'est pas rare de devoir ajouter des exceptions à des événements. Par exem
 Avant d'ajouter de nombreuses exceptions, il est parfoit préférable de trouver une règle de récurrence.
 
 
-#### Exception à l'unité
+#### Suppression d'occurence
 
 Il est possible d'ajouter une exception à un événement en ajoutant un champs `EXDATE` (ou `EXDATE;VALUE=DATE selon les clients).
 Par exemple, reprenons notre service comptabilité avec une réunion toutes les semaines le vendredi:
@@ -278,6 +280,8 @@ Il s'avère que le 1er mai est un jour férié ! Pour ne pas ajouter un faux év
 EXDATE;VALUE=DATE:20150501
 ```
 
+
+#### Modification d'occurence
 
 C'est bien, sauf que Bill Jobs, le CEO de la boîte a décidé de faire un discours devant ses salariés le 24 avril à 9h ! Il faut donc retarder la réunion ce jour là.
 
