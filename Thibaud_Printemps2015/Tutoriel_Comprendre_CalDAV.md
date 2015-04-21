@@ -30,6 +30,9 @@ Tutoriel: Comprendre CalDAV et l'appliquer
   * [Exemple 3](#exemple-3)
 5. [Les requêtes CalDAV](#5-les-requ%C3%AAtes-caldav)
 
+A. [Annexes](#a-annexes)
+  * [Propriétés Non-Standard](#propri%C3%A9t%C3%A9s-non-standard)
+
 
 
 1) CalDAV, kézaco ?
@@ -128,7 +131,7 @@ Un objet **vEVENT** ajoute un résumé de l'événement. Il est défini par la l
 
 Si l'événement à été modifié, il faut ajouter le champs **LAST-MODIFIED** au format UTC.
 
-Il est possible d'ajouter un lieu à l'événement grâce au champs **LOCATION**.
+Il est possible d'ajouter un lieu à l'événement grâce au champs **LOCATION** et/ou **GEO**
 
 
 #### Exemple
@@ -147,6 +150,7 @@ PRODID:-//Polypodes//CalInterne//FR
 		DTSTART:20150427T080000Z
 		DTEND:20150427T090000Z
 		LOCATION:Salle de réunion D
+		GEO:34.053501,-118.240071
 
 	END:VEVENT
 
@@ -360,3 +364,19 @@ END:VCALENDAR
 
 
 **Cette partie est à effectuer**
+
+
+A) Annexes
+----------
+
+#### Propriétés Non-Standard
+
+La [RFC 5545](http://tools.ietf.org/html/rfc5545#section-3.8.8.2) permet l'ajout de propriété non-standard dans un fichier iCalendar. Ces propriétés commencent par `X-`
+
+Par exemple, on pourrais ajouter un champs pour le prix de l'événement:
+
+```
+X-PRICE-STANDARD:10 <- 10 euros la place au tarif normal
+X-PRICE-CHILDREN:5  <- 5 euros la place pour les enfants
+(etc...)
+``
