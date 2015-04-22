@@ -3,11 +3,9 @@ Modèle d'un Événement
 
 *Note 1: Ceci est une* **proposition** *. Chaque propriété* **non indispensable** *peut être débattu.*
 
-*Note 2: Les nom iCalendar commençant par "X-" ne sont pas définitifs*
+*Note 2: Activez le mode raw si vous n'arrivez pas à voir le tableau en entier*
 
-*Note 3: Le suffixe "X-" sera remplacé par "X-ODE-"*
-
-*Note 4: Activez le mode raw si vous n'arrivez pas à voir le tableau en entier*
+*Note 3: Les dates seront au format [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601)*
 
 
 | Propriété        | Type     | Description                    | Source     | Avis préliminaire | Exemple                  |
@@ -19,8 +17,10 @@ Modèle d'un Événement
 |                  |          |                                |            |                   |                          |
 | **Date et heure**|          |                                |            |                   |                          |
 |                  |          |                                |            |                   |                          |
-| Date début       | Date     | Date et heure de début         | iCalendar  | **Indispensable** | 2014-06-20 / 20:00       |
-| Date fin         | Date     | Date et heure de fin           | iCalendar  | **Indispensable** | 2014-06-20 / 23:30       |
+| Date début       | Date     | Date et heure de début         | iCalendar  | **Indispensable** | 2015-06-20 / 20:00       |
+| Date fin         | Date     | Date et heure de fin           | iCalendar  | **Indispensable** | 2015-06-20 / 23:30       |
+| Date création    | Date     | Date de création de l'event    | ODE_V2     | Utile             | 2015-04-01 / 13:37       |
+| Date modification| Date     | Date de modif de l'événement   | ODE_V2     | Utile             | 2015-04-03 / 20:15       |
 |                  |          |                                |            |                   |                          |
 | **Localisation** [\[1\]](#liste-de-points-%C3%A0-d%C3%A9battre)||||       |                   |                          |
 |                  |          |                                |            |                   |                          |
@@ -39,7 +39,7 @@ Modèle d'un Événement
 | Sous-Événement   | UID      | UID d'un sous-événement        | schema.org | Utile (Optionnel) | SL-2015-XYZ-009          |
 | Super-Événement  | UID      | UID d'un sur-événement         | schema.org | Utile (Optionnel) | SL-2015-XYZ-001          |
 |                  |          |                                |            |                   |                          |
-| **Médias** [\[3\]](#liste-de-points-%C3%A0-d%C3%A9battre)||| |            |                   |                          |
+| **Médias** [\[2\]](#liste-de-points-%C3%A0-d%C3%A9battre)||| |            |                   |                          |
 |                  |          |                                |            |                   |                          |
 | Image            | URL      | Url d'une image de l'événement | schema.org | Très utile        | http://website/image.jpg |
 | URL              | URL      | URL sur le site organisateur   | schema.org | Important         | http://website/concert/  |
@@ -50,11 +50,11 @@ Modèle d'un Événement
 |                  |          |                                |            |                   |                          |
 | **Tarifs**       |          |                                |            |                   |                          |
 |                  |          |                                |            |                   |                          |
-| Prix standard    | Nombre   | Prix au tarif normal           | N\A        | Important         | 10 (10 €)                |
-| Prix réduit      | Nombre   | Prix au tarif réduit           | N\A        | Important (Opt.)  | 7.5 (7.5 €)              |
-| Prix enfant      | Nombre   | Prix au tarif enfant           | N\A        | Important (Opt.)  | 5 (5 €)                  |
+| Prix standard    | Nombre   | Prix au tarif normal           | ODE_V2     | Important         | 10 (10 €)                |
+| Prix réduit      | Nombre   | Prix au tarif réduit           | ODE_V2     | Important (Opt.)  | 7.5 (7.5 €)              |
+| Prix enfant      | Nombre   | Prix au tarif enfant           | ODE_V2     | Important (Opt.)  | 5 (5 €)                  |
 |                  |          |                                |            |                   |                          |
-| **Contacts** [\[2\]](#liste-de-points-%C3%A0-d%C3%A9battre)||||           |                   |                          |
+| **Contacts** [\[3\]](#liste-de-points-%C3%A0-d%C3%A9battre)||||           |                   |                          |
 |                  |          |                                |            |                   |                          |
 | Contact - Nom    | Texte    | Nom du contact                 | ODE_V1     | Utile             | John Smith               |
 | Contact - Email  | Email    | Email du contact               | ODE_V1     | Utile             | john.smith@email.com     |
@@ -67,8 +67,8 @@ Modèle d'un Événement
 
 #### Liste de points à débattre:
 * \[1\]: Géolocalisation ou Addresse
-* \[2\]: Ajout contact presse, ajout contact ticket ?
-* \[3\]: Vidéos, Sons ? Plus d'images ? Droit d'auteur sur les médias ?
+* \[2\]: Vidéos, Sons ? Plus d'images ? Droit d'auteur sur les médias ?
+* \[3\]: Ajout contact presse, ajout contact ticket ?
 
 
 #### Sources:
@@ -82,6 +82,8 @@ Modèle d'un Événement
 Définition technique des noms
 -----------------------------
 
+*Note 1: Les nom iCalendar commençant par "X-" ne sont pas définitifs car n'appartiennent pas au format iCalendar*
+
 | Propriété         | iCalendar               | Json, CSV & XML        | Obligatoire |
 |:------------------|:------------------------|:-----------------------|:-----------:|
 | Nom               | SUMMARY                 | name                   | Oui         |
@@ -89,6 +91,8 @@ Définition technique des noms
 | Description       | DESCRIPTION             | description            | Oui         |
 | Date début        | DTSTART                 | date_start             | Oui         |
 | Date fin          | DTEND                   | date_end               | Oui         |
+| Date création     | CREATED                 | date_created           | Oui         |
+| Date modification | LAST-MODIFIED           | date_modified          |             |
 | Lieu              | LOCATION                | location_name          |             |
 | Géolocalisaion    | GEO                     | geo                    |             |
 | Ville             | X-ODE-TOWN              | location_town          |             |
@@ -101,7 +105,7 @@ Définition technique des noms
 | Sous-Événement    | X-ODE-SUBEVENT          | subevent               |             |
 | Super-Événement   | X-ODE-SUPEREVENT        | superevent             |             |
 | Image             | X-ODE-IMAGE             | image                  |             |
-| URL               | X-ODE-URL               | url                    |             |
+| URL               | URL                     | url                    |             |
 | Langue            | X-ODE-LANGUAGE          | language               | Oui         |
 | Prix standard     | X-ODE-PRICE-STANDARD    | price_standard         |             |
 | Prix réduit       | X-ODE-PRICE-REDUCED     | price_reduced          |             |
