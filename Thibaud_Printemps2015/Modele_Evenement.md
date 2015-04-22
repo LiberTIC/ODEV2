@@ -7,6 +7,8 @@ Modèle d'un Événement
 
 *Note 3: Les dates seront au format [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601)*
 
+*Note 4: Le champs UID sera généré par le serveur et ne sera pas à fournir par l'utilisateur*
+
 
 | Propriété        | Type     | Description                    | Source     | Avis préliminaire | Exemple                  |
 |:-----------------|:--------:|:-------------------------------|:-----------|:------------------|:-------------------------|
