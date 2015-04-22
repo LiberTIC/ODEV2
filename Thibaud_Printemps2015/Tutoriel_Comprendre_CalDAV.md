@@ -373,10 +373,10 @@ A) Annexes
 
 La [RFC 5545](http://tools.ietf.org/html/rfc5545#section-3.8.8.2) permet l'ajout de propriété non-standard dans un fichier iCalendar. Ces propriétés commencent par `X-`
 
-Par exemple, on pourrais ajouter un champs pour le prix de l'événement:
+Par exemple, on pourrais ajouter un champs pour le prix d'un événement:
 
 ```
 X-PRICE-STANDARD:10 <- 10 euros la place au tarif normal
 X-PRICE-CHILDREN:5  <- 5 euros la place pour les enfants
 (etc...)
-``
+```
