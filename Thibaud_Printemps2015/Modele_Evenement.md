@@ -39,7 +39,7 @@ Modèle d'un Événement
 | Sous-Événement   | x-SUBEVENT       | UID      | UID d'un sous-événement        | schema.org | Utile (Optionnel) | SL-2015-XYZ-009          |
 | Super-Événement  | x-SUPEREVENT     | UID      | UID d'un sur-événement         | schema.org | Utile (Optionnel) | SL-2015-XYZ-001          |
 |                  |                  |          |                                |            |                   |                          |
-| **Médias**       |                  |          |                                |            |                   |                          |
+| **Médias** [\[3\]](#liste-de-points-%C3%A0-d%C3%A9battre)                    ||||            |                   |                          |
 |                  |                  |          |                                |            |                   |                          |
 | Image            | X-IMAGE          | URL      | Url d'une image de l'événement | schema.org | Très utile        | http://website/image.jpg |
 | URL              | X-URL            | URL      | URL sur le site organisateur   | schema.org | Important         | http://website/concert/  |
@@ -50,9 +50,9 @@ Modèle d'un Événement
 |                  |                  |          |                                |            |                   |                          |
 | **Tarifs**       |                  |          |                                |            |                   |                          |
 |                  |                  |          |                                |            |                   |                          |
-| Prix standard    | X-PRICE-STANDARD | Nombre   | Prix au tarif normal           | N\A        | Important         | 10 (10 euros)            |
-| Prix réduit      | X-PRICE-REDUCED  | Nombre   | Prix au tarif réduit           | N\A        | Important (Opt.)  | 7.5 (7.5 euros)          |
-| Prix enfant      | X-PRICE-CHILDREN | Nombre   | Prix au tarif enfant           | N\A        | Important (Opt.)  | 5 (5 euros)              |
+| Prix standard    | X-PRICE-STANDARD | Nombre   | Prix au tarif normal           | N\A        | Important         | 10 (10 €)                |
+| Prix réduit      | X-PRICE-REDUCED  | Nombre   | Prix au tarif réduit           | N\A        | Important (Opt.)  | 7.5 (7.5 €)              |
+| Prix enfant      | X-PRICE-CHILDREN | Nombre   | Prix au tarif enfant           | N\A        | Important (Opt.)  | 5 (5 €)                  |
 |                  |                  |          |                                |            |                   |                          |
 | **Contacts** [\[2\]](#liste-de-points-%C3%A0-d%C3%A9battre)                  ||||            |                   |                          |
 |                  |                  |          |                                |            |                   |                          |
@@ -67,7 +67,9 @@ Modèle d'un Événement
 
 #### Liste de points à débattre:
 * \[1\]: Géolocalisation ou Addresse
-* \[2\]: Ajout contact presse ?
+* \[2\]: Ajout contact presse, ajout contact ticket ?
+* \[3\]: Vidéos, Sons ? Plus d'images ? Droit d'auteur sur les médias ?
+
 
 #### Sources:
 * [RFC iCalendar](https://tools.ietf.org/html/rfc5545)
