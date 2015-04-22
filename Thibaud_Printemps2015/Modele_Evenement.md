@@ -96,7 +96,7 @@ Définition technique des noms
 | Date création     | CREATED                 | date_created           | Oui         |
 | Date modification | LAST-MODIFIED           | date_modified          |             |
 | Lieu              | LOCATION                | location_name          |             |
-| Géolocalisaion    | GEO                     | geo                    |             |
+| Géolocalisation   | GEO                     | geo                    |             |
 | Ville             | X-ODE-TOWN              | location_town          |             |
 | Pays              | X-ODE-COUNTRY           | location_country       |             |
 | Capacité du lieu  | X-ODE-LOCATION-CAPACITY | location_capacity      |             |
