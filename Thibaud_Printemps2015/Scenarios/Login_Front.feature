@@ -8,8 +8,9 @@ Fonctionnalité: Accéder au Front End
 	Scénario: Accéder à l'interface de connexion par clic
 		Étant donné que je suis à "/"
 		Quand je clique sur le lien "Se connecter"
-		Alors je devrais voir "Se connecter"
-		Et je devrais voir "Pseudo"
+		Alors je devrais être sur "/login"
+		Et je devrais voir "Se connecter"
+		Et je devrais voir "Nom d'utilisateur"
 		Et je devrais voir "Mot de passe"
 		Et le code de status de la réponse ne devrait pas être 500
 
@@ -17,28 +18,29 @@ Fonctionnalité: Accéder au Front End
 		Étant donné que je suis à "/"
 		Quand je vais sur "/login"
 		Alors je devrais voir "Se connecter"
-		Et je devrais voir "Pseudo"
+		Et je devrais voir "Se connecter"
+		Et je devrais voir "Nom d'utilisateur"
 		Et je devrais voir "Mot de passe"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Accéder à l'interface de création de compte par clic
 		Étant donné que je suis à "/"
-		Quand je clique sur le lien "S'enregistrer"
-		Alors je devrais voir "S'enregistrer"
-		Et je devrais voir "Pseudo"
+		Quand je clique sur le lien "Inscription"
+		Alors je devrais voir "Inscription"
+		Et je devrais voir "Nom d'utilisateur"
 		Et je devrais voir "Mot de passe"
-		Et je devrais voir "Retaper mot de passe"
-		Et je devrais voir "Addresse E-mail"
+		Et je devrais voir "Vérification"
+		Et je devrais voir "Adresse e-mail"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Accéder à l'interface de création de compte par url
 		Etant donné que je suis à "/"
 		Quand je vais sur "/register"
-		Alors je devrais voir "S'enregistrer"
-		Et je devrais voir "Pseudo"
+		Alors je devrais voir "Inscription"
+		Et je devrais voir "Nom d'utilisateur"
 		Et je devrais voir "Mot de passe"
-		Et je devrais voir "Retaper mot de passe"
-		Et je devrais voir "Addresse E-mail"
+		Et je devrais voir "Vérification"
+		Et je devrais voir "Adresse e-mail"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Accéder à l'interface de réinitialisation de mot de passe par clic
@@ -46,16 +48,16 @@ Fonctionnalité: Accéder au Front End
 		Quand je vais sur "/login"
 		Et que je clique sur le lien "Mot de passe oublié"
 		Alors je devrais voir "Réinitialiser un mot de passe"
-		Et je devrais voir "Addresse e-mail"
-		Et je ne devrais pas voir "Pseudo"
+		Et je devrais voir "Adresse e-mail"
+		Et je ne devrais pas voir "Nom d'utilisateur"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Accéder à l'interface de réinitialisation de mot de passe par url
 		Étant donné que je suis à "/"
 		Quand je vais sur "/lostpassword"
-		Alors je devrais voir "Addresse e-mail"
+		Alors je devrais voir "Adresse e-mail"
 		Et je devrais voir "Réinitialiser un mot de passe"
-		Et je ne devrais pas voir "Pseudo"
+		Et je ne devrais pas voir "Nom d'utilisateur"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Se connecter avec de bons identifiants
@@ -65,11 +67,11 @@ Fonctionnalité: Accéder au Front End
 			| login      | password      |
 			| compteTest | motDePasse123 |
 		Et que je valide le formulaire
-		Alors je devrais voir "Bonjour, compteTest"
+		Alors je devrais voir "Connecté"
 		Et je ne devrais pas voir "Se connecter"
 		Et je ne devrais pas voir "S'enregistrer"
 		Et je ne devrais pas voir "Mauvais identifiants"
-		Et je devrais voir "Se déconnecter"
+		Et je devrais voir "Déconnexion"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Se connecter avec de mauvais identifiants
@@ -80,9 +82,9 @@ Fonctionnalité: Accéder au Front End
 			| mauvaisCompte | mauvaisMotDePasse |
 		Et que je valide le formulaire
 		Alors je ne devrais pas voir "Bonjour, mauvaisCompte"
-		Et je devrais voir "Mauvais identifiants"
+		Et je devrais voir "incorrect"
 		Et je devrais voir "Oubli de mot de passe ?"
-		Et je devrais voir "Pseudo"
+		Et je devrais voir "Nom d'utilisateur"
 		Et je devrais voir "Mot de passe"
 		Et le code de status de la réponse ne devrait pas être 500
 
@@ -91,11 +93,12 @@ Fonctionnalité: Accéder au Front End
 		Quand je vais sur "/register"
 		Et que je saisis des identifiants de création
 			| login         | password      | password2     | email         |
-			| compteTestTmp | motDePasse123 | motDepasse123 | test@test.com |
+			| compteTestTmp | motDePasse123 | motDePasse123 | testTmp@test.com |
 		Et que je valide le formulaire
-		Alors je devrais voir "Vous avez reçu un email de confirmation"
-		Et je devrais voir "Se connecter"
+		Alors je devrais voir "Un mail a été envoyé à l'adresse"
+		Et je devrais voir "Retourner à la page d'accueil"
 		Et le code de status de la réponse ne devrait pas être 500
+# Ne pas oublier de supprimer le compte!
 
 	Scénario: S'enregistrer avec un pseudo déjà pris
 		Étant donné que je suis à "/"
@@ -104,9 +107,9 @@ Fonctionnalité: Accéder au Front End
 			| login         | password      | password2     | email         |
 			| compteTest    | motDePasse123 | motDepasse123 | test@test.com |
 		Et que je valide le formulaire
-		Alors je devrais voir "Ce pseudo est déjà utilisé"
-		Et je ne devrais pas voir "Vous avez reçu un email de confirmation"
-		Et je devrais voir "S'enregistrer"
+		Alors je devrais voir "Le nom d'utilisateur est déjà utilisé"
+		Et je ne devrais pas voir "Un mail a été envoyé à l'adresse"
+		Et je devrais voir "Inscription"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: S'enregistrer avec des mots de passe différents
@@ -116,9 +119,9 @@ Fonctionnalité: Accéder au Front End
 			| login          | password      | password2     | email         |
 			| compteTestTmp2 | motDePasse123 | motDepasse789 | test@test.com |
 		Et que je valide le formulaire
-		Alors je devrais voir "Les mots de passe ne correspondent pas"
-		Et je ne devrais pas voir "Vous avez reçu un email de confirmation"
-		Et je devrais voir "S'enregistrer"
+		Alors je devrais voir "Les deux mots de passe ne sont pas identiques"
+		Et je ne devrais pas voir "Un mail a été envoyé à l'adresse"
+		Et je devrais voir "Inscription"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: S'enregistrer avec une adresse email déjà prise
@@ -128,9 +131,9 @@ Fonctionnalité: Accéder au Front End
 			| login          | password      | password2     | email          |
 			| compteTestTmp2 | motDePasse123 | motDepasse123 | test@test.com |
 		Et que je valide le formulaire
-		Alors je devrais voir "L'adresse e-mail est déjà enregistré"
-		Et je ne devrais pas voir "Vous avez reçu un email de confirmation"
-		Et je devrais voir "S'enregistrer"
+		Alors je devrais voir "L'adresse e-mail est déjà utilisée"
+		Et je ne devrais pas voir "Un mail a été envoyé à l'adresse"
+		Et je devrais voir "Inscription"
 		Et le code de status de la réponse ne devrait pas être 500
 
 	Scénario: Réinitialiser un mot de passe
@@ -152,7 +155,8 @@ Fonctionnalité: Accéder au Front End
 			| compteTest | motDePasse123 |
 		Et que je valide le formulaire
 		Et que je vais sur "/login"
-		Alors je ne devrais pas voir "Se connecter"
+		Alors je devrais voir "Connecté"
+		Et je ne devrais pas voir "Se connecter"
 		Et je ne devrais pas voir "S'enregistrer"
 		Et le code de status de la réponse ne devrait pas être 500
 
@@ -164,7 +168,8 @@ Fonctionnalité: Accéder au Front End
 			| compteTest | motDePasse123 |
 		Et que je valide le formulaire
 		Et que je vais sur "/register"
-		Alors je ne devrais pas voir "S'enregistrer"
+		Alors je devrais voir "Connecté"
+		Et je ne devrais pas voir "S'enregistrer"
 		Et je ne devrais pas voir "Se connecter"
 		Et le code de status de la réponse ne devrait pas être 500
 
@@ -176,7 +181,8 @@ Fonctionnalité: Accéder au Front End
 			| compteTest | motDePasse123 |
 		Et que je valide le formulaire
 		Et que je vais sur "/register"
-		Alors je ne devrais pas voir "S'enregistrer"
+		Alors je devrais voir "Connecté"
+		Et je ne devrais pas voir "S'enregistrer"
 		Et je ne devrais pas voir "Réinitialiser un mot de passe"
 		Et je ne devrais pas voir "Se connecter"
 		Et le code de status de la réponse ne devrait pas être 500
