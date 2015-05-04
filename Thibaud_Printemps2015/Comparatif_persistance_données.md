@@ -37,6 +37,7 @@ Comparatif de CalDAV, SQL et Elastic Search pour la persistance des données
 
 **Inconvénients:**
 
+* Ne permet pas une utilisation par les clients iCalendar (Google Calendar, iCal (Apple), etc...
 * Ne permet pas une gestion de la récurrence
 
 
@@ -52,4 +53,5 @@ Comparatif de CalDAV, SQL et Elastic Search pour la persistance des données
 
 **Inconvénients:**
 
-* ne permet pas une gestion de la récurrence
+* Ne permet pas une utilisation par les clients iCalendar (Google Calendar, iCal (Apple), etc...
+* Ne permet pas une gestion de la récurrence
