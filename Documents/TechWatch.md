@@ -1,5 +1,7 @@
 # Technical Watch around ODE project
 
+Check out the [CalDAV resource website](http://caldav.calconnect.org/)
+
 CalDAV servers
 
 - http://sabre.io
