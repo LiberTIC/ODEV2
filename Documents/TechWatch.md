@@ -48,4 +48,6 @@ CalDAV clients
 - parse and manipulate iCalendar and vCard objects: https://github.com/fruux/sabre-vobject & http://sabre.io/vobject
 
 
-## [CalConnectSM, The Calendaring and Scheduling Consortium](http://www.calconnect.org/resources.shtml): Resources
+## CalConnectSM
+
+[CalConnectSM, The Calendaring and Scheduling Consortium](http://www.calconnect.org/resources.shtml): Resources
