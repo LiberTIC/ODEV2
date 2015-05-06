@@ -1,0 +1,28 @@
+default:
+    suites:
+        default:
+            type: symfony_bundle
+            bundle: 'AppBundle'
+            contexts:
+                - AppBundle\Features\Context\FeatureContext:
+                    simpleArg: 'string'
+                    session:   @session
+                - behatch:browser
+                - behatch:debug
+                - behatch:system
+                - behatch:json
+                - behatch:table
+                - behatch:rest
+    extensions:
+        Sanpi\Behatch\Extension: ~
+        Behat\WebApiExtension: ~
+        Behat\Symfony2Extension:
+            kernel:
+                env: test
+                debug: true
+        Behat\MinkExtension:
+            base_url: http://127.0.0.1:8000
+            default_session: 'symfony2'
+            sessions:
+                symfony2:
+                    symfony2: ~
