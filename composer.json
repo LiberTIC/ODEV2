@@ -24,7 +24,15 @@
         "sabre/dav": "~2.1.3"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~2.3"
+        "sensio/generator-bundle":      "~2.3",
+        "phpunit/phpunit":              "~4.6",
+        "squizlabs/php_codesniffer":    "2.0.x-dev",
+        "sebastian/phpcpd":             "*",
+        "phploc/phploc" :               "*",
+        "phpmd/phpmd" :                 "@stable",
+        "pdepend/pdepend" :             "2.0.*",
+        "fabpot/php-cs-fixer":          "@stable"
+
     },
     "scripts": {
         "post-root-package-install": [
