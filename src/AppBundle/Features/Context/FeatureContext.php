@@ -87,7 +87,7 @@ class FeatureContext extends MinkContext implements KernelAwareContext
         $page->fillField('password', $hash[0]['password']);
     }
 
-     /**
+    /**
      * @Given /^que je saisis une tâche$/
      */
     public function queJeSaisisUneTache(TableNode $table)
