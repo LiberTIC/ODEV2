@@ -10,7 +10,7 @@ use Sabre;
 
 class CalDAVController extends Controller
 {
-    public function indexAction($url = null, Request $request)
+    public function indexAction(Request $request)
     {
         //return $this->render('caldav/index.html.twig');
 
