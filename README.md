@@ -1,5 +1,7 @@
 # ODEV2
 
+###/!\ Les documents ont été déplacé dans le dossier /doc ! /!\
+
 ## Analyse du projet Open Data Events
 
 Ce dépôt conserve les documents et l'analyse de la v1 et ceux du prototype de la v2, ainsi que les compte-rendus des réunions de janvier-février 2015 
