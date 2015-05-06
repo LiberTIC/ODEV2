@@ -1,0 +1,10 @@
+
+homepage:
+    path:     /home
+    defaults: { _controller: AppBundle:Default:index }
+
+caldav:
+    path:     /caldav/{url}
+    defaults: { _controller: AppBundle:CalDAV:index, url: null }
+    requirements:
+        url: ".*"
