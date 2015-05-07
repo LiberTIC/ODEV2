@@ -1,6 +1,6 @@
 {
-    "name": "thibaud/odev2",
-    "license": "proprietary",
+    "name": "LiberTIC/ODEV2",
+    "license": "MIT",
     "type": "project",
     "autoload": {
         "psr-0": {
@@ -25,7 +25,23 @@
 	"elasticsearch/elasticsearch": "~1.0"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~2.3"
+        "sensio/generator-bundle":      "~2.3",
+        "phpunit/phpunit":              "~4.6",
+        "squizlabs/php_codesniffer":    "2.0.x-dev",
+        "sebastian/phpcpd":             "*",
+        "phploc/phploc" :               "*",
+        "phpmd/phpmd" :                 "@stable",
+        "pdepend/pdepend" :             "2.0.*",
+        "fabpot/php-cs-fixer":          "@stable",
+        "phpunit/phpunit":              "4.5.*",
+        "behat/behat":                  "~3.0@stable",
+        "behat/mink":                   "~1.7@dev",
+        "behat/mink-goutte-driver":     "@stable",
+        "behat/symfony2-extension":     "2.0.x-dev",
+        "behat/web-api-extension":      "~1.0@dev",
+        "knplabs/friendly-contexts":    "dev-master",
+        "behatch/contexts":             "*"
+
     },
     "scripts": {
         "post-root-package-install": [

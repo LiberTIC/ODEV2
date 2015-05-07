@@ -2,6 +2,37 @@
 
 ###/!\ Les documents ont été déplacé dans le dossier /doc ! /!\
 
+
+## Installation:
+
+```bash
+git https://github.com/LiberTIC/ODEV2.git
+cd ODEV2
+# The install process warns you
+# about requirements and configuration of Apache2, MySQL & PHP5.
+make
+make install
+php app/console server:run
+```
+
+
+## Qualité & tests
+
+```bash
+make quality
+make tests
+```
+
+## License, Copyright & Contributeurs
+
+(c) 2015 LiberTIC
+
+Licence: [MIT (X11)](http://en.wikipedia.org/wiki/MIT_License)
+
+Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
+
+[Contributeurs](https://github.com/LiberTIC/ODEV2/graphs/contributors)
+
 ## Analyse du projet Open Data Events
 
 Ce dépôt conserve les documents et l'analyse de la v1 et ceux du prototype de la v2, ainsi que les compte-rendus des réunions de janvier-février 2015 
