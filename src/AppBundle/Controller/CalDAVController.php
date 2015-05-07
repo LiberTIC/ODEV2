@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use PDO;
 use Sabre;
+use Elasticsearch;
+use AppBundle\Backend\ES;
 
 class CalDAVController extends Controller
 {
@@ -19,6 +21,8 @@ class CalDAVController extends Controller
         $baseUri = '/caldav/';
 
         $pdo = new PDO('mysql:dbname=sabredav;host=127.0.0.1', 'root', '');
+
+        $es = new Elasticsearch\Client();
 
         /*function exception_error_handler($errno, $errstr, $errfile, $errline ) {
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
@@ -61,9 +65,12 @@ class CalDAVController extends Controller
         $server->exec();
         $server->httpResponse->setHeader('Content-Security-Policy', "allow 'self';");
 
-        $this->logIt($request, $server->httpResponse);
+		//$this->logIt($request,$server->httpResponse);
 
-        return new Response($server->httpResponse->getBody(), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
+		if (is_string($server->httpResponse->getBody()))
+			return new Response($server->httpResponse->getBody(),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
+		else 
+			return new Response(stream_get_contents($server->httpResponse->getBody()),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
     }
 
     private function logIt($request, $response)
