@@ -69,7 +69,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
         	$src = $cal["_source"];
 
-	        $calendar = array('id' => $cal["_id"],
+	        $calendar = array('id' => $src["id"],
 	        		  'uri' => $src["uri"],
 	        		  'principaluri' => $src["principaluri"],
 	        		  '{' . CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => 'http://sabre.io/ns/sync/' . $src["synctoken"],
@@ -90,60 +90,50 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
     }
 
-    /**
-     * Creates a new calendar for a principal.
-     *
-     * If the creation was a success, an id must be returned that can be used
-     * to reference this calendar in other methods, such as updateCalendar.
-     *
-     * @param string $principalUri
-     * @param string $calendarUri
-     * @param array $properties
-     * @return string
-     */
     function createCalendar($principalUri, $calendarUri, array $properties) {
 
-        /*$fieldNames = [
-            'principaluri',
-            'uri',
-            'synctoken',
-            'transparent',
-        ];
-        $values = [
-            ':principaluri' => $principalUri,
-            ':uri'          => $calendarUri,
-            ':synctoken'    => 1,
-            ':transparent'  => 0,
+        $indexValues = [
+            'id' => -1,
+            'principaluri' => $principalUri,
+            'displayname' => null,
+            'uri' => $calendarUri,
+            'synctoken' => 1,
+            'description' => null,
+            'calendarorder' => 0,
+            'calendarcolor' => null,
+            'timezone' => null,
+            'components' => null,
+            'transparent' => 0
         ];
 
         // Default value
         $sccs = '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set';
-        $fieldNames[] = 'components';
         if (!isset($properties[$sccs])) {
-            $values[':components'] = 'VEVENT,VTODO';
+            $indexValues['components'] = ['VEVENT','VTODO'];
         } else {
             if (!($properties[$sccs] instanceof CalDAV\Property\SupportedCalendarComponentSet)) {
                 throw new DAV\Exception('The ' . $sccs . ' property must be of type: \Sabre\CalDAV\Property\SupportedCalendarComponentSet');
             }
-            $values[':components'] = implode(',',$properties[$sccs]->getValue());
+            $indexValues['components'] = $properties[$sccs]->getValue();
         }
         $transp = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
         if (isset($properties[$transp])) {
-            $values[':transparent'] = $properties[$transp]->getValue()==='transparent';
+            $indexValues['transparent'] = $properties[$transp]->getValue()==='transparent';
         }
 
         foreach($this->propertyMap as $xmlName=>$dbName) {
             if (isset($properties[$xmlName])) {
-
-                $values[':' . $dbName] = $properties[$xmlName];
-                $fieldNames[] = $dbName;
+                $indexValues[$dbName] = $properties[$xmlName];
             }
         }
 
-        $stmt = $this->pdo->prepare("INSERT INTO ".$this->calendarTableName." (".implode(', ', $fieldNames).") VALUES (".implode(', ',array_keys($values)).")");
-        $stmt->execute($values);
+        $newIndex = $this->manager->nextIdOf($this->calendarTableName);
 
-        return $this->pdo->lastInsertId();*/
+        $indexValues['id'] = $newIndex;
+
+        $this->manager->simpleIndex($this->calendarTableName,$newIndex,$indexValues);
+
+        return $newIndex;
     }
 
     /**
@@ -231,7 +221,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         	$src = $obj["_source"];
 
         	 $object = [
-	        	'id' => $obj["_id"],
+	        	'id' => $src["id"],
 	        	'uri' => $src["uri"],
 	        	'lastmodified' => $src["lastmodified"],
 	        	'etag' => '"' . $src['etag'] . '"',
@@ -256,7 +246,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         $row = $hit[0]["_source"];
 
         return [
-            'id'            => $hit[0]['_id'],
+            'id'            => $row['id'],
             'uri'           => $row['uri'],
             'lastmodified'  => $row['lastmodified'],
             'etag'          => '"' . $row['etag'] . '"',
@@ -279,7 +269,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             $src = $obj["_source"];
 
              $object = [
-                'id' => $obj["_id"],
+                'id' => $src["id"],
                 'uri' => $src["uri"],
                 'lastmodified' => $src["lastmodified"],
                 'etag' => '"' . $src['etag'] . '"',
@@ -294,45 +284,29 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $objects;
     }
 
-
-    /**
-     * Creates a new calendar object.
-     *
-     * The object uri is only the basename, or filename and not a full path.
-     *
-     * It is possible return an etag from this function, which will be used in
-     * the response to this PUT request. Note that the ETag must be surrounded
-     * by double-quotes.
-     *
-     * However, you should only really return this ETag if you don't mangle the
-     * calendar-data. If the result of a subsequent GET to this object is not
-     * the exact same as this request body, you should omit the ETag.
-     *
-     * @param mixed $calendarId
-     * @param string $objectUri
-     * @param string $calendarData
-     * @return string|null
-     */
     function createCalendarObject($calendarId,$objectUri,$calendarData) {
 
-        /*$extraData = $this->getDenormalizedData($calendarData);
+        $extraData = $this->getDenormalizedData($calendarData);
 
-        $stmt = $this->pdo->prepare('INSERT INTO '.$this->calendarObjectTableName.' (calendarid, uri, calendardata, lastmodified, etag, size, componenttype, firstoccurence, lastoccurence, uid) VALUES (?,?,?,?,?,?,?,?,?,?)');
-        $stmt->execute([
-            $calendarId,
-            $objectUri,
-            $calendarData,
-            time(),
-            $extraData['etag'],
-            $extraData['size'],
-            $extraData['componentType'],
-            $extraData['firstOccurence'],
-            $extraData['lastOccurence'],
-            $extraData['uid'],
-        ]);
+        $id = $this->manager->nextIdOf($this->calendarObjectTableName);
+
+        $values = [
+            'id' => $id,
+            'uri' => $objectUri,
+            'lastmodified' => time(),
+            'etag' => $extraData['etag'],
+            'calendarid' => $calendarId,
+            'size' => $extraData['size'],
+            'calendardata' => $calendarData,
+            'component' => $extraData['componentType'],
+            'firstoccurence' => $extraData['firstOccurence'],
+            'lastoccurence' => $extraData['lastOccurence'],
+            'uid' => $extraData['uid']
+        ];
+
+        $this->manager->simpleIndex($this->calendarObjectTableName,$id,$values);
+
         $this->addChange($calendarId, $objectUri, 1);
-
-        return '"' . $extraData['etag'] . '"';*/
 
     }
 
@@ -367,24 +341,9 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
     }
 
-    /**
-     * Parses some information from calendar objects, used for optimized
-     * calendar-queries.
-     *
-     * Returns an array with the following keys:
-     *   * etag - An md5 checksum of the object without the quotes.
-     *   * size - Size of the object in bytes
-     *   * componentType - VEVENT, VTODO or VJOURNAL
-     *   * firstOccurence
-     *   * lastOccurence
-     *   * uid - value of the UID property
-     *
-     * @param string $calendarData
-     * @return array
-     */
     protected function getDenormalizedData($calendarData) {
 
-        /*$vObject = VObject\Reader::read($calendarData);
+        $vObject = VObject\Reader::read($calendarData);
         $componentType = null;
         $component = null;
         $firstOccurence = null;
@@ -442,7 +401,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             'firstOccurence' => $firstOccurence,
             'lastOccurence'  => $lastOccurence,
             'uid' => $uid,
-        ];*/
+        ];
 
     }
 
@@ -590,25 +549,6 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
     }
 
-    /**
-     * Searches through all of a users calendars and calendar objects to find
-     * an object with a specific UID.
-     *
-     * This method should return the path to this object, relative to the
-     * calendar home, so this path usually only contains two parts:
-     *
-     * calendarpath/objectpath.ics
-     *
-     * If the uid is not found, return null.
-     *
-     * This method should only consider * objects that the principal owns, so
-     * any calendars owned by other principals that also appear in this
-     * collection should be ignored.
-     *
-     * @param string $principalUri
-     * @param string $uid
-     * @return string|null
-     */
     function getCalendarObjectByUID($principalUri, $uid) {
 
         $searchResult = $this->manager->simpleQuery($this->calendarTableName,["principaluri" => $principalUri]);
@@ -618,7 +558,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         $calendarsUri = [];
 
         foreach($searchResult as $cal) {
-            $calendarsUri[$cal["_id"]] = $cal["_source"]["uri"];
+            $calendarsUri[$cal["_source"]["id"]] = $cal["_source"]["uri"];
         }
 
         $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => array_keys($calendarsUri)]);
@@ -629,65 +569,9 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
     }
 
-    /**
-     * The getChanges method returns all the changes that have happened, since
-     * the specified syncToken in the specified calendar.
-     *
-     * This function should return an array, such as the following:
-     *
-     * [
-     *   'syncToken' => 'The current synctoken',
-     *   'added'   => [
-     *      'new.txt',
-     *   ],
-     *   'modified'   => [
-     *      'modified.txt',
-     *   ],
-     *   'deleted' => [
-     *      'foo.php.bak',
-     *      'old.txt'
-     *   ]
-     * ];
-     *
-     * The returned syncToken property should reflect the *current* syncToken
-     * of the calendar, as reported in the {http://sabredav.org/ns}sync-token
-     * property this is needed here too, to ensure the operation is atomic.
-     *
-     * If the $syncToken argument is specified as null, this is an initial
-     * sync, and all members should be reported.
-     *
-     * The modified property is an array of nodenames that have changed since
-     * the last token.
-     *
-     * The deleted property is an array with nodenames, that have been deleted
-     * from collection.
-     *
-     * The $syncLevel argument is basically the 'depth' of the report. If it's
-     * 1, you only have to report changes that happened only directly in
-     * immediate descendants. If it's 2, it should also include changes from
-     * the nodes below the child collections. (grandchildren)
-     *
-     * The $limit argument allows a client to specify how many results should
-     * be returned at most. If the limit is not specified, it should be treated
-     * as infinite.
-     *
-     * If the limit (infinite or not) is higher than you're willing to return,
-     * you should throw a Sabre\DAV\Exception\TooMuchMatches() exception.
-     *
-     * If the syncToken is expired (due to data cleanup) or unknown, you must
-     * return null.
-     *
-     * The limit is 'suggestive'. You are free to ignore it.
-     *
-     * @param string $calendarId
-     * @param string $syncToken
-     * @param int $syncLevel
-     * @param int $limit
-     * @return array
-     */
     function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
 
-        $getResult = $this->manager->simpleGet($this->calendarTableName,$calendarid);
+        $getResult = $this->manager->simpleQuery($this->calendarTableName,["id" => $calendarId]);
 
         if (!$getResult["found"]) return null;
 
@@ -742,27 +626,22 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $result;
     }
 
-    /**
-     * Adds a change record to the calendarchanges table.
-     *
-     * @param mixed $calendarId
-     * @param string $objectUri
-     * @param int $operation 1 = add, 2 = modify, 3 = delete.
-     * @return void
-     */
     protected function addChange($calendarId, $objectUri, $operation) {
 
-        /*$stmt = $this->pdo->prepare('INSERT INTO ' . $this->calendarChangesTableName .' (uri, synctoken, calendarid, operation) SELECT ?, synctoken, ?, ? FROM ' . $this->calendarTableName .' WHERE id = ?');
-        $stmt->execute([
-            $objectUri,
-            $calendarId,
-            $operation,
-            $calendarId
-        ]);
-        $stmt = $this->pdo->prepare('UPDATE ' . $this->calendarTableName . ' SET synctoken = synctoken + 1 WHERE id = ?');
-        $stmt->execute([
-            $calendarId
-        ]);*/
+        $id = $this->manager->nextIdOf($this->calendarChangesTableName);
+        $synctoken = $this->manager->synctokenOf($calendarId);
+
+        $values = [
+            'id' => $id,
+            'uri' => $objectUri,
+            'synctoken' => $synctoken,
+            'calendarid' => $calendarId,
+            'operation' => $operation
+        ];
+
+        $this->manager->simpleIndex($this->calendarChangesTableName,$id,$values);
+
+        $this->manager->incSynctokenOf($calendarId);
 
     }
 

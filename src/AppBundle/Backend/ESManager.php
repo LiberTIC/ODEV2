@@ -17,12 +17,14 @@ class ESManager {
 	*	Simple Get mean we get a result with the id specified
 	*/
 	public function simpleGet($type,$id) {
+
+		//echo "WHAT THE FUCK?";
 		$getParams = array();
 		$getParams['index'] = $this->index;
 		$getParams['type'] = $type;
 		$getParams['id'] = $id;
 
-		return $client->get($getParams);
+		return $this->client->get($getParams);
 	}
 
 	/**
@@ -64,5 +66,61 @@ class ESManager {
         $retDoc = $this->client->search($searchParams);
 
         return $retDoc["hits"]["hits"];
+	}
+
+	/**
+	* Simple Index mean that we index with the parameters given
+	* Return the new id
+	*/
+	public function simpleIndex($type,$id,$params) {
+		$indexParams = array();
+		$indexParams['index'] = $this->index;
+		$indexParams['type'] = $type;
+		$indexParams['id'] = $id;
+		$indexParams['body'] = $params;
+
+		$this->incIdOf($type);
+
+		$this->client->index($indexParams);
+	}
+
+	/**
+	* Return the NEXT index to be used
+	*/
+	public function nextIdOf($type) {
+		return $this->simpleGet("auto_increments",1)["_source"][$type];
+	}
+
+	/**
+	* Increment the index to be used
+	*/
+	private function incIdOf($type) {
+		$updateParams = array();
+		$updateParams['index'] = $this->index;
+		$updateParams['type'] = "auto_increments";
+		$updateParams['id'] = 1;
+		$updateParams['body']['script'] = "ctx._source.".$type."+=1";
+
+		$this->client->update($updateParams);
+	}
+
+	/**
+	* Return the synctoken of an object
+	*/
+	public function synctokenOf($calendarId) {
+		return $this->simpleGet("calendars",$calendarId)["_source"]["synctoken"];
+	}
+
+	/**
+	* Increment the synctoken of an object
+	*/
+	public function incSynctokenOf($calendarId) {
+		$updateParams = array();
+		$updateParams['index'] = $this->index;
+		$updateParams['type'] = "calendars";
+		$updateParams['id'] = $calendarId;
+		$updateParams['body']['script'] = "ctx._source.synctoken+=1";
+
+		$this->client->update($updateParams);
 	}
 }
