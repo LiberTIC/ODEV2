@@ -53,28 +53,27 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
         $this->client = $client;
         $this->pdo = $pdo;
+
+        $this->manager = new ESManager($client);
     }
 
     function getCalendarsForUser($principalUri) {
 
-        $searchParams = array();
-        $searchParams['index'] = $this->index;
-        $searchParams['type'] = $this->calendarTableName;
-        $searchParams['body']["query"]["match"]["principaluri"] = $principalUri;
+        $searchResult = $this->manager->simpleQuery($this->calendarTableName,["principaluri" => $principalUri]);
 
-        $retDoc = $this->client->search($searchParams);
+        if (!$searchResult) return [];
 
         $calendars = [];
 
-        foreach($retDoc["hits"]["hits"] as $cal) {
+        foreach($searchResult as $cal) {
 
         	$src = $cal["_source"];
 
 	        $calendar = array('id' => $cal["_id"],
 	        		  'uri' => $src["uri"],
 	        		  'principaluri' => $src["principaluri"],
-	        		  '{' . CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => 'http://sabre.io/ns/sync/' . $src["sync_token"],
-	        		  '{http://sabredav.org/ns}sync-token' => $src["sync_token"],
+	        		  '{' . CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => 'http://sabre.io/ns/sync/' . $src["synctoken"],
+	        		  '{http://sabredav.org/ns}sync-token' => $src["synctoken"],
 	        		  '{' . CalDAV\Plugin::NS_CALDAV . '}supported-calendar-component-set' => new CalDAV\Property\SupportedCalendarComponentSet($src["components"]),
 	        		  '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp' => new CalDAV\Property\ScheduleCalendarTransp($src['transparent']?'transparent':'opaque'),
 	        		  '{DAV:}displayname' => $src["displayname"],
@@ -86,8 +85,6 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
 			$calendars[] = $calendar;
 	    }
-
-        //print_r($calendar);
 
         return $calendars;
 
@@ -224,16 +221,13 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
     function getCalendarObjects($calendarId) {
 
-        $searchParams = array();
-        $searchParams['index'] = $this->index;
-        $searchParams['type'] = $this->calendarObjectTableName;
-        $searchParams['body']["query"]["match"]["calendarid"] = $calendarId;
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId]);
 
-        $retDoc = $this->client->search($searchParams);
+        if (!$searchResult) return [];
 
         $objects = [];
 
-        foreach($retDoc["hits"]["hits"] as $obj) {
+        foreach($searchResult as $obj) {
         	$src = $obj["_source"];
 
         	 $object = [
@@ -249,57 +243,13 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 	        $objects[] = $object;
         }
 
-       
-
         return $objects;
 
     }
 
-    /**
-     * Returns information from a single calendar object, based on it's object
-     * uri.
-     *
-     * The object uri is only the basename, or filename and not a full path.
-     *
-     * The returned array must have the same keys as getCalendarObjects. The
-     * 'calendardata' object is required here though, while it's not required
-     * for getCalendarObjects.
-     *
-     * This method must return null if the object did not exist.
-     *
-     * @param string $calendarId
-     * @param string $objectUri
-     * @return array|null
-     */
     function getCalendarObject($calendarId,$objectUri) {
 
-        /*$stmt = $this->pdo->prepare('SELECT id, uri, lastmodified, etag, calendarid, size, calendardata, componenttype FROM '.$this->calendarObjectTableName.' WHERE calendarid = ? AND uri = ?');
-        $stmt->execute([$calendarId, $objectUri]);
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        if(!$row) return null;
-
-        return [
-            'id'            => $row['id'],
-            'uri'           => $row['uri'],
-            'lastmodified'  => $row['lastmodified'],
-            'etag'          => '"' . $row['etag'] . '"',
-            'calendarid'    => $row['calendarid'],
-            'size'          => (int)$row['size'],
-            'calendardata'  => $row['calendardata'],
-            'component'     => strtolower($row['componenttype']),
-         ];*/
-
-
-        $searchParams = array();
-        $searchParams['index'] = $this->index;
-        $searchParams['type'] = $this->calendarObjectTableName;
-        $searchParams['body']["query"]["bool"]["must"][0]["match"]["calendarid"] = $calendarId;
-        $searchParams['body']["query"]["bool"]["must"][1]["match"]["uri"] = $objectUri;
-
-        $retDoc = $this->client->search($searchParams);
-
-        $hit = $retDoc["hits"]["hits"];
+        $hit = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId, "uri" => $objectUri]);
 
         if ($hit == null) return null;
 
@@ -317,45 +267,31 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
          ];
     }
 
-    /**
-     * Returns a list of calendar objects.
-     *
-     * This method should work identical to getCalendarObject, but instead
-     * return all the calendar objects in the list as an array.
-     *
-     * If the backend supports this, it may allow for some speed-ups.
-     *
-     * @param mixed $calendarId
-     * @param array $uris
-     * @return array
-     */
     function getMultipleCalendarObjects($calendarId, array $uris) {
 
-        /*$query = 'SELECT id, uri, lastmodified, etag, calendarid, size, calendardata, componenttype FROM '.$this->calendarObjectTableName.' WHERE calendarid = ? AND uri IN (';
-        // Inserting a whole bunch of question marks
-        $query.=implode(',', array_fill(0, count($uris), '?'));
-        $query.=')';
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId, "uri" => $uris]);
 
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute(array_merge([$calendarId], $uris));
+        if (!$searchResult) return [];
 
-        $result = [];
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        $objects = [];
 
-            $result[] = [
-                'id'           => $row['id'],
-                'uri'          => $row['uri'],
-                'lastmodified' => $row['lastmodified'],
-                'etag'         => '"' . $row['etag'] . '"',
-                'calendarid'   => $row['calendarid'],
-                'size'         => (int)$row['size'],
-                'calendardata' => $row['calendardata'],
-                'component'    => strtolower($row['componenttype']),
+        foreach($searchResult as $obj) {
+            $src = $obj["_source"];
+
+             $object = [
+                'id' => $obj["_id"],
+                'uri' => $src["uri"],
+                'lastmodified' => $src["lastmodified"],
+                'etag' => '"' . $src['etag'] . '"',
+                'calendarid' => $src["calendarid"],
+                'size' => $src["size"],
+                'component' => strtolower($src["component"])
             ];
 
+            $objects[] = $object;
         }
-        return $result;*/
 
+        return $objects;
     }
 
 
@@ -675,26 +611,21 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      */
     function getCalendarObjectByUID($principalUri, $uid) {
 
-        /*$query = <<<SQL
-SELECT
-    calendars.uri AS calendaruri, calendarobjects.uri as objecturi
-FROM
-    $this->calendarObjectTableName AS calendarobjects
-LEFT JOIN
-    $this->calendarTableName AS calendars
-    ON calendarobjects.calendarid = calendars.id
-WHERE
-    calendars.principaluri = ?
-    AND
-    calendarobjects.uid = ?
-SQL;
+        $searchResult = $this->manager->simpleQuery($this->calendarTableName,["principaluri" => $principalUri]);
 
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$principalUri, $uid]);
+        if (!$searchResult) return null;
 
-        if ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            return $row['calendaruri'] . '/' . $row['objecturi'];
-        }*/
+        $calendarsUri = [];
+
+        foreach($searchResult as $cal) {
+            $calendarsUri[$cal["_id"]] = $cal["_source"]["uri"];
+        }
+
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => array_keys($calendarsUri)]);
+
+        if (!$searchResult) return null;
+
+        return $calendarsUri[$searchResult["_source"]["calendarid"]] . '/' . $searchResult["_source"]["uri"];
 
     }
 
@@ -756,37 +687,32 @@ SQL;
      */
     function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
 
-        // Current synctoken
-        /*$stmt = $this->pdo->prepare('SELECT synctoken FROM ' .$this->calendarTableName . ' WHERE id = ?');
-        $stmt->execute([ $calendarId ]);
-        $currentToken = $stmt->fetchColumn(0);
+        $getResult = $this->manager->simpleGet($this->calendarTableName,$calendarid);
 
-        if (is_null($currentToken)) return null;
+        if (!$getResult["found"]) return null;
+
+        $currentToken = $getResult["_source"]["synctoken"];
 
         $result = [
             'syncToken' => $currentToken,
             'added'     => [],
             'modified'  => [],
-            'deleted'   => [],
+            'deleted'   => []
         ];
 
         if ($syncToken) {
 
-            $query = "SELECT uri, operation FROM " . $this->calendarChangesTableName . " WHERE synctoken >= ? AND synctoken < ? AND calendarid = ? ORDER BY synctoken";
-            if ($limit>0) $query.= " LIMIT " . (int)$limit;
+            $params["query"]["filtered"]["filter"]["bool"]["must"]["term"]["calendarid"] = $calendarId;
+            $params["query"]["filtered"]["filter"]["bool"]["must"]["range"]["syncToken"] = ["gte" => $syncToken, "lt" => $currentToken];
 
-            // Fetching all changes
-            $stmt = $this->pdo->prepare($query);
-            $stmt->execute([$syncToken, $currentToken, $calendarId]);
+            $searchResult = $this->manager->complexQuery($this->calendarChangesTableName,$params,["synctoken" => "asc"]);
+
+            if (!$searchResult) return $result;
 
             $changes = [];
 
-            // This loop ensures that any duplicates are overwritten, only the
-            // last change on a node is relevant.
-            while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
-                $changes[$row['uri']] = $row['operation'];
-
+            foreach($searchResult as $ch) {
+                $changes[$ch["uri"]] = $ch["operation"];
             }
 
             foreach($changes as $uri => $operation) {
@@ -802,18 +728,18 @@ SQL;
                         $result['deleted'][] = $uri;
                         break;
                 }
-
             }
         } else {
-            // No synctoken supplied, this is the initial sync.
-            $query = "SELECT uri FROM " . $this->calendarObjectTableName . " WHERE calendarid = ?";
-            $stmt = $this->pdo->prepare($query);
-            $stmt->execute([$calendarId]);
+            $searchResult = $this->manager->simpleRequest($this->calendarObjectTableName,["calendarid" => $calendarId]);
 
-            $result['added'] = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            if (!$searchResult) return null;
+
+            foreach($searchResult as $ch) {
+                $result['added'][] = $ch["_source"]["uri"];
+            }
         }
-        return $result;*/
 
+        return $result;
     }
 
     /**
@@ -1058,6 +984,8 @@ SQL;
             'size'         => (int)$row['size'],
          ];*/
 
+         return [];
+
     }
 
     /**
@@ -1088,6 +1016,8 @@ SQL;
         }
 
         return $result;*/
+
+        return [];
 
     }
 

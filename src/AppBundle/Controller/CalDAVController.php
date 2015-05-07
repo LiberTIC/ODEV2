@@ -8,13 +8,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use PDO;
 use Sabre;
 use Elasticsearch;
-use AppBundle\Backend\ES;
+use AppBundle;
 
 class CalDAVController extends Controller
 {
     public function indexAction(Request $request)
     {
-        //return $this->render('caldav/index.html.twig');
 
         date_default_timezone_set('Europe/Paris');
 
@@ -22,16 +21,12 @@ class CalDAVController extends Controller
 
         $pdo = new PDO('mysql:dbname=sabredav;host=127.0.0.1', 'root', '');
 
-        $es = new Elasticsearch\Client();
-
-        /*function exception_error_handler($errno, $errstr, $errfile, $errline ) {
-            throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-        }
-        set_error_handler("exception_error_handler");*/
+        $client = new Elasticsearch\Client();
 
         #Backends
         $authBackend = new Sabre\DAV\Auth\Backend\PDO($pdo);
-        $calendarBackend = new Sabre\CalDAV\Backend\PDO($pdo);
+        //$calendarBackend = new Sabre\CalDAV\Backend\PDO($pdo);
+        $calendarBackend = new AppBundle\Backend\ES($client,$pdo);
         $principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
         $tree = [
@@ -65,9 +60,9 @@ class CalDAVController extends Controller
         $server->exec();
         $server->httpResponse->setHeader('Content-Security-Policy', "allow 'self';");
 
-		//$this->logIt($request,$server->httpResponse);
+		$this->logIt($request,$server->httpResponse);
 
-		if (is_string($server->httpResponse->getBody()))
+		if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null)
 			return new Response($server->httpResponse->getBody(),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
 		else 
 			return new Response(stream_get_contents($server->httpResponse->getBody()),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
