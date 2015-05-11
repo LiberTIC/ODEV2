@@ -15,7 +15,6 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 {
     const MAX_DATE = '2038-01-01';
 
-    protected $pdo;
     protected $client;
 
     public $index = 'caldav';
@@ -48,10 +47,9 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
-    public function __construct($client, \PDO $pdo)
+    public function __construct($client)
     {
         $this->client = $client;
-        $this->pdo = $pdo;
 
         $this->manager = new ESManager($client);
     }
@@ -135,75 +133,68 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $newIndex;
     }
 
-    /**
-     * Updates properties for a calendar.
-     *
-     * The list of mutations is stored in a Sabre\DAV\PropPatch object.
-     * To do the actual updates, you must tell this object which properties
-     * you're going to process with the handle() method.
-     *
-     * Calling the handle method is like telling the PropPatch object "I
-     * promise I can handle updating this property".
-     *
-     * Read the PropPatch documenation for more info and examples.
-     *
-     * @param string               $calendarId
-     * @param \Sabre\DAV\PropPatch $propPatch
-     */
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
     {
+        $searchResult = $this->manager->simpleGet($this->calendarTableName, $calendarId);
 
-        /*$supportedProperties = array_keys($this->propertyMap);
-        $supportedProperties[] = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
+        if ($searchResult == null) {
+            return;
+        }
 
-        $propPatch->handle($supportedProperties, function($mutations) use ($calendarId) {
+        $values = $searchResult['_source'];
+
+        $supportedProperties = array_keys($this->propertyMap);
+        $supportedProperties[] = '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp';
+
+        $propPatch->handle($supportedProperties, function ($mutations) use ($calendarId, $values) {
             $newValues = [];
-            foreach($mutations as $propertyName=>$propertyValue) {
-
-                switch($propertyName) {
-                    case '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp' :
+            foreach ($mutations as $propertyName => $propertyValue) {
+                switch ($propertyName) {
+                    case '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' :
                         $fieldName = 'transparent';
-                        $newValues[$fieldName] = $propertyValue->getValue()==='transparent';
+                        $newValues[$fieldName] = $propertyValue->getValue() === 'transparent';
                         break;
                     default :
                         $fieldName = $this->propertyMap[$propertyName];
                         $newValues[$fieldName] = $propertyValue;
                         break;
                 }
-
-            }
-            $valuesSql = [];
-            foreach($newValues as $fieldName=>$value) {
-                $valuesSql[] = $fieldName . ' = ?';
             }
 
-            $stmt = $this->pdo->prepare("UPDATE " . $this->calendarTableName . " SET " . implode(', ',$valuesSql) . " WHERE id = ?");
-            $newValues['id'] = $calendarId;
-            $stmt->execute(array_values($newValues));
+            foreach ($newValues as $fieldName => $value) {
+                $values[$fieldName] = $value;
+            }
 
-            $this->addChange($calendarId, "", 2);
+            $this->manager->simpleIndex($this->calendarTableName, $calendarId, $values);
+
+            $this->addChange($calendarId, '', 2);
 
             return true;
 
-        });*/
+        });
     }
 
-    /**
-     * Delete a calendar and all it's objects.
-     *
-     * @param string $calendarId
-     */
     public function deleteCalendar($calendarId)
     {
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
-        /*$stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarObjectTableName.' WHERE calendarid = ?');
-        $stmt->execute([$calendarId]);
+        if ($searchResult != null) {
+            foreach ($searchResult as $obj) {
+                $id = $obj['_source']['id'];
+                $this->manager->simpleDelete($this->calendarObjectTableName, $id);
+            }
+        }
 
-        $stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarTableName.' WHERE id = ?');
-        $stmt->execute([$calendarId]);
+        $this->manager->simpleDelete($this->calendarObjectTableName, $calendarId);
 
-        $stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarChangesTableName.' WHERE id = ?');
-        $stmt->execute([$calendarId]);*/
+        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['calendarid' => $calendarId]);
+
+        if ($searchResult != null) {
+            foreach ($searchResult as $chg) {
+                $id = $obj['_source']['id'];
+                $this->manager->simpleDelete($this->calendarChangesTableName, $id);
+            }
+        }
     }
 
     public function getCalendarObjects($calendarId)

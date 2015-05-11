@@ -80,6 +80,7 @@ class ESManager
         $indexParams['type'] = $type;
         $indexParams['id'] = $id;
         $indexParams['body'] = $params;
+        $indexParams['refresh'] = true;
 
         $this->incIdOf($type);
 
