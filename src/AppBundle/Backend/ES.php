@@ -2,24 +2,23 @@
 
 namespace AppBundle\Backend;
 
-use
-    Sabre\VObject,
-    Sabre\CalDAV,
-    Sabre\DAV,
-    Sabre\DAV\Exception\Forbidden,
-    Sabre\CalDAV\Backend\AbstractBackend,
-    Sabre\CalDAV\Backend\SyncSupport,
-    Sabre\CalDAV\Backend\SubscriptionSupport,
-    Sabre\CalDAV\Backend\SchedulingSupport;
+use Sabre\VObject;
+use Sabre\CalDAV;
+use Sabre\DAV;
+use Sabre\DAV\Exception\Forbidden;
+use Sabre\CalDAV\Backend\AbstractBackend;
+use Sabre\CalDAV\Backend\SyncSupport;
+use Sabre\CalDAV\Backend\SubscriptionSupport;
+use Sabre\CalDAV\Backend\SchedulingSupport;
 
-class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport {
-
+class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
+{
     const MAX_DATE = '2038-01-01';
 
     protected $pdo;
     protected $client;
 
-    public $index = "caldav";
+    public $index = 'caldav';
 
     public $calendarTableName = 'calendars';
 
@@ -32,66 +31,66 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
     public $calendarSubscriptionsTableName = 'calendarsubscriptions';
 
     public $propertyMap = [
-        '{DAV:}displayname'                          => 'displayname',
+        '{DAV:}displayname' => 'displayname',
         '{urn:ietf:params:xml:ns:caldav}calendar-description' => 'description',
-        '{urn:ietf:params:xml:ns:caldav}calendar-timezone'    => 'timezone',
-        '{http://apple.com/ns/ical/}calendar-order'  => 'calendarorder',
-        '{http://apple.com/ns/ical/}calendar-color'  => 'calendarcolor',
+        '{urn:ietf:params:xml:ns:caldav}calendar-timezone' => 'timezone',
+        '{http://apple.com/ns/ical/}calendar-order' => 'calendarorder',
+        '{http://apple.com/ns/ical/}calendar-color' => 'calendarcolor',
     ];
 
     public $subscriptionPropertyMap = [
-        '{DAV:}displayname'                                           => 'displayname',
-        '{http://apple.com/ns/ical/}refreshrate'                      => 'refreshrate',
-        '{http://apple.com/ns/ical/}calendar-order'                   => 'calendarorder',
-        '{http://apple.com/ns/ical/}calendar-color'                   => 'calendarcolor',
-        '{http://calendarserver.org/ns/}subscribed-strip-todos'       => 'striptodos',
-        '{http://calendarserver.org/ns/}subscribed-strip-alarms'      => 'stripalarms',
+        '{DAV:}displayname' => 'displayname',
+        '{http://apple.com/ns/ical/}refreshrate' => 'refreshrate',
+        '{http://apple.com/ns/ical/}calendar-order' => 'calendarorder',
+        '{http://apple.com/ns/ical/}calendar-color' => 'calendarcolor',
+        '{http://calendarserver.org/ns/}subscribed-strip-todos' => 'striptodos',
+        '{http://calendarserver.org/ns/}subscribed-strip-alarms' => 'stripalarms',
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
-    function __construct($client, \PDO $pdo) {
-
+    public function __construct($client, \PDO $pdo)
+    {
         $this->client = $client;
         $this->pdo = $pdo;
 
         $this->manager = new ESManager($client);
     }
 
-    function getCalendarsForUser($principalUri) {
+    public function getCalendarsForUser($principalUri)
+    {
+        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['principaluri' => $principalUri]);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarTableName,["principaluri" => $principalUri]);
-
-        if (!$searchResult) return [];
+        if (!$searchResult) {
+            return [];
+        }
 
         $calendars = [];
 
-        foreach($searchResult as $cal) {
+        foreach ($searchResult as $cal) {
+            $src = $cal['_source'];
 
-        	$src = $cal["_source"];
+            $calendar = array('id' => $src['id'],
+                      'uri' => $src['uri'],
+                      'principaluri' => $src['principaluri'],
+                      '{'.CalDAV\Plugin::NS_CALENDARSERVER.'}getctag' => 'http://sabre.io/ns/sync/'.$src['synctoken'],
+                      '{http://sabredav.org/ns}sync-token' => $src['synctoken'],
+                      '{'.CalDAV\Plugin::NS_CALDAV.'}supported-calendar-component-set' => new CalDAV\Property\SupportedCalendarComponentSet($src['components']),
+                      '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' => new CalDAV\Property\ScheduleCalendarTransp($src['transparent'] ? 'transparent' : 'opaque'),
+                      '{DAV:}displayname' => $src['displayname'],
+                      '{urn:ietf:params:xml:ns:caldav}calendar-description' => $src['description'],
+                      '{urn:ietf:params:xml:ns:caldav}calendar-timezone' => $src['timezone'],
+                      '{http://apple.com/ns/ical/}calendar-order' => $src['calendarorder'],
+                      '{http://apple.com/ns/ical/}calendar-color' => $src['calendarcolor'],
+                );
 
-	        $calendar = array('id' => $src["id"],
-	        		  'uri' => $src["uri"],
-	        		  'principaluri' => $src["principaluri"],
-	        		  '{' . CalDAV\Plugin::NS_CALENDARSERVER . '}getctag' => 'http://sabre.io/ns/sync/' . $src["synctoken"],
-	        		  '{http://sabredav.org/ns}sync-token' => $src["synctoken"],
-	        		  '{' . CalDAV\Plugin::NS_CALDAV . '}supported-calendar-component-set' => new CalDAV\Property\SupportedCalendarComponentSet($src["components"]),
-	        		  '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp' => new CalDAV\Property\ScheduleCalendarTransp($src['transparent']?'transparent':'opaque'),
-	        		  '{DAV:}displayname' => $src["displayname"],
-	        		  '{urn:ietf:params:xml:ns:caldav}calendar-description' => $src["description"],
-	        		  '{urn:ietf:params:xml:ns:caldav}calendar-timezone' => $src["timezone"],
-					  '{http://apple.com/ns/ical/}calendar-order' => $src["calendarorder"],
-					  '{http://apple.com/ns/ical/}calendar-color' =>  $src["calendarcolor"]
-	        	);
-
-			$calendars[] = $calendar;
-	    }
+            $calendars[] = $calendar;
+        }
 
         return $calendars;
-
     }
 
-    function createCalendar($principalUri, $calendarUri, array $properties) {
-
+    public function createCalendar($principalUri, $calendarUri, array $properties)
+    {
         $indexValues = [
             'id' => -1,
             'principaluri' => $principalUri,
@@ -103,7 +102,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             'calendarcolor' => null,
             'timezone' => null,
             'components' => null,
-            'transparent' => 0
+            'transparent' => 0,
         ];
 
         // Default value
@@ -112,16 +111,16 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             $indexValues['components'] = ['VEVENT','VTODO'];
         } else {
             if (!($properties[$sccs] instanceof CalDAV\Property\SupportedCalendarComponentSet)) {
-                throw new DAV\Exception('The ' . $sccs . ' property must be of type: \Sabre\CalDAV\Property\SupportedCalendarComponentSet');
+                throw new DAV\Exception('The '.$sccs.' property must be of type: \Sabre\CalDAV\Property\SupportedCalendarComponentSet');
             }
             $indexValues['components'] = $properties[$sccs]->getValue();
         }
-        $transp = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
+        $transp = '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp';
         if (isset($properties[$transp])) {
-            $indexValues['transparent'] = $properties[$transp]->getValue()==='transparent';
+            $indexValues['transparent'] = $properties[$transp]->getValue() === 'transparent';
         }
 
-        foreach($this->propertyMap as $xmlName=>$dbName) {
+        foreach ($this->propertyMap as $xmlName => $dbName) {
             if (isset($properties[$xmlName])) {
                 $indexValues[$dbName] = $properties[$xmlName];
             }
@@ -131,7 +130,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
         $indexValues['id'] = $newIndex;
 
-        $this->manager->simpleIndex($this->calendarTableName,$newIndex,$indexValues);
+        $this->manager->simpleIndex($this->calendarTableName, $newIndex, $indexValues);
 
         return $newIndex;
     }
@@ -148,11 +147,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      *
      * Read the PropPatch documenation for more info and examples.
      *
-     * @param string $calendarId
+     * @param string               $calendarId
      * @param \Sabre\DAV\PropPatch $propPatch
-     * @return void
      */
-    function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch) {
+    public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
+    {
 
         /*$supportedProperties = array_keys($this->propertyMap);
         $supportedProperties[] = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
@@ -187,16 +186,15 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             return true;
 
         });*/
-
     }
 
     /**
-     * Delete a calendar and all it's objects
+     * Delete a calendar and all it's objects.
      *
      * @param string $calendarId
-     * @return void
      */
-    function deleteCalendar($calendarId) {
+    public function deleteCalendar($calendarId)
+    {
 
         /*$stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarObjectTableName.' WHERE calendarid = ?');
         $stmt->execute([$calendarId]);
@@ -206,76 +204,29 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 
         $stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarChangesTableName.' WHERE id = ?');
         $stmt->execute([$calendarId]);*/
-
     }
 
-    function getCalendarObjects($calendarId) {
+    public function getCalendarObjects($calendarId)
+    {
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId]);
-
-        if (!$searchResult) return [];
-
-        $objects = [];
-
-        foreach($searchResult as $obj) {
-        	$src = $obj["_source"];
-
-        	 $object = [
-	        	'id' => $src["id"],
-	        	'uri' => $src["uri"],
-	        	'lastmodified' => $src["lastmodified"],
-	        	'etag' => '"' . $src['etag'] . '"',
-	        	'calendarid' => $src["calendarid"],
-	        	'size' => $src["size"],
-	        	'component' => strtolower($src["component"])
-	        ];
-
-	        $objects[] = $object;
+        if (!$searchResult) {
+            return [];
         }
 
-        return $objects;
-
-    }
-
-    function getCalendarObject($calendarId,$objectUri) {
-
-        $hit = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId, "uri" => $objectUri]);
-
-        if ($hit == null) return null;
-
-        $row = $hit[0]["_source"];
-
-        return [
-            'id'            => $row['id'],
-            'uri'           => $row['uri'],
-            'lastmodified'  => $row['lastmodified'],
-            'etag'          => '"' . $row['etag'] . '"',
-            'calendarid'    => $row['calendarid'],
-            'size'          => $row['size'],
-            'calendardata'  => $row['calendardata'],
-            'component'     => strtolower($row['component'])
-         ];
-    }
-
-    function getMultipleCalendarObjects($calendarId, array $uris) {
-
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => $calendarId, "uri" => $uris]);
-
-        if (!$searchResult) return [];
-
         $objects = [];
 
-        foreach($searchResult as $obj) {
-            $src = $obj["_source"];
+        foreach ($searchResult as $obj) {
+            $src = $obj['_source'];
 
-             $object = [
-                'id' => $src["id"],
-                'uri' => $src["uri"],
-                'lastmodified' => $src["lastmodified"],
-                'etag' => '"' . $src['etag'] . '"',
-                'calendarid' => $src["calendarid"],
-                'size' => $src["size"],
-                'component' => strtolower($src["component"])
+            $object = [
+                'id' => $src['id'],
+                'uri' => $src['uri'],
+                'lastmodified' => $src['lastmodified'],
+                'etag' => '"'.$src['etag'].'"',
+                'calendarid' => $src['calendarid'],
+                'size' => $src['size'],
+                'component' => strtolower($src['component']),
             ];
 
             $objects[] = $object;
@@ -284,8 +235,59 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $objects;
     }
 
-    function createCalendarObject($calendarId,$objectUri,$calendarData) {
+    public function getCalendarObject($calendarId, $objectUri)
+    {
+        $hit = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $objectUri]);
 
+        if ($hit == null) {
+            return;
+        }
+
+        $row = $hit[0]['_source'];
+
+        return [
+            'id' => $row['id'],
+            'uri' => $row['uri'],
+            'lastmodified' => $row['lastmodified'],
+            'etag' => '"'.$row['etag'].'"',
+            'calendarid' => $row['calendarid'],
+            'size' => $row['size'],
+            'calendardata' => $row['calendardata'],
+            'component' => strtolower($row['component']),
+         ];
+    }
+
+    public function getMultipleCalendarObjects($calendarId, array $uris)
+    {
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $uris]);
+
+        if (!$searchResult) {
+            return [];
+        }
+
+        $objects = [];
+
+        foreach ($searchResult as $obj) {
+            $src = $obj['_source'];
+
+            $object = [
+                'id' => $src['id'],
+                'uri' => $src['uri'],
+                'lastmodified' => $src['lastmodified'],
+                'etag' => '"'.$src['etag'].'"',
+                'calendarid' => $src['calendarid'],
+                'size' => $src['size'],
+                'component' => strtolower($src['component']),
+            ];
+
+            $objects[] = $object;
+        }
+
+        return $objects;
+    }
+
+    public function createCalendarObject($calendarId, $objectUri, $calendarData)
+    {
         $extraData = $this->getDenormalizedData($calendarData);
 
         $id = $this->manager->nextIdOf($this->calendarObjectTableName);
@@ -301,58 +303,57 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             'component' => $extraData['componentType'],
             'firstoccurence' => $extraData['firstOccurence'],
             'lastoccurence' => $extraData['lastOccurence'],
-            'uid' => $extraData['uid']
+            'uid' => $extraData['uid'],
         ];
 
-        $this->manager->simpleIndex($this->calendarObjectTableName,$id,$values);
+        $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 1);
-
     }
 
-    /**
-     * Updates an existing calendarobject, based on it's uri.
-     *
-     * The object uri is only the basename, or filename and not a full path.
-     *
-     * It is possible return an etag from this function, which will be used in
-     * the response to this PUT request. Note that the ETag must be surrounded
-     * by double-quotes.
-     *
-     * However, you should only really return this ETag if you don't mangle the
-     * calendar-data. If the result of a subsequent GET to this object is not
-     * the exact same as this request body, you should omit the ETag.
-     *
-     * @param mixed $calendarId
-     * @param string $objectUri
-     * @param string $calendarData
-     * @return string|null
-     */
-    function updateCalendarObject($calendarId,$objectUri,$calendarData) {
+    public function updateCalendarObject($calendarId, $objectUri, $calendarData)
+    {
+        $extraData = $this->getDenormalizedData($calendarData);
 
-        /*$extraData = $this->getDenormalizedData($calendarData);
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uid' => $extraData['uid']]);
 
-        $stmt = $this->pdo->prepare('UPDATE '.$this->calendarObjectTableName.' SET calendardata = ?, lastmodified = ?, etag = ?, size = ?, componenttype = ?, firstoccurence = ?, lastoccurence = ?, uid = ? WHERE calendarid = ? AND uri = ?');
-        $stmt->execute([$calendarData, time(), $extraData['etag'], $extraData['size'], $extraData['componentType'], $extraData['firstOccurence'], $extraData['lastOccurence'], $extraData['uid'], $calendarId, $objectUri]);
+        if ($searchResult == null) {
+            return;
+        }
+
+        $id = $searchResult[0]['_source']['id'];
+
+        $values = [
+            'id' => $id,
+            'uri' => $objectUri,
+            'lastmodified' => time(),
+            'etag' => $extraData['etag'],
+            'calendarid' => $calendarId,
+            'size' => $extraData['size'],
+            'calendardata' => $calendarData,
+            'component' => $extraData['componentType'],
+            'firstoccurence' => $extraData['firstOccurence'],
+            'lastoccurence' => $extraData['lastOccurence'],
+            'uid' => $extraData['uid'],
+        ];
+
+        $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
-
-        return '"' . $extraData['etag'] . '"';*/
-
     }
 
-    protected function getDenormalizedData($calendarData) {
-
+    protected function getDenormalizedData($calendarData)
+    {
         $vObject = VObject\Reader::read($calendarData);
         $componentType = null;
         $component = null;
         $firstOccurence = null;
         $lastOccurence = null;
         $uid = null;
-        foreach($vObject->getComponents() as $component) {
-            if ($component->name!=='VTIMEZONE') {
+        foreach ($vObject->getComponents() as $component) {
+            if ($component->name !== 'VTIMEZONE') {
                 $componentType = $component->name;
-                $uid = (string)$component->UID;
+                $uid = (string) $component->UID;
                 break;
             }
         }
@@ -377,20 +378,18 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
                     $lastOccurence = $firstOccurence;
                 }
             } else {
-                $it = new VObject\RecurrenceIterator($vObject, (string)$component->UID);
+                $it = new VObject\RecurrenceIterator($vObject, (string) $component->UID);
                 $maxDate = new \DateTime(self::MAX_DATE);
                 if ($it->isInfinite()) {
                     $lastOccurence = $maxDate->getTimeStamp();
                 } else {
                     $end = $it->getDtEnd();
-                    while($it->valid() && $end < $maxDate) {
+                    while ($it->valid() && $end < $maxDate) {
                         $end = $it->getDtEnd();
                         $it->next();
-
                     }
                     $lastOccurence = $end->getTimeStamp();
                 }
-
             }
         }
 
@@ -399,28 +398,24 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             'size' => strlen($calendarData),
             'componentType' => $componentType,
             'firstOccurence' => $firstOccurence,
-            'lastOccurence'  => $lastOccurence,
+            'lastOccurence' => $lastOccurence,
             'uid' => $uid,
         ];
-
     }
 
-    /**
-     * Deletes an existing calendar object.
-     *
-     * The object uri is only the basename, or filename and not a full path.
-     *
-     * @param string $calendarId
-     * @param string $objectUri
-     * @return void
-     */
-    function deleteCalendarObject($calendarId,$objectUri) {
+    public function deleteCalendarObject($calendarId, $objectUri)
+    {
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uri' => $objectUri]);
 
-        /*$stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarObjectTableName.' WHERE calendarid = ? AND uri = ?');
-        $stmt->execute([$calendarId, $objectUri]);
+        if ($searchResult == null) {
+            return;
+        }
 
-        $this->addChange($calendarId, $objectUri, 3);*/
+        $id = $searchResult[0]['_source']['id'];
 
+        $this->manager->simpleDelete($this->calendarObjectTableName, $id);
+
+        $this->addChange($calendarId, $objectUri, 3);
     }
 
     /**
@@ -472,10 +467,12 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      * specific components, and VEVENT time-ranges.
      *
      * @param string $calendarId
-     * @param array $filters
+     * @param array  $filters
+     *
      * @return array
      */
-    function calendarQuery($calendarId, array $filters) {
+    public function calendarQuery($calendarId, array $filters)
+    {
 
         /*$componentType = null;
         $requirePostFilter = true;
@@ -546,88 +543,94 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         }
 
         return $result;*/
-
     }
 
-    function getCalendarObjectByUID($principalUri, $uid) {
+    public function getCalendarObjectByUID($principalUri, $uid)
+    {
+        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['principaluri' => $principalUri]);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarTableName,["principaluri" => $principalUri]);
-
-        if (!$searchResult) return null;
+        if (!$searchResult) {
+            return;
+        }
 
         $calendarsUri = [];
 
-        foreach($searchResult as $cal) {
-            $calendarsUri[$cal["_source"]["id"]] = $cal["_source"]["uri"];
+        foreach ($searchResult as $cal) {
+            $calendarsUri[$cal['_source']['id']] = $cal['_source']['uri'];
         }
 
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName,["calendarid" => array_keys($calendarsUri)]);
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => array_keys($calendarsUri)]);
 
-        if (!$searchResult) return null;
+        if (!$searchResult) {
+            return;
+        }
 
-        return $calendarsUri[$searchResult["_source"]["calendarid"]] . '/' . $searchResult["_source"]["uri"];
-
+        return $calendarsUri[$searchResult['_source']['calendarid']].'/'.$searchResult['_source']['uri'];
     }
 
-    function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
+    public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
+    {
+        $getResult = $this->manager->simpleQuery($this->calendarTableName, ['id' => $calendarId]);
 
-        $getResult = $this->manager->simpleQuery($this->calendarTableName,["id" => $calendarId]);
+        if (!$getResult['found']) {
+            return;
+        }
 
-        if (!$getResult["found"]) return null;
-
-        $currentToken = $getResult["_source"]["synctoken"];
+        $currentToken = $getResult['_source']['synctoken'];
 
         $result = [
             'syncToken' => $currentToken,
-            'added'     => [],
-            'modified'  => [],
-            'deleted'   => []
+            'added' => [],
+            'modified' => [],
+            'deleted' => [],
         ];
 
         if ($syncToken) {
+            $params['query']['filtered']['filter']['bool']['must']['term']['calendarid'] = $calendarId;
+            $params['query']['filtered']['filter']['bool']['must']['range']['syncToken'] = ['gte' => $syncToken, 'lt' => $currentToken];
 
-            $params["query"]["filtered"]["filter"]["bool"]["must"]["term"]["calendarid"] = $calendarId;
-            $params["query"]["filtered"]["filter"]["bool"]["must"]["range"]["syncToken"] = ["gte" => $syncToken, "lt" => $currentToken];
+            $searchResult = $this->manager->complexQuery($this->calendarChangesTableName, $params, ['synctoken' => 'asc']);
 
-            $searchResult = $this->manager->complexQuery($this->calendarChangesTableName,$params,["synctoken" => "asc"]);
-
-            if (!$searchResult) return $result;
+            if (!$searchResult) {
+                return $result;
+            }
 
             $changes = [];
 
-            foreach($searchResult as $ch) {
-                $changes[$ch["uri"]] = $ch["operation"];
+            foreach ($searchResult as $ch) {
+                $changes[$ch['uri']] = $ch['operation'];
             }
 
-            foreach($changes as $uri => $operation) {
-
-                switch($operation) {
-                    case 1 :
+            foreach ($changes as $uri => $operation) {
+                switch ($operation) {
+                    case 1:
                         $result['added'][] = $uri;
                         break;
-                    case 2 :
+                    case 2:
                         $result['modified'][] = $uri;
                         break;
-                    case 3 :
+                    case 3:
                         $result['deleted'][] = $uri;
                         break;
                 }
             }
         } else {
-            $searchResult = $this->manager->simpleRequest($this->calendarObjectTableName,["calendarid" => $calendarId]);
+            $searchResult = $this->manager->simpleRequest($this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
-            if (!$searchResult) return null;
+            if (!$searchResult) {
+                return;
+            }
 
-            foreach($searchResult as $ch) {
-                $result['added'][] = $ch["_source"]["uri"];
+            foreach ($searchResult as $ch) {
+                $result['added'][] = $ch['_source']['uri'];
             }
         }
 
         return $result;
     }
 
-    protected function addChange($calendarId, $objectUri, $operation) {
-
+    protected function addChange($calendarId, $objectUri, $operation)
+    {
         $id = $this->manager->nextIdOf($this->calendarChangesTableName);
         $synctoken = $this->manager->synctokenOf($calendarId);
 
@@ -636,13 +639,12 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             'uri' => $objectUri,
             'synctoken' => $synctoken,
             'calendarid' => $calendarId,
-            'operation' => $operation
+            'operation' => $operation,
         ];
 
-        $this->manager->simpleIndex($this->calendarChangesTableName,$id,$values);
+        $this->manager->simpleIndex($this->calendarChangesTableName, $id, $values);
 
         $this->manager->incSynctokenOf($calendarId);
-
     }
 
     /**
@@ -674,9 +676,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      *    default components).
      *
      * @param string $principalUri
+     *
      * @return array
      */
-    function getSubscriptionsForUser($principalUri) {
+    public function getSubscriptionsForUser($principalUri)
+    {
 
         /*$fields = array_values($this->subscriptionPropertyMap);
         $fields[] = 'id';
@@ -716,7 +720,6 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $subscriptions;*/
 
         return [];
-
     }
 
     /**
@@ -727,10 +730,12 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      *
      * @param string $principalUri
      * @param string $uri
-     * @param array $properties
+     * @param array  $properties
+     *
      * @return mixed
      */
-    function createSubscription($principalUri, $uri, array $properties) {
+    public function createSubscription($principalUri, $uri, array $properties)
+    {
 
         /*$fieldNames = [
             'principaluri',
@@ -762,11 +767,10 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         $stmt->execute($values);
 
         return $this->pdo->lastInsertId();*/
-
     }
 
     /**
-     * Updates a subscription
+     * Updates a subscription.
      *
      * The list of mutations is stored in a Sabre\DAV\PropPatch object.
      * To do the actual updates, you must tell this object which properties
@@ -777,11 +781,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      *
      * Read the PropPatch documenation for more info and examples.
      *
-     * @param mixed $subscriptionId
+     * @param mixed                $subscriptionId
      * @param \Sabre\DAV\PropPatch $propPatch
-     * @return void
      */
-    function updateSubscription($subscriptionId, DAV\PropPatch $propPatch) {
+    public function updateSubscription($subscriptionId, DAV\PropPatch $propPatch)
+    {
 
         /*$supportedProperties = array_keys($this->subscriptionPropertyMap);
         $supportedProperties[] = '{http://calendarserver.org/ns/}source';
@@ -815,20 +819,18 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             return true;
 
         });*/
-
     }
 
     /**
-     * Deletes a subscription
+     * Deletes a subscription.
      *
      * @param mixed $subscriptionId
-     * @return void
      */
-    function deleteSubscription($subscriptionId) {
+    public function deleteSubscription($subscriptionId)
+    {
 
         /*$stmt = $this->pdo->prepare('DELETE FROM ' . $this->calendarSubscriptionsTableName . ' WHERE id = ?');
         $stmt->execute([$subscriptionId]);*/
-
     }
 
     /**
@@ -845,9 +847,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      *
      * @param string $principalUri
      * @param string $objectUri
+     *
      * @return array
      */
-    function getSchedulingObject($principalUri, $objectUri) {
+    public function getSchedulingObject($principalUri, $objectUri)
+    {
 
         /*$stmt = $this->pdo->prepare('SELECT uri, calendardata, lastmodified, etag, size FROM '.$this->schedulingObjectTableName.' WHERE principaluri = ? AND uri = ?');
         $stmt->execute([$principalUri, $objectUri]);
@@ -864,7 +868,6 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
          ];*/
 
          return [];
-
     }
 
     /**
@@ -876,9 +879,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      * The main difference is that 'calendardata' is optional.
      *
      * @param string $principalUri
+     *
      * @return array
      */
-    function getSchedulingObjects($principalUri) {
+    public function getSchedulingObjects($principalUri)
+    {
 
         /*$stmt = $this->pdo->prepare('SELECT id, calendardata, uri, lastmodified, etag, size FROM '.$this->schedulingObjectTableName.' WHERE principaluri = ?');
         $stmt->execute([$principalUri]);
@@ -897,21 +902,19 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         return $result;*/
 
         return [];
-
     }
 
     /**
-     * Deletes a scheduling object
+     * Deletes a scheduling object.
      *
      * @param string $principalUri
      * @param string $objectUri
-     * @return void
      */
-    function deleteSchedulingObject($principalUri, $objectUri) {
+    public function deleteSchedulingObject($principalUri, $objectUri)
+    {
 
         /*$stmt = $this->pdo->prepare('DELETE FROM '.$this->schedulingObjectTableName.' WHERE principaluri = ? AND uri = ?');
         $stmt->execute([$principalUri, $objectUri]);*/
-
     }
 
     /**
@@ -920,13 +923,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
      * @param string $principalUri
      * @param string $objectUri
      * @param string $objectData
-     * @return void
      */
-    function createSchedulingObject($principalUri, $objectUri, $objectData) {
+    public function createSchedulingObject($principalUri, $objectUri, $objectData)
+    {
 
         /*$stmt = $this->pdo->prepare('INSERT INTO '.$this->schedulingObjectTableName.' (principaluri, calendardata, uri, lastmodified, etag, size) VALUES (?, ?, ?, ?, ?, ?)');
         $stmt->execute([$principalUri, $objectData, $objectUri, time(), md5($objectData), strlen($objectData) ]);*/
-
     }
-
 }

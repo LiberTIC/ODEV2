@@ -14,7 +14,6 @@ class CalDAVController extends Controller
 {
     public function indexAction(Request $request)
     {
-
         date_default_timezone_set('Europe/Paris');
 
         $baseUri = '/caldav/';
@@ -26,7 +25,7 @@ class CalDAVController extends Controller
         #Backends
         $authBackend = new Sabre\DAV\Auth\Backend\PDO($pdo);
         //$calendarBackend = new Sabre\CalDAV\Backend\PDO($pdo);
-        $calendarBackend = new AppBundle\Backend\ES($client,$pdo);
+        $calendarBackend = new AppBundle\Backend\ES($client, $pdo);
         $principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
         $tree = [
@@ -60,12 +59,13 @@ class CalDAVController extends Controller
         $server->exec();
         $server->httpResponse->setHeader('Content-Security-Policy', "allow 'self';");
 
-		$this->logIt($request,$server->httpResponse);
+        $this->logIt($request, $server->httpResponse);
 
-		if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null)
-			return new Response($server->httpResponse->getBody(),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
-		else 
-			return new Response(stream_get_contents($server->httpResponse->getBody()),$server->httpResponse->getStatus(),$server->httpResponse->getHeaders());
+        if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null) {
+            return new Response($server->httpResponse->getBody(), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
+        } else {
+            return new Response(stream_get_contents($server->httpResponse->getBody()), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
+        }
     }
 
     private function logIt($request, $response)
