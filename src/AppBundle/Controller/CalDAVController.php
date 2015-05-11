@@ -20,17 +20,16 @@ class CalDAVController extends Controller
 
         $pdo = new PDO('mysql:dbname=sabredav;host=127.0.0.1', 'root', '');
 
-
         $params = array();
         $params['connectionParams']['auth'] = array(
             'ODE',
             'ultraSecretePasswordOfTheDead',
-            'Basic'
+            'Basic',
         );
         $client = new Elasticsearch\Client($params);
 
         #Backends
-        $authBackend = new Sabre\DAV\Auth\Backend\PDO($pdo);
+        $authBackend = new AppBundle\Backend\Auth($client);
         $calendarBackend = new AppBundle\Backend\ES($client);
         $principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
