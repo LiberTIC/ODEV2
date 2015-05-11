@@ -58,7 +58,7 @@ class ESManager
         $searchParams['type'] = $type;
         $searchParams['body'] = $params;
 
-        if (!$sort) {
+        if ($sort != null) {
             foreach ($sort as $name => $mode) {
                 $searchParams['sort'][$name]['order'] = $mode;
             }

@@ -33,7 +33,8 @@ class CalDAVController extends Controller
         #Backends
         $authBackend = new AppBundle\Backend\Auth($manager);
         $calendarBackend = new AppBundle\Backend\ES($manager);
-        $principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
+        //$principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
+        $principalBackend = new AppBundle\Backend\Principals($manager);
 
         $tree = [
             new Sabre\CalDAV\Principal\Collection($principalBackend),

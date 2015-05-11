@@ -148,11 +148,11 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
             $newValues = [];
             foreach ($mutations as $propertyName => $propertyValue) {
                 switch ($propertyName) {
-                    case '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' :
+                    case '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp':
                         $fieldName = 'transparent';
                         $newValues[$fieldName] = $propertyValue->getValue() === 'transparent';
                         break;
-                    default :
+                    default:
                         $fieldName = $this->propertyMap[$propertyName];
                         $newValues[$fieldName] = $propertyValue;
                         break;
