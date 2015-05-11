@@ -15,7 +15,7 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
 {
     const MAX_DATE = '2038-01-01';
 
-    protected $client;
+    protected $manager;
 
     public $index = 'caldav';
 
@@ -47,11 +47,9 @@ class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, Sc
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
-    public function __construct($client)
+    public function __construct($manager)
     {
-        $this->client = $client;
-
-        $this->manager = new ESManager($client);
+        $this->manager = $manager;
     }
 
     public function getCalendarsForUser($principalUri)

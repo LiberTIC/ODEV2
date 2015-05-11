@@ -6,13 +6,11 @@ use Sabre\DAV\Auth\Backend\AbstractDigest;
 
 class Auth extends AbstractDigest
 {
-    protected $client;
+    protected $manager;
 
-    public function __construct($client)
+    public function __construct($manager)
     {
-        $this->client = $client;
-
-        $this->manager = new ESManager($client);
+        $this->manager = $manager;
     }
 
     public function getDigestHash($realm, $username)
@@ -24,9 +22,5 @@ class Auth extends AbstractDigest
         }
 
         return $searchResult[0]['_source']['digesta1'];
-
-        /*$stmt = $this->pdo->prepare('SELECT digesta1 FROM '.$this->tableName.' WHERE username = ?');
-        $stmt->execute([$username]);
-        return $stmt->fetchColumn() ?: null;*/
     }
 }

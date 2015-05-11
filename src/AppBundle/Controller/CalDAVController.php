@@ -28,9 +28,11 @@ class CalDAVController extends Controller
         );
         $client = new Elasticsearch\Client($params);
 
+        $manager = new AppBundle\Backend\ESManager($client);
+
         #Backends
-        $authBackend = new AppBundle\Backend\Auth($client);
-        $calendarBackend = new AppBundle\Backend\ES($client);
+        $authBackend = new AppBundle\Backend\Auth($manager);
+        $calendarBackend = new AppBundle\Backend\ES($manager);
         $principalBackend = new Sabre\DAVACL\PrincipalBackend\PDO($pdo);
 
         $tree = [
