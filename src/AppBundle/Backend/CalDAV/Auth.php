@@ -15,12 +15,15 @@ class Auth extends AbstractDigest
 
     public function getDigestHash($realm, $username)
     {
-        $searchResult = $this->manager->simpleQuery('users', ['username' => $username]);
+        $oldIndex = $this->manager->index;
+        $this->manager->index = "app";
+        $searchResult = $this->manager->simpleQuery('users', ['usernameCanonical' => strtolower($username)]);
+        $this->manager->index = $oldIndex;
 
         if ($searchResult == null) {
             return;
         }
 
-        return $searchResult[0]['_source']['digesta1'];
+        return $searchResult[0]['_source']['passwordDigesta'];
     }
 }

@@ -108,8 +108,8 @@ class UserManager implements UserManagerInterface
 
     		$user->setId($id);
     	}
-    	else
-    		$this->esmanager->simpleIndex('users',$user->getId(),$user->jsonSerialize());
+    	
+    	$this->esmanager->simpleIndex('users',$user->getId(),$user->jsonSerialize());
     }
 
     public function updateCanonicalFields(UserInterface $user)
@@ -122,6 +122,8 @@ class UserManager implements UserManagerInterface
     {
     	if (0 !== strlen($password = $user->getPlainPassword())) {
 
+            $passwordDigesta = md5($user->getUsernameCanonical().":SabreDAV:".$password);
+
 			$salt = $user->getSalt();
 			$salted = $password.'{'.$salt.'}';
 			$digest = hash('sha512', $salted, true);
@@ -133,6 +135,7 @@ class UserManager implements UserManagerInterface
 			$encodedPassword = base64_encode($digest);
 
             $user->setPassword($encodedPassword);
+            $user->setPasswordDigesta($passwordDigesta);
             $user->eraseCredentials();
         }
     }
@@ -151,7 +154,8 @@ class UserManager implements UserManagerInterface
         $user->setEnabled($u['enabled']);
         $user->setSalt($u['salt']);
         $user->setPassword($u['password']);
-	    $user->setLastLogin(\DateTime::createFromFormat("Y-m-d H:i:s.u" , $u['lastLogin']['date']));
+        if ($u['lastLogin'] != null)
+	       $user->setLastLogin(\DateTime::createFromFormat("Y-m-d H:i:s.u" , $u['lastLogin']['date']));
         $user->setLocked($u['locked']);
         $user->setExpired($u['locked']);
         $user->setConfirmationToken($u['confirmationToken']);

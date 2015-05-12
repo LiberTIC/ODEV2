@@ -11,6 +11,8 @@ class User extends BaseUser implements JsonSerializable
 
     protected $id;
 
+    private $passwordDigesta;
+
     public function __construct()
     {
         parent::__construct();
@@ -25,6 +27,14 @@ class User extends BaseUser implements JsonSerializable
     	$this->salt = $salt;
     }
 
+    public function getPasswordDigesta() {
+        return $this->passwordDigesta;
+    }
+
+    public function setPasswordDigesta($passwordDigesta) {
+        $this->passwordDigesta = $passwordDigesta;
+    }
+
     public function jsonSerialize() {
     	return [
     		"id" => $this->id,
@@ -35,6 +45,7 @@ class User extends BaseUser implements JsonSerializable
     		"enabled" => $this->enabled,
     		"salt" => $this->salt,
     		"password" => $this->password,
+            "passwordDigesta" => $this->passwordDigesta,
     		"lastLogin" => $this->lastLogin,
     		"locked" => $this->locked,
     		"expired" => $this->expired,
