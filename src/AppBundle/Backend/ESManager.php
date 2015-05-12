@@ -115,7 +115,7 @@ class ESManager
     }
 
     /**
-     * Return the NEXT index to be used.
+     * Return the NEXT id to be used.
      */
     public function nextIdOf($type)
     {

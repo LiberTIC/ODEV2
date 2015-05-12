@@ -9,10 +9,10 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-    	if (true === $this->container->get('security.context')->isGranted('ROLE_USER')) {
+        if (true === $this->container->get('security.context')->isGranted('ROLE_USER')) {
             return new Response("Oh yisss");
         } else {
-        	return new Response("Not connected");
+            return new Response("Not connected");
         }
 
         return $this->render(':default:index.html.twig');

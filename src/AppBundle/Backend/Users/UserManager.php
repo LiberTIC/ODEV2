@@ -9,12 +9,13 @@ use AppBundle\Backend\ESManager;
 
 class UserManager implements UserManagerInterface
 {
-	private $esmanager;
+    private $esmanager;
 
-	private $encoderFactory;
+    private $encoderFactory;
 
-    public function __construct() {
-    	$params = array();
+    public function __construct()
+    {
+        $params = array();
         $params['connectionParams']['auth'] = array(
             'ODE',
             'ultraSecretePasswordOfTheDead',
@@ -28,34 +29,36 @@ class UserManager implements UserManagerInterface
 
     public function createUser()
     {
-    	$class = $this->getClass();
+        $class = $this->getClass();
         return new $class;
     }
 
-    public function deleteUser(UserInterface $user) 
+    public function deleteUser(UserInterface $user)
     {
-    	$this->esmanager->simpleDelete('users',$user->getId());
+        $this->esmanager->simpleDelete('users', $user->getId());
     }
 
     public function findUserBy(array $criteria)
     {
-    	$searchResult = $this->esmanager->simpleQuery('users',$criteria);
+        $searchResult = $this->esmanager->simpleQuery('users', $criteria);
 
-    	if ($searchResult == null) return null;
+        if ($searchResult == null) {
+            return null;
+        }
 
-    	$u = $searchResult[0]['_source'];
+        $u = $searchResult[0]['_source'];
 
         return $this->loadUserFromArray($u);
     }
 
     public function findUserByUsername($username)
     {
-    	return $this->findUserBy(['usernameCanonical' => $username]);
+        return $this->findUserBy(['usernameCanonical' => $username]);
     }
 
     public function findUserByEmail($email)
     {
-    	return $this->findUserBy(['emailCanonical' => $email]);
+        return $this->findUserBy(['emailCanonical' => $email]);
     }
 
     public function findUserByUsernameOrEmail($usernameOrEmail)
@@ -69,70 +72,70 @@ class UserManager implements UserManagerInterface
 
     public function findUserByConfirmationToken($token)
     {
-    	return $this->findUserByUsername(['confirmationToken' => $token]);
+        return $this->findUserByUsername(['confirmationToken' => $token]);
     }
 
     public function findUsers()
     {
-    	$searchResult = $this->esmanager->simpleSearch('users');
-    	$t = null;
-    	echo $t->truc();
-    	$users = [];
-    	foreach($searchResult as $u) {
-    		$u = $u['_source'];
+        $searchResult = $this->esmanager->simpleSearch('users');
+        $t = null;
+        echo $t->truc();
+        $users = [];
+        foreach ($searchResult as $u) {
+            $u = $u['_source'];
 
-    		$users[] = $this->loadUserFromArray($u);
-    	}
+            $users[] = $this->loadUserFromArray($u);
+        }
 
-    	return $users;
+        return $users;
     }
 
     public function getClass()
     {
-    	return 'AppBundle\Entity\User';
+        return 'AppBundle\Entity\User';
     }
 
     public function reloadUser(UserInterface $user)
     {
-    	return $this->findUserBy(['id' => $user->getId()]);
+        return $this->findUserBy(['id' => $user->getId()]);
     }
 
     public function updateUser(UserInterface $user)
     {
 
-    	$this->updatePassword($user);
+        $this->updatePassword($user);
 
-    	if ($user->getId() == null) {
+        if ($user->getId() == null) {
+            $id = $this->esmanager->nextIdOf('users');
 
-    		$id = $this->esmanager->nextIdOf('users');
+            $user->setId($id);
 
-    		$user->setId($id);
-    	}
-    	
-    	$this->esmanager->simpleIndex('users',$user->getId(),$user->jsonSerialize());
+            $this->createPrincipals($user);
+        }
+        
+        $this->esmanager->simpleIndex('users', $user->getId(), $user->jsonSerialize());
     }
 
     public function updateCanonicalFields(UserInterface $user)
     {
-    	$user->setUsernameCanonical(strtolower($user->getUsername()));
-    	$user->setEmailCanonical(strtolower($user->getEmail()));
+        $user->setUsernameCanonical(strtolower($user->getUsername()));
+        $user->setEmailCanonical(strtolower($user->getEmail()));
     }
 
     public function updatePassword(UserInterface $user)
     {
-    	if (0 !== strlen($password = $user->getPlainPassword())) {
-
+        if (0 !== strlen($password = $user->getPlainPassword())) {
             $passwordDigesta = md5($user->getUsernameCanonical().":SabreDAV:".$password);
 
-			$salt = $user->getSalt();
-			$salted = $password.'{'.$salt.'}';
-			$digest = hash('sha512', $salted, true);
+            $salt = $user->getSalt();
+            $salted = $password.'{'.$salt.'}';
+            $digest = hash('sha512', $salted, true);
 
-			for ($i=1; $i<5000; $i++) {
-				$digest = hash('sha512', $digest.$salted, true);
-			}
+            for ($i=1; $i<5000; $i++) {
+                $digest = hash('sha512', $digest.$salted, true);
+            }
 
-			$encodedPassword = base64_encode($digest);
+            $encodedPassword = base64_encode($digest);
 
             $user->setPassword($encodedPassword);
             $user->setPasswordDigesta($passwordDigesta);
@@ -144,8 +147,9 @@ class UserManager implements UserManagerInterface
 
 
 
-    public function loadUserFromArray($u) {
-    	$user = $this->createUser();
+    public function loadUserFromArray($u)
+    {
+        $user = $this->createUser();
         $user->setId($u['id']);
         $user->setUsername($u['username']);
         $user->setUsernameCanonical($u['usernameCanonical']);
@@ -154,15 +158,42 @@ class UserManager implements UserManagerInterface
         $user->setEnabled($u['enabled']);
         $user->setSalt($u['salt']);
         $user->setPassword($u['password']);
-        if ($u['lastLogin'] != null)
-	       $user->setLastLogin(\DateTime::createFromFormat("Y-m-d H:i:s.u" , $u['lastLogin']['date']));
+        if ($u['lastLogin'] != null) {
+            $user->setLastLogin(\DateTime::createFromFormat("Y-m-d H:i:s.u", $u['lastLogin']['date']));
+        }
         $user->setLocked($u['locked']);
         $user->setExpired($u['locked']);
         $user->setConfirmationToken($u['confirmationToken']);
-        foreach($u['roles'] as $role) {
-        	$user->addRole($role);
+        foreach ($u['roles'] as $role) {
+            $user->addRole($role);
         }
 
         return $user;
+    }
+
+    public function createPrincipals($user)
+    {
+        $oldIndex = $this->esmanager->index;
+        $this->esmanager->index = 'caldav';
+
+        $id = $this->esmanager->nextIdOf('principals');
+        $username = $user->getUsername();
+        $usernameCanonical = $user->getUsernameCanonical();
+        $email = $user->getEmail();
+
+        $principal = ['id' => $id, 'uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
+        $this->esmanager->simpleIndex('principals', $id, $principal);
+
+        $id++;
+        $principal['id'] = $id;
+        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
+        $this->esmanager->simpleIndex('principals', $id, $principal);
+
+        $id++;
+        $principal['id'] = $id;
+        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
+        $this->esmanager->simpleIndex('principals', $id, $principal);
+
+        $this->esmanager->index = $oldIndex;
     }
 }
