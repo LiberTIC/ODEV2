@@ -70,6 +70,20 @@ class ESManager
     }
 
     /**
+     * Simple Search mean that we return ALL documents found.
+     */
+    public function simpleSearch($type)
+    {
+        $searchParams = array();
+        $searchParams['index'] = $this->index;
+        $searchParams['type'] = $type;
+
+        $retDoc = $this->client->search($searchParams);
+
+        return $retDoc['hits']['hits'];
+    }
+
+    /**
      * Simple Index mean that we index with the parameters given
      * Return the new id.
      */

@@ -1,6 +1,6 @@
 
 homepage:
-    path:     /home
+    path:     /
     defaults: { _controller: AppBundle:Default:index }
 
 caldav:
