@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Backend;
+namespace AppBundle\Backend\CalDAV;
 
 use Sabre\VObject;
 use Sabre\CalDAV;
@@ -11,7 +11,7 @@ use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
 
-class ES extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
+class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
     const MAX_DATE = '2038-01-01';
 

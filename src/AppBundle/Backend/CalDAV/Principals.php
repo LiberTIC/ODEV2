@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Backend;
+namespace AppBundle\Backend\CalDAV;
 
 use Sabre\DAV;
 use Sabre\HTTP\URLUtil;
