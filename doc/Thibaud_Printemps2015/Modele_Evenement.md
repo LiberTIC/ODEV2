@@ -35,7 +35,7 @@ Modèle d'un Événement
 |                  |          |                                       |            |                              |
 | Participants     | Texte    | Participants à l'événement            | schema.org | Shakaponk;Tagada Jones       |
 | Durée            | Durée    | Durée de l'événement                  | schema.org | PT3H30M (3h30min)            |
-| Status           | Texte    | Status de l'événement                 | schema.org | Annulé / Reporté             |
+| Status           | Texte    | Status de l'événement                 | iCalendar  | Annulé / Reporté             |
 | Organisateur     | Texte    | Organisateur de l'événement           | schema.org | Stéréolux                    |
 | Sous-Événement   | UID      | UID d'un sous-événement               | schema.org | SL-2015-XYZ-009              |
 | Super-Événement  | UID      | UID d'un sur-événement                | schema.org | SL-2015-XYZ-001              |
@@ -97,12 +97,12 @@ Définition technique des noms
 | Capacité du lieu  | X-ODE-LOCATION-CAPACITY | location_capacity      |
 | Participants      | X-ODE-ATTENDEES         | attendees              |
 | Durée             | X-ODE-DURATION          | duration               |
-| Status            | X-ODE-STATUS            | status                 |
+| Status            | STATUS                  | status                 |
 | Organisateur      | X-ODE-ORGANIZER         | organizer              |
 | Sous-Événement    | X-ODE-SUBEVENT          | subevent               |
 | Super-Événement   | X-ODE-SUPEREVENT        | superevent             |
 | URL               | URL                     | url                    |
-| URL orga          | X-ODE-URL-ORGA          | url_orga               |
+| URL orga          | X-ODE-URL-ORGA          | url_orga               |
 | URLs medias       | X-ODE-URLS-MEDIAS       | urls_medias            |
 | Langue            | X-ODE-LANGUAGE          | language               |
 | Prix standard     | X-ODE-PRICE-STANDARD    | price_standard         |
