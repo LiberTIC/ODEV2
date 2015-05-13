@@ -114,6 +114,7 @@ class FeatureContext extends MinkContext implements KernelAwareContext
 
     /**
      * @Given /^que je clique sur le lien "([^"]*)"$/
+     * @Given /^je clique sur le lien "([^"]*)"$/
      */
     public function queJeCliqueSurLeLien($arg1)
     {
@@ -128,6 +129,20 @@ class FeatureContext extends MinkContext implements KernelAwareContext
         $this->session = $this->getCustomSession();
         $page = $this->session->getPage();
         $page->find('css', '[type=submit]')->submit();
+    }
+
+    /**
+     * @Then /^je devrais voir le bouton "([^"]*)"$/
+     */
+    public function jeDevraisVoirLeBouton($arg1)
+    {
+        echo $arg1."|";
+        $this->session = $this->getCustomSession();
+        $page = $this->session->getPage();
+        $button = $page->findField($arg1);
+        echo $button->getTagName()."/";
+        if ($button == null)
+            throw new \Exception('Button "'.$arg1.'" is not present on the page');
     }
 
     protected function getCustomSession()

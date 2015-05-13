@@ -2,4 +2,25 @@
 
 {% block body %}
     Homepage.
+
+    <ul>
+        {% if not auth_rem %}
+            <li>
+                <a href="{{ path("fos_user_security_login") }}">
+                    Se connecter
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path("fos_user_profile_show") }}">
+                    Accéder au profil
+                </a>
+            </li>
+            <li>
+                <a href="{{ path("fos_user_security_logout") }}">
+                    Se déconnecter
+                </a>
+            </li>
+        {% endif %}
+    </ul>
 {% endblock %}
