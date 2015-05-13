@@ -49,18 +49,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
-    public $fields = [
-        'name'               => 'SUMMARY',
-        'description'        => 'DESCRIPTION',
-        'date_start'         => 'DTSTART',
-        'date_end'           => 'DTEND',
-        'date_created'       => 'CREATED',
-        'date_modified'      => 'LAST-MODIFIED',
-        'location_name'      => 'LOCATION',
-        'geo'                => 'GEO',
-        'status'             => 'STATUS',
-    ];
-
 
     public $extensions = [];
 
@@ -68,6 +56,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     {
         $this->manager = $manager;
 
+        $this->extensions[] = new Extension\StandardExtension();
         $this->extensions[] = new Extension\ODEExtension();
         $this->extensions[] = new Extension\AppleExtension();
     }
@@ -463,15 +452,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     {
 
         $customs = [];
-        
-        foreach ($this->fields as $jsonName => $iCalName) {
-            $property = $component->__get($iCalName);
-            if ($property != null) {
-                $customs[$jsonName] = $property->getValue();
-            } else {
-                $customs[$jsonName] = null;
-            }
-        }
 
         foreach ($this->extensions as $extension) {
             $custExt = $extension->extractData($component);
