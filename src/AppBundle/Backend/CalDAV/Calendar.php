@@ -11,6 +11,8 @@ use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
 
+use AppBundle\Backend\CalDAV\Extension;
+
 class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
     const MAX_DATE = '2038-01-01';
@@ -47,9 +49,27 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
+    public $fields = [
+        'name'               => 'SUMMARY',
+        'description'        => 'DESCRIPTION',
+        'date_start'         => 'DTSTART',
+        'date_end'           => 'DTEND',
+        'date_created'       => 'CREATED',
+        'date_modified'      => 'LAST-MODIFIED',
+        'location_name'      => 'LOCATION',
+        'geo'                => 'GEO',
+        'status'             => 'STATUS',
+    ];
+
+
+    public $extensions = [];
+
     public function __construct($manager)
     {
         $this->manager = $manager;
+
+        $this->extensions[] = new Extension\ODEExtension();
+        $this->extensions[] = new Extension\AppleExtension();
     }
 
     public function getCalendarsForUser($principalUri)
@@ -277,9 +297,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData)
     {
-        $extraData = $this->getDenormalizedData($calendarData);
-
         $id = $this->manager->nextIdOf($this->calendarObjectTableName);
+
+        $calendarData = $this->addUrl($calendarData, $id);
+        $extraData = $this->getDenormalizedData($calendarData);
 
         $values = [
             'id' => $id,
@@ -293,7 +314,12 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'firstoccurence' => $extraData['firstOccurence'],
             'lastoccurence' => $extraData['lastOccurence'],
             'uid' => $extraData['uid'],
+            'url' => $extraData['url'],
         ];
+
+        foreach ($extraData['customs'] as $jsonName => $value) {
+            $values[$jsonName] = $value;
+        }
 
         $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
@@ -324,11 +350,39 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'firstoccurence' => $extraData['firstOccurence'],
             'lastoccurence' => $extraData['lastOccurence'],
             'uid' => $extraData['uid'],
+            'url' => $extraData['url'],
         ];
+
+        foreach ($extraData['customs'] as $jsonName => $value) {
+            $values[$jsonName] = $value;
+        }
 
         $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
+    }
+
+    protected function addURL($calendarData, $id)
+    {
+        $vObject = VObject\Reader::read($calendarData, $id);
+        $componentType = null;
+        $component = null;
+
+        $uid = null;
+        foreach ($vObject->getComponents() as $component) {
+            if ($component->name !== 'VTIMEZONE') {
+                $componentType = $component->name;
+                $uid = (string) $component->UID;
+                break;
+            }
+        }
+        if (!$componentType) {
+            throw new \Sabre\DAV\Exception\BadRequest('Calendar objects must have a VJOURNAL, VEVENT or VTODO component');
+        }
+        if ($componentType === 'VEVENT') {
+            $component->add('URL', 'jaifaiiiim.com', ['VALUE'=>"URI"]);
+        }
+        return $vObject->serialize();
     }
 
     protected function getDenormalizedData($calendarData)
@@ -339,6 +393,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $firstOccurence = null;
         $lastOccurence = null;
         $uid = null;
+        $url = null;
+        $customs = null;
+
         foreach ($vObject->getComponents() as $component) {
             if ($component->name !== 'VTIMEZONE') {
                 $componentType = $component->name;
@@ -380,6 +437,14 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                     $lastOccurence = $end->getTimeStamp();
                 }
             }
+
+            
+
+            if ($component->URL != null) {
+                $url = $component->URL->getParts();
+            }
+
+            $customs = $this->extractCustomData($component);
         }
 
         return [
@@ -389,7 +454,32 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'firstOccurence' => $firstOccurence,
             'lastOccurence' => $lastOccurence,
             'uid' => $uid,
+            'url' => $url[0],
+            'customs' => $customs,
         ];
+    }
+
+    protected function extractCustomData($component)
+    {
+
+        $customs = [];
+        
+        foreach ($this->fields as $jsonName => $iCalName) {
+            $property = $component->__get($iCalName);
+            if ($property != null) {
+                $customs[$jsonName] = $property->getValue();
+            } else {
+                $customs[$jsonName] = null;
+            }
+        }
+
+        foreach ($this->extensions as $extension) {
+            $custExt = $extension->extractData($component);
+
+            $customs = array_merge($customs, $custExt);
+        }
+
+        return $customs;
     }
 
     public function deleteCalendarObject($calendarId, $objectUri)
