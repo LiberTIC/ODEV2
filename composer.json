@@ -34,7 +34,6 @@
         "phpmd/phpmd" :                 "@stable",
         "pdepend/pdepend" :             "2.0.*",
         "fabpot/php-cs-fixer":          "@stable",
-        "phpunit/phpunit":              "4.5.*",
         "behat/behat":                  "~3.0@stable",
         "behat/mink":                   "~1.7@dev",
         "behat/mink-goutte-driver":     "@stable",
