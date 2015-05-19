@@ -32,7 +32,7 @@ class CalDAVController extends Controller
 
         #Backends
         $authBackend = new AppBundle\Backend\CalDAV\Auth($manager);
-        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($manager);
+        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($manager,$this->get('converter'));
         $principalBackend = new AppBundle\Backend\CalDAV\Principals($manager);
 
         $tree = [
@@ -66,16 +66,20 @@ class CalDAVController extends Controller
         $server->exec();
         $server->httpResponse->setHeader('Content-Security-Policy', "allow 'self';");
 
-        $this->logIt($request, $server->httpResponse);
+        $responseBody = $server->httpResponse->getBodyAsString(); // This method must be called only one time!
 
-        if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null) {
+        $this->logIt($request, $server->httpResponse,$responseBody);
+
+        return new Response($responseBody, $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
+
+        /*if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null) {
             return new Response($server->httpResponse->getBody(), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
         } else {
             return new Response(stream_get_contents($server->httpResponse->getBody()), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
-        }
+        }*/
     }
 
-    private function logIt($request, $response)
+    private function logIt($request, $response, $responseBody)
     {
         $this->get('logger')->info('------------------------ METHOD -------------------------');
         $this->get('logger')->info($request->getMethod());
@@ -88,7 +92,7 @@ class CalDAVController extends Controller
             }
         }
         $this->get('logger')->info('------------------------ RESPONSE -----------------------');
-        $this->get('logger')->info($response->getBody());
+        $this->get('logger')->info($responseBody);
         $this->get('logger')->info('------------------------ END ----------------------------');
     }
 }

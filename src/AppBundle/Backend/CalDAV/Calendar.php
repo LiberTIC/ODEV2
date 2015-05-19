@@ -11,13 +11,14 @@ use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
 
-use AppBundle\Backend\CalDAV\Extension;
+use AppBundle\Service\FormatConverter;
 
 class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
     const MAX_DATE = '2038-01-01';
 
     protected $manager;
+    protected $converter;
 
     public $index = 'caldav';
 
@@ -49,16 +50,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         '{http://calendarserver.org/ns/}subscribed-strip-attachments' => 'stripattachments',
     ];
 
-
-    public $extensions = [];
-
-    public function __construct($manager)
+    public function __construct($manager, FormatConverter $converter)
     {
         $this->manager = $manager;
-
-        $this->extensions[] = new Extension\StandardExtension();
-        $this->extensions[] = new Extension\ODEExtension();
-        $this->extensions[] = new Extension\AppleExtension();
+        $this->converter = $converter;
     }
 
     public function getCalendarsForUser($principalUri)
@@ -250,7 +245,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'etag' => '"'.$row['etag'].'"',
             'calendarid' => $row['calendarid'],
             'size' => $row['size'],
-            'calendardata' => $row['calendardata'],
+            //'calendardata' => $row['calendardata'],
+            //'calendardata' => $this->converter->convert('json','icalendar',$row)->serialize(),
+            'calendardata' => $this->converter->convert('json','icalendar',$row['vobject'])->serialize(),
             'component' => strtolower($row['component']),
          ];
     }
@@ -286,29 +283,28 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData)
     {
+
+        $vCal = VObject\Reader::read($calendarData);
+
         $id = $this->manager->nextIdOf($this->calendarObjectTableName);
 
-        $calendarData = $this->addUrl($calendarData, $id);
-        $extraData = $this->getDenormalizedData($calendarData);
+        $sizeurl = $this->addURL($vCal,$id);
+
+        //$calendarData = $vCal->serialize();
 
         $values = [
             'id' => $id,
             'uri' => $objectUri,
             'lastmodified' => time(),
-            'etag' => $extraData['etag'],
             'calendarid' => $calendarId,
-            'size' => $extraData['size'],
             'calendardata' => $calendarData,
-            'component' => $extraData['componentType'],
-            'firstoccurence' => $extraData['firstOccurence'],
-            'lastoccurence' => $extraData['lastOccurence'],
-            'uid' => $extraData['uid'],
-            'url' => $extraData['url'],
+            'etag' => md5($calendarData),
+            'size' => strlen($calendarData)+$sizeurl,
+            'component' => 'vevent',
+            'uid' => $vCal->VEVENT->UID->__toString(),
         ];
 
-        foreach ($extraData['customs'] as $jsonName => $value) {
-            $values[$jsonName] = $value;
-        }
+        $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
         $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
@@ -317,9 +313,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function updateCalendarObject($calendarId, $objectUri, $calendarData)
     {
-        $extraData = $this->getDenormalizedData($calendarData);
+        $vCal = VObject\Reader::read($calendarData);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uid' => $extraData['uid']]);
+        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uid' => $vCal->VEVENT->UID->__toString()]);
 
         if ($searchResult == null) {
             return;
@@ -331,135 +327,32 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'id' => $id,
             'uri' => $objectUri,
             'lastmodified' => time(),
-            'etag' => $extraData['etag'],
             'calendarid' => $calendarId,
-            'size' => $extraData['size'],
             'calendardata' => $calendarData,
-            'component' => $extraData['componentType'],
-            'firstoccurence' => $extraData['firstOccurence'],
-            'lastoccurence' => $extraData['lastOccurence'],
-            'uid' => $extraData['uid'],
-            'url' => $extraData['url'],
+            'etag' => md5($calendarData),
+            'size' => strlen($calendarData),
+            'component' => 'vevent',
+            'uid' => $vCal->VEVENT->UID->__toString(),
         ];
 
-        foreach ($extraData['customs'] as $jsonName => $value) {
-            $values[$jsonName] = $value;
-        }
+        $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
+
 
         $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
     }
 
-    protected function addURL($calendarData, $id)
+    protected function addURL($vCal,$id)
     {
-        $vObject = VObject\Reader::read($calendarData, $id);
-        $componentType = null;
-        $component = null;
-
-        $uid = null;
-        foreach ($vObject->getComponents() as $component) {
-            if ($component->name !== 'VTIMEZONE') {
-                $componentType = $component->name;
-                $uid = (string) $component->UID;
-                break;
-            }
-        }
-        if (!$componentType) {
-            throw new \Sabre\DAV\Exception\BadRequest('Calendar objects must have a VJOURNAL, VEVENT or VTODO component');
-        }
-        if ($componentType === 'VEVENT') {
-            $component->add('URL', 'jaifaiiiim.com', ['VALUE'=>"URI"]);
-        }
-        return $vObject->serialize();
+        $url = 'projet-ode.fr/event/'.$id;
+        $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
+        return strlen($url);
     }
 
     protected function getDenormalizedData($calendarData)
     {
-        $vObject = VObject\Reader::read($calendarData);
-        $componentType = null;
-        $component = null;
-        $firstOccurence = null;
-        $lastOccurence = null;
-        $uid = null;
-        $url = null;
-        $customs = null;
-
-        foreach ($vObject->getComponents() as $component) {
-            if ($component->name !== 'VTIMEZONE') {
-                $componentType = $component->name;
-                $uid = (string) $component->UID;
-                break;
-            }
-        }
-        if (!$componentType) {
-            throw new \Sabre\DAV\Exception\BadRequest('Calendar objects must have a VJOURNAL, VEVENT or VTODO component');
-        }
-        if ($componentType === 'VEVENT') {
-            $firstOccurence = $component->DTSTART->getDateTime()->getTimeStamp();
-            // Finding the last occurence is a bit harder
-            if (!isset($component->RRULE)) {
-                if (isset($component->DTEND)) {
-                    $lastOccurence = $component->DTEND->getDateTime()->getTimeStamp();
-                } elseif (isset($component->DURATION)) {
-                    $endDate = clone $component->DTSTART->getDateTime();
-                    $endDate->add(VObject\DateTimeParser::parse($component->DURATION->getValue()));
-                    $lastOccurence = $endDate->getTimeStamp();
-                } elseif (!$component->DTSTART->hasTime()) {
-                    $endDate = clone $component->DTSTART->getDateTime();
-                    $endDate->modify('+1 day');
-                    $lastOccurence = $endDate->getTimeStamp();
-                } else {
-                    $lastOccurence = $firstOccurence;
-                }
-            } else {
-                $it = new VObject\RecurrenceIterator($vObject, (string) $component->UID);
-                $maxDate = new \DateTime(self::MAX_DATE);
-                if ($it->isInfinite()) {
-                    $lastOccurence = $maxDate->getTimeStamp();
-                } else {
-                    $end = $it->getDtEnd();
-                    while ($it->valid() && $end < $maxDate) {
-                        $end = $it->getDtEnd();
-                        $it->next();
-                    }
-                    $lastOccurence = $end->getTimeStamp();
-                }
-            }
-
-            
-
-            if ($component->URL != null) {
-                $url = $component->URL->getParts();
-            }
-
-            $customs = $this->extractCustomData($component);
-        }
-
-        return [
-            'etag' => md5($calendarData),
-            'size' => strlen($calendarData),
-            'componentType' => $componentType,
-            'firstOccurence' => $firstOccurence,
-            'lastOccurence' => $lastOccurence,
-            'uid' => $uid,
-            'url' => $url[0],
-            'customs' => $customs,
-        ];
-    }
-
-    protected function extractCustomData($component)
-    {
-
-        $customs = [];
-
-        foreach ($this->extensions as $extension) {
-            $custExt = $extension->extractData($component);
-
-            $customs = array_merge($customs, $custExt);
-        }
-
-        return $customs;
+        return $this->converter->convert('icalendar','json',$calendarData);
     }
 
     public function deleteCalendarObject($calendarId, $objectUri)
