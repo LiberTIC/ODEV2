@@ -6,7 +6,7 @@
 ## Installation:
 
 ```bash
-git https://github.com/LiberTIC/ODEV2.git
+git clone https://github.com/LiberTIC/ODEV2.git
 cd ODEV2
 # The install process warns you
 # about requirements and configuration of Apache2, MySQL & PHP5.
