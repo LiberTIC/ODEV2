@@ -5,7 +5,7 @@
 - [Official setup doc](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
 - [Digital Ocean doc](https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-on-an-ubuntu-vps)
 
-Mind that `Java 7 update 55` is not enough up-to-date for the last elastic release, on Ubuntu 12.10. COnsider upgrading to Java8. See elastic log on error while trying to start it.
+Mind that `Java 7 update 55` is not enough up-to-date for the last elastic release, on Ubuntu 12.10. Consider upgrading to Java8. See elastic log on error while trying to start it.
 
 ### Enable Marvel logging
 ```
