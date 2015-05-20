@@ -7,8 +7,14 @@ WIP...
 marvel.agent.enabled: true
 ```
 
+### Reduce network to localhost
+```
+network.bind_host: localhost
+```
+
 ### Enable scripting
 ```
+script.disable_dynamic: false
 script.groovy.sandbox.enabled: true
 ```
 
