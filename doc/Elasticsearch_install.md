@@ -2,6 +2,23 @@
 
 WIP...
 
+### Enable Marvel logging
+```
+marvel.agent.enabled: true
+```
+
+### Enable scripting
+```
+script.groovy.sandbox.enabled: true
+```
+
+### Enable Http Basic Auth
+```
+http.basic.enabled: true
+http.basic.user: "ODE"
+http.basic.password: "ultraSecretePasswordOfTheDead"
+```
+
 ### Config pour mapping du serveur:
 
 ```
