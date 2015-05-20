@@ -15,6 +15,11 @@ make install
 php app/console server:run
 ```
 
+**Fork of Sabre/VObject**
+
+For the purpose of this project we needed to adapt Sabre\VObject by fixing and tweeking some code. Because of that, we created a fork of this project ([here](https://github.com/polypodes/sabre-vobject)).
+To use our own fork in composer, we followed [these instructions](http://snippets.khromov.se/composer-use-your-own-fork-for-a-package/)
+
 
 ## Qualité & tests
 
