@@ -290,8 +290,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $sizeurl = $this->addURL($vCal,$id);
 
-        //$calendarData = $vCal->serialize();
-
         $values = [
             'id' => $id,
             'uri' => $objectUri,
@@ -311,6 +309,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $this->addChange($calendarId, $objectUri, 1);
     }
 
+    protected function addURL($vCal,$id)
+    {
+        $url = 'projet-ode.fr/event/'.$id;
+        $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
+        return strlen(';VALUE=URI'.$url)+5; // 5 for 'URL:' and '\n'
+    }
+
     public function updateCalendarObject($calendarId, $objectUri, $calendarData)
     {
         $vCal = VObject\Reader::read($calendarData);
@@ -322,6 +327,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
 
         $id = $searchResult[0]['_source']['id'];
+
 
         $values = [
             'id' => $id,
@@ -337,17 +343,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
-
         $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
-    }
-
-    protected function addURL($vCal,$id)
-    {
-        $url = 'projet-ode.fr/event/'.$id;
-        $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
-        return strlen($url);
     }
 
     protected function getDenormalizedData($calendarData)

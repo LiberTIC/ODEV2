@@ -92,6 +92,7 @@ class CalDAVController extends Controller
             }
         }
         $this->get('logger')->info('------------------------ RESPONSE -----------------------');
+        $this->get('logger')->info($response->__toString());
         $this->get('logger')->info($responseBody);
         $this->get('logger')->info('------------------------ END ----------------------------');
     }
