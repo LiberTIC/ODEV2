@@ -1,14 +1,25 @@
 ## Installation d'un serveur ElasticSearch
 
-WIP...
+### Documentation
+
+- [Official setup doc](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
+- [Digital Ocean doc](https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-on-an-ubuntu-vps)
+
+Mind that `Java 7 update 55` is not enough up-to-date for the last elastic release, on Ubuntu 12.10. Consider upgrading to Java8. See elastic log on error while trying to start it.
 
 ### Enable Marvel logging
 ```
 marvel.agent.enabled: true
 ```
 
+### Reduce network to localhost
+```
+network.bind_host: localhost
+```
+
 ### Enable scripting
 ```
+script.disable_dynamic: false
 script.groovy.sandbox.enabled: true
 ```
 
