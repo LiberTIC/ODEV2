@@ -5,9 +5,7 @@ namespace AppBundle\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use PDO;
 use Sabre;
-use Elasticsearch;
 use AppBundle;
 
 class CalDAVController extends Controller
@@ -18,17 +16,7 @@ class CalDAVController extends Controller
 
         $baseUri = '/caldav/';
 
-        $pdo = new PDO('mysql:dbname=sabredav;host=127.0.0.1', 'root', '');
-
-        $params = array();
-        $params['connectionParams']['auth'] = array(
-            'ODE',
-            'ultraSecretePasswordOfTheDead',
-            'Basic',
-        );
-        $client = new Elasticsearch\Client($params);
-
-        $manager = new AppBundle\Backend\ESManager($client);
+        $manager = $this->get('esmanager');
 
         #Backends
         $authBackend = new AppBundle\Backend\CalDAV\Auth($manager);
@@ -71,12 +59,6 @@ class CalDAVController extends Controller
         $this->logIt($request, $server->httpResponse,$responseBody);
 
         return new Response($responseBody, $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
-
-        /*if (is_string($server->httpResponse->getBody()) || $server->httpResponse->getBody() == null) {
-            return new Response($server->httpResponse->getBody(), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
-        } else {
-            return new Response(stream_get_contents($server->httpResponse->getBody()), $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
-        }*/
     }
 
     private function logIt($request, $response, $responseBody)

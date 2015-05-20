@@ -13,18 +13,9 @@ class UserManager implements UserManagerInterface
 
     private $encoderFactory;
 
-    public function __construct()
+    public function __construct($manager)
     {
-        $params = array();
-        $params['connectionParams']['auth'] = array(
-            'ODE',
-            'ultraSecretePasswordOfTheDead',
-            'Basic',
-        );
-        $client = new Client($params);
-
-        $this->esmanager = new ESManager($client);
-        $this->esmanager->index = 'app';
+        $this->esmanager = $manager;
     }
 
     public function createUser()
@@ -35,12 +26,12 @@ class UserManager implements UserManagerInterface
 
     public function deleteUser(UserInterface $user)
     {
-        $this->esmanager->simpleDelete('users', $user->getId());
+        $this->esmanager->simpleDelete('app', 'users', $user->getId());
     }
 
     public function findUserBy(array $criteria)
     {
-        $searchResult = $this->esmanager->simpleQuery('users', $criteria);
+        $searchResult = $this->esmanager->simpleQuery('app', 'users', $criteria);
 
         if ($searchResult == null) {
             return null;
@@ -77,7 +68,7 @@ class UserManager implements UserManagerInterface
 
     public function findUsers()
     {
-        $searchResult = $this->esmanager->simpleSearch('users');
+        $searchResult = $this->esmanager->simpleSearch('app', 'users');
         $t = null;
         echo $t->truc();
         $users = [];
@@ -106,14 +97,14 @@ class UserManager implements UserManagerInterface
         $this->updatePassword($user);
 
         if ($user->getId() == null) {
-            $id = $this->esmanager->nextIdOf('users');
+            $id = $this->esmanager->nextIdOf('app', 'users');
 
             $user->setId($id);
 
             $this->createPrincipals($user);
         }
         
-        $this->esmanager->simpleIndex('users', $user->getId(), $user->jsonSerialize());
+        $this->esmanager->simpleIndex('app', 'users', $user->getId(), $user->jsonSerialize());
     }
 
     public function updateCanonicalFields(UserInterface $user)
@@ -173,27 +164,22 @@ class UserManager implements UserManagerInterface
 
     public function createPrincipals($user)
     {
-        $oldIndex = $this->esmanager->index;
-        $this->esmanager->index = 'caldav';
-
-        $id = $this->esmanager->nextIdOf('principals');
+        $id = $this->esmanager->nextIdOf('caldav','principals');
         $username = $user->getUsername();
         $usernameCanonical = $user->getUsernameCanonical();
         $email = $user->getEmail();
 
         $principal = ['id' => $id, 'uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
-        $this->esmanager->simpleIndex('principals', $id, $principal);
+        $this->esmanager->simpleIndex('caldav', 'principals', $id, $principal);
 
         $id++;
         $principal['id'] = $id;
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
-        $this->esmanager->simpleIndex('principals', $id, $principal);
+        $this->esmanager->simpleIndex('caldav', 'principals', $id, $principal);
 
         $id++;
         $principal['id'] = $id;
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
-        $this->esmanager->simpleIndex('principals', $id, $principal);
-
-        $this->esmanager->index = $oldIndex;
+        $this->esmanager->simpleIndex('caldav', 'principals', $id, $principal);
     }
 }

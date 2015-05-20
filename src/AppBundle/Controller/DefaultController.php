@@ -6,9 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use AppBundle\Backend\ESManager;
-use Elasticsearch;
-
 class DefaultController extends Controller
 {
     public function indexAction()
@@ -18,15 +15,8 @@ class DefaultController extends Controller
 
     public function testAction()
     {
-        $params = array();
-        $params['connectionParams']['auth'] = array(
-            'ODE',
-            'ultraSecretePasswordOfTheDead',
-            'Basic',
-        );
-        $client = new Elasticsearch\Client($params);
-        $manager = new ESManager($client);
-        $event = $manager->simpleGet('calendarobjects',13)['_source'];
+        $manager = $this->get('esmanager');
+        $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];
 
 
         $converter = $this->container->get('converter');
@@ -73,7 +63,7 @@ VCF;
         $data = $converter->convert('icalendar','json',$data);
 
         $event['vobject'] = $data;
-        $manager->simpleIndex('calendarobjects', 13, $event);
+        //$manager->simpleIndex('calendarobjects', 13, $event);
 
 
         //$data = $converter->convert('icalendar','json',$event['calendardata']);

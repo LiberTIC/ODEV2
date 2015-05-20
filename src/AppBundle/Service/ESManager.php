@@ -1,12 +1,10 @@
 <?php
 
-namespace AppBundle\Backend;
+namespace AppBundle\Service;
 
 class ESManager
 {
     private $client;
-
-    public $index = 'caldav';
 
     public function __construct($client)
     {
@@ -16,10 +14,10 @@ class ESManager
     /**
      * Simple Get mean we get a result with the id specified.
      */
-    public function simpleGet($type, $id)
+    public function simpleGet($index, $type, $id)
     {
         $getParams = array();
-        $getParams['index'] = $this->index;
+        $getParams['index'] = $index;
         $getParams['type'] = $type;
         $getParams['id'] = $id;
 
@@ -29,10 +27,10 @@ class ESManager
     /**
      * Simple Query mean that it will return a result only if it find the EXACT value.
      */
-    public function simpleQuery($type, $params)
+    public function simpleQuery($index, $type, $params)
     {
         $searchParams = array();
-        $searchParams['index'] = $this->index;
+        $searchParams['index'] = $index;
         $searchParams['type'] = $type;
 
         if (count($params) == 1) {
@@ -51,10 +49,10 @@ class ESManager
     /**
      * Complex Query let you provide the parameters for the query.
      */
-    public function complexQuery($type, $params, $sort = null)
+    public function complexQuery($index, $type, $params, $sort = null)
     {
         $searchParams = array();
-        $searchParams['index'] = $this->index;
+        $searchParams['index'] = $index;
         $searchParams['type'] = $type;
         $searchParams['body'] = $params;
 
@@ -72,10 +70,10 @@ class ESManager
     /**
      * Simple Search mean that we return ALL documents found.
      */
-    public function simpleSearch($type)
+    public function simpleSearch($index, $type)
     {
         $searchParams = array();
-        $searchParams['index'] = $this->index;
+        $searchParams['index'] = $index;
         $searchParams['type'] = $type;
 
         $retDoc = $this->client->search($searchParams);
@@ -87,16 +85,16 @@ class ESManager
      * Simple Index mean that we index with the parameters given
      * Return the new id.
      */
-    public function simpleIndex($type, $id, $params)
+    public function simpleIndex($index, $type, $id, $params)
     {
         $indexParams = array();
-        $indexParams['index'] = $this->index;
+        $indexParams['index'] = $index;
         $indexParams['type'] = $type;
         $indexParams['id'] = $id;
         $indexParams['body'] = $params;
         $indexParams['refresh'] = true;
 
-        $this->incIdOf($type);
+        $this->incIdOf($index, $type);
 
         $this->client->index($indexParams);
     }
@@ -104,10 +102,10 @@ class ESManager
     /**
      * Delete based on id.
      */
-    public function simpleDelete($type, $id)
+    public function simpleDelete($index, $type, $id)
     {
         $deleteParams = array();
-        $deleteParams['index'] = $this->index;
+        $deleteParams['index'] = $index;
         $deleteParams['type'] = $type;
         $deleteParams['id'] = $id;
 
@@ -117,18 +115,18 @@ class ESManager
     /**
      * Return the NEXT id to be used.
      */
-    public function nextIdOf($type)
+    public function nextIdOf($index, $type)
     {
-        return $this->simpleGet('auto_increments', 1)['_source'][$type];
+        return $this->simpleGet($index,'auto_increments', 1)['_source'][$type];
     }
 
     /**
      * Increment the index to be used.
      */
-    private function incIdOf($type)
+    private function incIdOf($index, $type)
     {
         $updateParams = array();
-        $updateParams['index'] = $this->index;
+        $updateParams['index'] = $index;
         $updateParams['type'] = 'auto_increments';
         $updateParams['id'] = 1;
         $updateParams['body']['script'] = 'ctx._source.'.$type.'+=1';
@@ -141,7 +139,7 @@ class ESManager
      */
     public function synctokenOf($calendarId)
     {
-        return $this->simpleGet('calendars', $calendarId)['_source']['synctoken'];
+        return $this->simpleGet('caldav','calendars', $calendarId)['_source']['synctoken'];
     }
 
     /**
@@ -150,7 +148,7 @@ class ESManager
     public function incSynctokenOf($calendarId)
     {
         $updateParams = array();
-        $updateParams['index'] = $this->index;
+        $updateParams['index'] = 'caldav';
         $updateParams['type'] = 'calendars';
         $updateParams['id'] = $calendarId;
         $updateParams['body']['script'] = 'ctx._source.synctoken+=1';

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "59a003a54cc52e712a1409763431b86a",
+    "hash": "651784ae8970dc77b696da16d9adf8cf",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1095,6 +1095,51 @@
             "time": "2014-12-12 05:04:05"
         },
         {
+            "name": "m6web/elasticsearch-bundle",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/M6Web/ElasticsearchBundle.git",
+                "reference": "9c1068a647947487f5fd1f86deb595f03293a420"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/M6Web/ElasticsearchBundle/zipball/9c1068a647947487f5fd1f86deb595f03293a420",
+                "reference": "9c1068a647947487f5fd1f86deb595f03293a420",
+                "shasum": ""
+            },
+            "require": {
+                "elasticsearch/elasticsearch": "~1.3.2",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "atoum/atoum": "master-dev",
+                "m6web/coke": "~1.2.0",
+                "m6web/symfony2-coding-standard": "~1.2.0",
+                "symfony/config": "~2.3.0",
+                "symfony/dependency-injection": "~2.3.0",
+                "symfony/yaml": "~2.3"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matthieu Guillermin",
+                    "email": "matthieu.guillermin@m6.fr"
+                }
+            ],
+            "description": "Symfony2 Bundle on top of elasticsearch/elasticsearch-php",
+            "time": "2015-02-04 14:28:12"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.13.1",
             "source": {
@@ -1433,12 +1478,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/polypodes/sabre-vobject.git",
-                "reference": "fb89db02f9ed832e53acba51c0341cbf5c3c34ca"
+                "reference": "5596703c7ad140eb3026b01721878f3a1699e15e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/polypodes/sabre-vobject/zipball/fb89db02f9ed832e53acba51c0341cbf5c3c34ca",
-                "reference": "fb89db02f9ed832e53acba51c0341cbf5c3c34ca",
+                "url": "https://api.github.com/repos/polypodes/sabre-vobject/zipball/5596703c7ad140eb3026b01721878f3a1699e15e",
+                "reference": "5596703c7ad140eb3026b01721878f3a1699e15e",
                 "shasum": ""
             },
             "require": {
@@ -1494,7 +1539,7 @@
                 "forum": "https://groups.google.com/group/sabredav-discuss",
                 "source": "https://github.com/fruux/sabre-vobject"
             },
-            "time": "2015-05-20 10:32:50"
+            "time": "2015-05-20 11:25:54"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -4636,6 +4681,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "sabre/vobject": 20,
+        "m6web/elasticsearch-bundle": 20,
         "squizlabs/php_codesniffer": 20,
         "phpmd/phpmd": 0,
         "fabpot/php-cs-fixer": 0,

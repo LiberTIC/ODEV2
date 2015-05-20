@@ -20,8 +20,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     protected $manager;
     protected $converter;
 
-    public $index = 'caldav';
-
     public $calendarTableName = 'calendars';
 
     public $calendarObjectTableName = 'calendarobjects';
@@ -58,7 +56,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarsForUser($principalUri)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['principaluri' => $principalUri]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['principaluri' => $principalUri]);
 
         if (!$searchResult) {
             return [];
@@ -126,18 +124,18 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             }
         }
 
-        $newIndex = $this->manager->nextIdOf($this->calendarTableName);
+        $newIndex = $this->manager->nextIdOf('caldav',$this->calendarTableName);
 
         $indexValues['id'] = $newIndex;
 
-        $this->manager->simpleIndex($this->calendarTableName, $newIndex, $indexValues);
+        $this->manager->simpleIndex('caldav',$this->calendarTableName, $newIndex, $indexValues);
 
         return $newIndex;
     }
 
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
     {
-        $searchResult = $this->manager->simpleGet($this->calendarTableName, $calendarId);
+        $searchResult = $this->manager->simpleGet('caldav',$this->calendarTableName, $calendarId);
 
         if ($searchResult == null) {
             return;
@@ -167,7 +165,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                 $values[$fieldName] = $value;
             }
 
-            $this->manager->simpleIndex($this->calendarTableName, $calendarId, $values);
+            $this->manager->simpleIndex('caldav',$this->calendarTableName, $calendarId, $values);
 
             $this->addChange($calendarId, '', 2);
 
@@ -178,30 +176,30 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendar($calendarId)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
         if ($searchResult != null) {
             foreach ($searchResult as $obj) {
                 $id = $obj['_source']['id'];
-                $this->manager->simpleDelete($this->calendarObjectTableName, $id);
+                $this->manager->simpleDelete('caldav',$this->calendarObjectTableName, $id);
             }
         }
 
-        $this->manager->simpleDelete($this->calendarObjectTableName, $calendarId);
+        $this->manager->simpleDelete('caldav',$this->calendarObjectTableName, $calendarId);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['calendarid' => $calendarId]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['calendarid' => $calendarId]);
 
         if ($searchResult != null) {
             foreach ($searchResult as $chg) {
                 $id = $obj['_source']['id'];
-                $this->manager->simpleDelete($this->calendarChangesTableName, $id);
+                $this->manager->simpleDelete('caldav',$this->calendarChangesTableName, $id);
             }
         }
     }
 
     public function getCalendarObjects($calendarId)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
         if (!$searchResult) {
             return [];
@@ -230,7 +228,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarObject($calendarId, $objectUri)
     {
-        $hit = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $objectUri]);
+        $hit = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $objectUri]);
 
         if ($hit == null) {
             return;
@@ -254,7 +252,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getMultipleCalendarObjects($calendarId, array $uris)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $uris]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId, 'uri' => $uris]);
 
         if (!$searchResult) {
             return [];
@@ -286,7 +284,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $vCal = VObject\Reader::read($calendarData);
 
-        $id = $this->manager->nextIdOf($this->calendarObjectTableName);
+        $id = $this->manager->nextIdOf('caldav',$this->calendarObjectTableName);
 
         $sizeurl = $this->addURL($vCal,$id);
 
@@ -304,7 +302,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
-        $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
+        $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 1);
     }
@@ -320,7 +318,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     {
         $vCal = VObject\Reader::read($calendarData);
 
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uid' => $vCal->VEVENT->UID->__toString()]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['uid' => $vCal->VEVENT->UID->__toString()]);
 
         if ($searchResult == null) {
             return;
@@ -343,7 +341,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
-        $this->manager->simpleIndex($this->calendarObjectTableName, $id, $values);
+        $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
     }
@@ -355,7 +353,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendarObject($calendarId, $objectUri)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['uri' => $objectUri]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['uri' => $objectUri]);
 
         if ($searchResult == null) {
             return;
@@ -363,7 +361,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $id = $searchResult[0]['_source']['id'];
 
-        $this->manager->simpleDelete($this->calendarObjectTableName, $id);
+        $this->manager->simpleDelete('caldav',$this->calendarObjectTableName, $id);
 
         $this->addChange($calendarId, $objectUri, 3);
     }
@@ -497,7 +495,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarObjectByUID($principalUri, $uid)
     {
-        $searchResult = $this->manager->simpleQuery($this->calendarTableName, ['principaluri' => $principalUri]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['principaluri' => $principalUri]);
 
         if (!$searchResult) {
             return;
@@ -509,7 +507,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $calendarsUri[$cal['_source']['id']] = $cal['_source']['uri'];
         }
 
-        $searchResult = $this->manager->simpleQuery($this->calendarObjectTableName, ['calendarid' => array_keys($calendarsUri)]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => array_keys($calendarsUri)]);
 
         if (!$searchResult) {
             return;
@@ -520,7 +518,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
     {
-        $getResult = $this->manager->simpleQuery($this->calendarTableName, ['id' => $calendarId]);
+        $getResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['id' => $calendarId]);
 
         if (!$getResult['found']) {
             return;
@@ -539,7 +537,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $params['query']['filtered']['filter']['bool']['must']['term']['calendarid'] = $calendarId;
             $params['query']['filtered']['filter']['bool']['must']['range']['syncToken'] = ['gte' => $syncToken, 'lt' => $currentToken];
 
-            $searchResult = $this->manager->complexQuery($this->calendarChangesTableName, $params, ['synctoken' => 'asc']);
+            $searchResult = $this->manager->complexQuery('caldav',$this->calendarChangesTableName, $params, ['synctoken' => 'asc']);
 
             if (!$searchResult) {
                 return $result;
@@ -565,7 +563,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                 }
             }
         } else {
-            $searchResult = $this->manager->simpleRequest($this->calendarObjectTableName, ['calendarid' => $calendarId]);
+            $searchResult = $this->manager->simpleRequest('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId]);
 
             if (!$searchResult) {
                 return;
@@ -581,7 +579,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected function addChange($calendarId, $objectUri, $operation)
     {
-        $id = $this->manager->nextIdOf($this->calendarChangesTableName);
+        $id = $this->manager->nextIdOf('caldav',$this->calendarChangesTableName);
         $synctoken = $this->manager->synctokenOf($calendarId);
 
         $values = [
@@ -592,7 +590,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'operation' => $operation,
         ];
 
-        $this->manager->simpleIndex($this->calendarChangesTableName, $id, $values);
+        $this->manager->simpleIndex('caldav',$this->calendarChangesTableName, $id, $values);
 
         $this->manager->incSynctokenOf($calendarId);
     }

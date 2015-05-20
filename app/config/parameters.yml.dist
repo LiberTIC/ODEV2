@@ -18,3 +18,8 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+
+    elasticsearch_host: localhost
+    elasticsearch_port: 9200
+    elasticsearch_user: ode
+    elasticsearch_password: aPassword

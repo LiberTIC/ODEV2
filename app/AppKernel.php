@@ -18,6 +18,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
             new FOS\UserBundle\FOSUserBundle(),
+            new M6Web\Bundle\ElasticsearchBundle\M6WebElasticsearchBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

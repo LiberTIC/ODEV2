@@ -36,7 +36,7 @@ class Principals extends AbstractBackend
 
     public function getPrincipalsByPrefix($prefixPath)
     {
-        $searchResult = $this->manager->complexQuery($this->tableName, ['query' => ['filtered' => ['filter' => ['prefix' => ['uri' => $prefixPath]]]]]);
+        $searchResult = $this->manager->complexQuery('caldav',$this->tableName, ['query' => ['filtered' => ['filter' => ['prefix' => ['uri' => $prefixPath]]]]]);
 
         $principals = [];
 
@@ -67,7 +67,7 @@ class Principals extends AbstractBackend
 
     public function getPrincipalByPath($path)
     {
-        $searchResult = $this->manager->simpleQuery($this->tableName, ['uri' => $path]);
+        $searchResult = $this->manager->simpleQuery('caldav',$this->tableName, ['uri' => $path]);
 
         if ($searchResult == null) {
             return [];
