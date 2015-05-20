@@ -20,6 +20,13 @@ php app/console server:run
 For the purpose of this project we needed to adapt Sabre\VObject by fixing and tweeking some code. Because of that, we created a fork of this project ([here](https://github.com/polypodes/sabre-vobject)).
 To use our own fork in composer, we followed [these instructions](http://snippets.khromov.se/composer-use-your-own-fork-for-a-package/)
 
+**Installation of ElasticSearch**
+
+You can find detailed informations [here](doc/Elasticsearch_install.md)
+
+## Use of REST API
+
+You can find more information about the API [here](doc/RestAPI.md)
 
 ## Qualité & tests
 
