@@ -12,3 +12,7 @@ caldav:
     defaults: { _controller: AppBundle:CalDAV:index, url: null }
     requirements:
         url: ".*"
+
+api:
+    resource: "@AppBundle/Resources/config/APIrouting.yml"
+    prefix:   /api

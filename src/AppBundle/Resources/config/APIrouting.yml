@@ -1,0 +1,4 @@
+
+api_index:
+    path:     /
+    defaults: { _controller: AppBundle:API:index }
