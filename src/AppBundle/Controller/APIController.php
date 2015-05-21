@@ -16,6 +16,10 @@ class APIController extends Controller
         return $this->buildResponse($data);
     }
 
+
+    /* CALENDAR ACTIONS */
+
+
     public function indexCalendarAction()
     {
         return $this->redirectToRoute('api_calendar_list');
@@ -40,12 +44,67 @@ class APIController extends Controller
 
         if ($calendar == null)
         {
-            $error = ['error' => ['code' => '404', 'message' => 'The calendar with the given uri could not be found.']];
-            return $this->buildResponse($error);
+            return $this->buildError('404','The calendar with the given uri could not be found.');
         }
 
         return $this->buildResponse(['calendar' => $calendar[0]['_source']]);
     }
+
+
+    /* EVENT ACTIONS */
+
+
+    public function indexCalendarEventAction($uri)
+    {
+        return $this->redirectToRoute('api_calendar_event_list',['uri' => $uri]);
+    }
+
+    public function listCalendarEventAction($uri)
+    {
+        $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
+
+        if ($calendar == null)
+        {
+            return $this->buildError('404','The calendar with the given uri could not be found.');
+        }
+
+        $calendarId = $calendar[0]['_source']['id'];
+        $events = $this->get('esmanager')->simpleQuery('caldav','calendarobjects', ['calendarid' => $calendarId]);
+    
+        $ret = [];
+        foreach($events as $event) {
+            $ret[] = ['uri' => $event['_source']['uri'], 'calendaruri' => $uri, 'etag' => $event['_source']['etag'] ];
+        }
+
+        return $this->buildResponse(['events' => $ret]);
+    }
+
+    public function getCalendarEventAction($uri,$uriEvent)
+    {
+        $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
+
+        if ($calendar == null)
+        {
+            return $this->buildError('404','The calendar with the given uri could not be found.');
+        }
+
+        $calendarId = $calendar[0]['_source']['id'];
+
+        $event = $this->get('esmanager')->simpleQuery('caldav','calendarobjects',['uri' => $uriEvent, 'calendarid' => $calendarId]);
+
+        if ($event == null)
+        {
+            return $this->buildError('404','The event with the given uri could not be found.');
+        }
+
+        $vobject = $event[0]['_source']['vobject'];
+        $vobject = $this->get('converter')->jCalUnfix($vobject);
+        return $this->buildResponse(['event' => ['uri' => $uriEvent, 'etag' => $event[0]['_source']['etag'], 'vobject' => $vobject ] ]);
+    }
+
+
+    /* END */
+
 
     public function buildResponse($data) {
 
@@ -70,5 +129,12 @@ class APIController extends Controller
 
             return new Response($data);
         }
+    }
+
+    public function buildError($code,$message) {
+
+        $error = ['error' => ['code' => $code, 'message' => $message]];
+
+        return $this->buildResponse($error);
     }
 }

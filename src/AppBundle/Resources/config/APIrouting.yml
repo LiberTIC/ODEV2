@@ -6,14 +6,29 @@ api_index:
 api_calendar_index:
     path:     /calendar
     defaults: { _controller: AppBundle:API:indexCalendar }
-    methods: [GET]
+    methods:  [GET]
 
 api_calendar_list:
     path:     /calendar/list
     defaults: { _controller: AppBundle:API:listCalendar }
-    methods: [GET]
+    methods:  [GET]
 
 api_calendar_get:
     path:     /calendar/{uri}
     defaults: { _controller: AppBundle:API:getCalendar }
-    methods: [GET]
+    methods:  [GET]
+
+api_calendar_event_index:
+    path:     /calendar/{uri}/event
+    defaults: { _controller: AppBundle:API:indexCalendarEvent }
+    methods:  [GET]
+
+api_calendar_event_list:
+    path:     /calendar/{uri}/event/list
+    defaults: { _controller: AppBundle:API:listCalendarEvent }
+    methods:  [GET]
+
+api_calendar_event_get:
+    path:     /calendar/{uri}/event/{uriEvent}
+    defaults: { _controller: AppBundle:API:getCalendarEvent }
+    methods:  [GET]
