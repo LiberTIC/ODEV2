@@ -2,6 +2,8 @@
 
 *Note: Currently, API only handles json, but new formats should be implemented in a not so distant future*
 
+*Note: For future developement: http://williamdurand.fr/2012/08/02/rest-apis-with-symfony2-the-right-way/*
+
 #### Calendar
 
 **List calendars**
