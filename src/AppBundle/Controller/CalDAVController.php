@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sabre;
@@ -14,7 +15,7 @@ class CalDAVController extends Controller
     {
         date_default_timezone_set('Europe/Paris');
 
-        $baseUri = '/caldav/';
+        $baseUri = '/caldav';
 
         $manager = $this->get('esmanager');
 
@@ -51,14 +52,21 @@ class CalDAVController extends Controller
         $browser = new Sabre\DAV\Browser\Plugin();
         $server->addPlugin($browser);
 
-        $server->exec();
-        $server->httpResponse->setHeader('Content-Security-Policy', "allow 'self';");
+        $callback = function () use ($server,$request) {
 
-        $responseBody = $server->httpResponse->getBodyAsString(); // This method must be called only one time!
+            /* These two lines fix a weird bug
+               where SabreDAV would give the correct answer to a propfind */
+            $url = $server->httpRequest->getUrl();
+            $server->httpRequest = new Sabre\HTTP\Request($request->getMethod(),$url,$request->headers->all(),$request->getContent());
 
-        $this->logIt($request, $server->httpResponse,$responseBody);
+            $server->exec();
 
-        return new Response($responseBody, $server->httpResponse->getStatus(), $server->httpResponse->getHeaders());
+            /* These two lines log the request and the response */
+            $responseBody = $server->httpResponse->getBodyAsString();
+            $this->logIt($request, $server->httpResponse,$responseBody);
+        };
+
+        return new StreamedResponse($callback);
     }
 
     private function logIt($request, $response, $responseBody)
