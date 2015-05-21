@@ -188,9 +188,9 @@ stats: quality build
 	@bin/pdepend --summary-xml=build/pdepend/summary.xml --jdepend-chart=build/pdepend/jdepend.svg --overview-pyramid=build/pdepend/pyramid.svg src
 
 update: vendor/autoload.php
-	@$(MAKE) explain
+#	@$(MAKE) explain
 	@$(MAKE) pull
-	@$(MAKE) schemaDb
+#	@$(MAKE) schemaDb
 	@$(MAKE) clear
 	@$(MAKE) done
 
