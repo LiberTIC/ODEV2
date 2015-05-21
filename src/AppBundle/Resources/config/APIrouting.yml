@@ -2,3 +2,18 @@
 api_index:
     path:     /
     defaults: { _controller: AppBundle:API:index }
+
+api_calendar_index:
+    path:     /calendar
+    defaults: { _controller: AppBundle:API:indexCalendar }
+    methods: [GET]
+
+api_calendar_list:
+    path:     /calendar/list
+    defaults: { _controller: AppBundle:API:listCalendar }
+    methods: [GET]
+
+api_calendar_get:
+    path:     /calendar/{uri}
+    defaults: { _controller: AppBundle:API:getCalendar }
+    methods: [GET]

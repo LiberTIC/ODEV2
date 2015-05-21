@@ -16,6 +16,37 @@ class APIController extends Controller
         return $this->buildResponse($data);
     }
 
+    public function indexCalendarAction()
+    {
+        return $this->redirectToRoute('api_calendar_list');
+    }
+
+    public function listCalendarAction()
+    {
+        $calendars = $this->get('esmanager')->simpleSearch('caldav','calendars');
+
+        $ret = [];
+        foreach($calendars as $calendar)
+        {
+            $ret[] = array('uri' => $calendar['_source']['uri'], 'displayname' => $calendar['_source']['displayname']);
+        }
+
+        return $this->buildResponse(['calendars' => $ret]);
+    }
+
+    public function getCalendarAction($uri)
+    {
+        $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
+
+        if ($calendar == null)
+        {
+            $error = ['error' => ['code' => '404', 'message' => 'The calendar with the given uri could not be found.']];
+            return $this->buildResponse($error);
+        }
+
+        return $this->buildResponse(['calendar' => $calendar[0]['_source']]);
+    }
+
     public function buildResponse($data) {
 
         $format = 'json';
