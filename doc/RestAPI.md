@@ -4,7 +4,8 @@
 
 *Note: For future developement: http://williamdurand.fr/2012/08/02/rest-apis-with-symfony2-the-right-way/*
 
-#### Calendar
+### Calendar
+------------
 
 **List calendars**
 
@@ -70,7 +71,7 @@ Return the calendar corresponding the given uri. Response is formatted as follow
 **List events of a calendar**
 
 ```
-GET /api/calendar/{uri}/event/list
+GET /api/calendar/{uri}/events/
 ```
 
 Return the list of all events of a calendar. Response is formatted as follow:
@@ -106,7 +107,8 @@ Return the list of all events of a calendar. Response is formatted as follow:
 ```
 
 
-#### Events
+### Events
+-----------
 
 **Get event by its uri**
 
