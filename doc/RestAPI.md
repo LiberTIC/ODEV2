@@ -16,14 +16,27 @@ Return the list of all calendar of the server. Response is formatted as follow:
 
 ```
 {
+    "count": 14,
     "calendars": [
         {
             "uri": "default",
-            "displayname": "default"
+            "displayname": "default",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://localhost:8000/api/calendar/default"
+                }
+            ]
         },
         {
-            "uri": "someCalendar",
-            "displayname": "Some Calendar"
+            "uri": "somecalendar",
+            "displayname": "Some Calendar",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://localhost:8000/api/calendar/somecalendar"
+                }
+            ]
         },
         ...
     ]
@@ -41,12 +54,15 @@ Return the calendar corresponding the given uri. Response is formatted as follow
 ```
 {
     "calendar": {
-        "id": 42,
-        "principaluri": "principals\/admin",
         "displayname": "default",
         "uri": "default",
         "synctoken": 1337,
-        ...
+        "description": "Bla bla bla",
+        "links": [
+            { "rel": "self", "href": "http://localhost:8000/api/calendar/default" },
+            { "rel": "events", "href": "http://localhost:8000/api/calendar/default/events/" },
+            { "rel": "owner", "href": "not implemented yet" }
+        ]
     }
 }
 ```
@@ -61,35 +77,61 @@ Return the list of all events of a calendar. Response is formatted as follow:
 
 ```
 {
+    "count": 34,
     "events": [
         {
-            "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55.ics",
+            "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
             "calendaruri": "default",
-            "etag": "e1c27a9442524e5641f8039216420454"
+            "etag": "e1c27a9442524e5641f8039216420454",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://localhost:8000/api/event/9D515E5D-E1D7-4982-A125-A32E74C7BD55"
+                },
+                {
+                    "rel": "calendar",
+                    "href": "http://localhost:8000/api/calendar/default"
+                }
+            ]
         },
         {
-            "uri": "697588A2-2660-4460-9B63-63B0FA70480C.ics",
+            "uri": "697588A2-2660-4460-9B63-63B0FA70480C",
             "calendaruri": "default",
-            "etag": "8e56913f6e36c0ad12c24f6eeb651c3c"
+            "etag": "8e56913f6e36c0ad12c24f6eeb651c3c",
+            ...
         },
         ...
     ]
 }
 ```
 
-**Get event by its uri and its calendar-uri**
+
+#### Events
+
+**Get event by its uri**
 
 ```
-GET /api/calendar/{uri}/event/{uriEvent}
+GET /api/event/{uriEvent}
 ```
 
-Return the event corresponding the given uris. Response is formatted as follow:
+Return the event corresponding the given uri. Response is formatted as follow:
 
 ```
 {
     "event": {
-        "uri": "697588A2-2660-4460-9B63-63B0FA70480C.ics",
-        "etag": "8e56913f6e36c0ad12c24f6eeb651c3c",
+        "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
+        "calendaruri": "default",
+        "links": [
+            {
+                "rel": "self",
+                "href": "http://localhost:8000/api/event/9D515E5D-E1D7-4982-A125-A32E74C7BD55"
+            },
+            {
+                "rel": "calendar",
+                "href": "http://localhost:8000/api/calendar/default"
+            }
+        ],
+        "etag": "e1c27a9442524e5641f8039216420454",
         "vobject": [
             "vcalendar",
             [
