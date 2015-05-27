@@ -67,7 +67,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         foreach ($searchResult as $cal) {
             $src = $cal['_source'];
 
-            $calendar = array('id' => $src['id'],
+            $calendar = array(  
+                      'id' => $cal['_id'],
                       'uri' => $src['uri'],
                       'principaluri' => $src['principaluri'],
                       '{'.CalDAV\Plugin::NS_CALENDARSERVER.'}getctag' => 'http://sabre.io/ns/sync/'.$src['synctoken'],
@@ -90,7 +91,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     public function createCalendar($principalUri, $calendarUri, array $properties)
     {
         $indexValues = [
-            'id' => -1,
             'principaluri' => $principalUri,
             'displayname' => null,
             'uri' => $calendarUri,
@@ -124,13 +124,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             }
         }
 
-        $newIndex = $this->manager->nextIdOf('caldav',$this->calendarTableName);
+        $ret = $this->manager->simpleIndex('caldav',$this->calendarTableName, null, $indexValues);
 
-        $indexValues['id'] = $newIndex;
-
-        $this->manager->simpleIndex('caldav',$this->calendarTableName, $newIndex, $indexValues);
-
-        return $newIndex;
+        return $ret['_id'];
     }
 
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
@@ -180,7 +176,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         if ($searchResult != null) {
             foreach ($searchResult as $obj) {
-                $id = $obj['_source']['id'];
+                $id = $obj['_id'];
                 $this->manager->simpleDelete('caldav',$this->calendarObjectTableName, $id);
             }
         }
@@ -191,7 +187,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         if ($searchResult != null) {
             foreach ($searchResult as $chg) {
-                $id = $obj['_source']['id'];
+                $id = $obj['_id'];
                 $this->manager->simpleDelete('caldav',$this->calendarChangesTableName, $id);
             }
         }
@@ -211,7 +207,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $src = $obj['_source'];
 
             $object = [
-                'id' => $src['id'],
+                'id' => $obj['_id'],
                 'uri' => $src['uri'],
                 'lastmodified' => $src['lastmodified'],
                 'etag' => '"'.$src['etag'].'"',
@@ -237,7 +233,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $row = $hit[0]['_source'];
 
         return [
-            'id' => $row['id'],
+            'id' => $hit[0]['_id'],
             'uri' => $row['uri'],
             'lastmodified' => $row['lastmodified'],
             'etag' => '"'.$row['etag'].'"',
@@ -262,7 +258,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $src = $obj['_source'];
 
             $object = [
-                'id' => $src['id'],
+                'id' => $obj['_id'],
                 'uri' => $src['uri'],
                 'lastmodified' => $src['lastmodified'],
                 'etag' => '"'.$src['etag'].'"',
@@ -282,14 +278,12 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $vCal = VObject\Reader::read($calendarData);
 
-        $id = $this->manager->nextIdOf('caldav',$this->calendarObjectTableName);
+        $this->addURL($vCal,md5($objectUri));
 
-        $this->addURL($vCal,$id);
 
         $calendarData = $vCal->serialize();
 
         $values = [
-            'id' => $id,
             'uri' => $objectUri,
             'lastmodified' => time(),
             'calendarid' => $calendarId,
@@ -301,9 +295,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'lobject' => $this->converter->extractToLobject($vCal)
         ];
 
-        $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, $id, $values);
+        $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, null, $values);
 
         $this->addChange($calendarId, $objectUri, 1);
+        
     }
 
     protected function addURL($vCal,$id)
@@ -322,12 +317,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             return;
         }
 
-        $id = $searchResult[0]['_source']['id'];
+        $id = $searchResult[0]['_id'];
 
         $calendarData = $vCal->serialize();
 
         $values = [
-            'id' => $id,
             'uri' => $objectUri,
             'lastmodified' => time(),
             'calendarid' => $calendarId,
@@ -352,7 +346,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             return;
         }
 
-        $id = $searchResult[0]['_source']['id'];
+        $id = $searchResult[0]['_id'];
 
         $this->manager->simpleDelete('caldav',$this->calendarObjectTableName, $id);
 
@@ -497,7 +491,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $calendarsUri = [];
 
         foreach ($searchResult as $cal) {
-            $calendarsUri[$cal['_source']['id']] = $cal['_source']['uri'];
+            $calendarsUri[$cal['_id']] = $cal['_source']['uri'];
         }
 
         $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => array_keys($calendarsUri)]);
@@ -572,18 +566,17 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected function addChange($calendarId, $objectUri, $operation)
     {
-        $id = $this->manager->nextIdOf('caldav',$this->calendarChangesTableName);
         $synctoken = $this->manager->synctokenOf($calendarId);
 
         $values = [
-            'id' => $id,
+            //'id' => $id,
             'uri' => $objectUri,
             'synctoken' => $synctoken,
             'calendarid' => $calendarId,
             'operation' => $operation,
         ];
 
-        $this->manager->simpleIndex('caldav',$this->calendarChangesTableName, $id, $values);
+        $this->manager->simpleIndex('caldav',$this->calendarChangesTableName, null, $values);
 
         $this->manager->incSynctokenOf($calendarId);
     }

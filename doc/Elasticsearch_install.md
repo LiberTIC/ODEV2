@@ -132,6 +132,71 @@ PUT /caldav
 }
 ```
 
+### Données de tests
+
+```
+POST /caldav/calendars/
+{
+  "principaluri" : "principals/admin",
+  "displayname" : "default",
+  "uri": "default",
+  "synctoken": 1,
+  "description": null,
+  "calendarorder": 1,
+  "calendarcolor": "#711A76FF",
+  "timezone": null,
+  "components": ["VEVENT","VTODO"],
+  "transparent": 0
+}
+
+POST /caldav/principals/
+{
+  "uri": "principals/admin",
+  "email": "admin@example.org",
+  "displayname": "Administrator",
+  "vcardurl": null
+}
+
+POST /caldav/principals/
+{
+  "uri": "principals/admin/calendar-proxy-read",
+  "email": null,
+  "displayname": null,
+  "vcardurl": null
+}
+
+POST /caldav/principals/
+{
+  "uri": "principals/admin/calendar-proxy-write",
+  "email": null,
+  "displayname": null,
+  "vcardurl": null
+}
+
+POST /app/users/
+{
+  "username": "admin",
+  "usernameCanonical": "admin",
+  "email": "admin@admin.fr",
+  "emailCanonical": "admin@admin.fr",
+  "enabled": true,
+  "salt": "buk14ljud3scw4k80k8kcckks8gc8o0",
+  "password": "mnvGN+JXg8jkCr+9AZg7fCP8BEbgGpoclogxp76h7kHg1wAstu8JwZmABhRQYHSUl+KpN4MJIAwXfYoLsMn7MQ==",
+  "passwordDigesta": "87fd274b7b6c01e48d7c2f965da8ddf7",
+  "lastLogin": null,
+  "locked": false,
+  "expired": false,
+  "expires_at": null,
+  "confirmationToken": null,
+  "passwordRequestedAt": null,
+  "roles": [],
+  "credentialsExpired": false,
+  "credentialsExpireAt": null
+}
+```
+
+*Note: admin a pour mot de passe: "admin"*
+
 
 ### Supprimer les logs
 

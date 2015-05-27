@@ -90,11 +90,15 @@ class ESManager
         $indexParams = array();
         $indexParams['index'] = $index;
         $indexParams['type'] = $type;
-        $indexParams['id'] = $id;
+        if ($id != null)
+        {
+            $indexParams['id'] = $id;
+        }
         $indexParams['body'] = $params;
+
         $indexParams['refresh'] = true;
 
-        $this->incIdOf($index, $type);
+        //$this->incIdOf($index, $type);
 
         $this->client->index($indexParams);
     }
@@ -110,28 +114,6 @@ class ESManager
         $deleteParams['id'] = $id;
 
         $this->client->delete($deleteParams);
-    }
-
-    /**
-     * Return the NEXT id to be used.
-     */
-    public function nextIdOf($index, $type)
-    {
-        return $this->simpleGet($index,'auto_increments', 1)['_source'][$type];
-    }
-
-    /**
-     * Increment the index to be used.
-     */
-    private function incIdOf($index, $type)
-    {
-        $updateParams = array();
-        $updateParams['index'] = $index;
-        $updateParams['type'] = 'auto_increments';
-        $updateParams['id'] = 1;
-        $updateParams['body']['script'] = 'ctx._source.'.$type.'+=1';
-
-        $this->client->update($updateParams);
     }
 
     /**

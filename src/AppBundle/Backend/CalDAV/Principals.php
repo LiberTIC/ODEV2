@@ -76,7 +76,8 @@ class Principals extends AbstractBackend
         $pr = $searchResult[0];
 
         $principal = [
-            'id' => $pr['_source']['id'],
+            //'id' => $pr['_source']['id'],
+            'id'  => $pr['_id'],
             'uri' => $pr['_source']['uri'],
         ];
 
