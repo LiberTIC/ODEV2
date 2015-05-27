@@ -171,8 +171,8 @@ class APIController extends Controller
             return $this->buildError('404','The event with the given uri could not be found.');
         }
 
-        $vobject = $event[0]['_source']['vobject'];
-        $vobject = $this->get('converter')->jCalUnfix($vobject);
+        $calendarData = $event[0]['_source']['calendardata'];
+        $vobject = $this->get('converter')->convert('icalendar','json',$calendarData,false);
 
         $calendar = $this->get('esmanager')->simpleGet('caldav','calendars',$event[0]['_source']['calendarid']);
 

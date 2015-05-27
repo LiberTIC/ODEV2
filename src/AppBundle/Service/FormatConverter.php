@@ -9,7 +9,7 @@ class FormatConverter
 
     private $supportedFormat = ["icalendar","json","xml","csv"];
 
-    public function convert($formatSource,$formatDest,$data) {
+    public function convert($formatSource,$formatDest,$data,$fix = true) {
 
         $formatSource = strtolower($formatSource);
         $formatDest = strtolower($formatDest);
@@ -30,7 +30,7 @@ class FormatConverter
 
         if ($formatSource == "icalendar") { // iCal => Json => formatDest
 
-            $retData = $this->convertICalToJson($data);
+            $retData = $this->convertICalToJson($data, $fix);
 
             switch($formatDest) {
                 case "json":
@@ -57,7 +57,7 @@ class FormatConverter
                     break;
             }
 
-            $retData = $this->convertJsonToICal($retData);
+            $retData = $this->convertJsonToICal($retData,$fix);
         } else {
             if ($formatSource == "json" && $formatDest == "xml") {
                 $retData = $this->convertJsonToXML($data);
