@@ -175,7 +175,11 @@ class FormatConverter
 
         foreach($this->lookupTable as $jsonName => $icalName) {
             if ($data = $vevent->__get($icalName)) {
-                $lobject[$jsonName] = $data->__toString();
+                $parts = $data->getParts();
+                if (sizeof($parts) == 1) {
+                    $parts = $parts[0];
+                }
+                $lobject[$jsonName] = $parts;
             }
         }
 

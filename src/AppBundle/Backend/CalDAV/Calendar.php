@@ -280,6 +280,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $this->addURL($vCal,md5($objectUri));
 
+        $this->extractAppleGeo($vCal);
 
         $calendarData = $vCal->serialize();
 
@@ -307,6 +308,28 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
     }
 
+    /* Apple Calendar use a custom property: X-APPLE-STRUCTURED-LOCATION
+     * Even if they also add a LOCATION property, they should also add a GEO property
+     * They don't do it, so we do it.
+     */
+    protected function extractAppleGeo($vCal) {
+        $struct = $vCal->VEVENT->__get('X-APPLE-STRUCTURED-LOCATION');
+        
+        if ($struct == null)
+            return null;
+
+        $geo = substr($struct->getValue(),4);
+
+        if ($vCal->VEVENT->__get('GEO') == null)
+        {
+            $vCal->VEVENT->add('GEO',explode(',',$geo));
+        }
+        else 
+        {
+            $vCal->VEVENT->GEO->setParts(explode(',',$geo));
+        }
+    }
+
     public function updateCalendarObject($calendarId, $objectUri, $calendarData)
     {
         $vCal = VObject\Reader::read($calendarData);
@@ -318,6 +341,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
 
         $id = $searchResult[0]['_id'];
+
+        $this->extractAppleGeo($vCal);
 
         $calendarData = $vCal->serialize();
 
