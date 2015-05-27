@@ -158,6 +158,7 @@ Return the event corresponding the given uri. Response is formatted as follow:
     "event": {
         "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
         "calendaruri": "default",
+        "etag": "e1c27a9442524e5641f8039216420454",
         "links": [
             {
                 "rel": "self",
@@ -168,7 +169,20 @@ Return the event corresponding the given uri. Response is formatted as follow:
                 "href": "http://localhost:8000/api/calendar/default"
             }
         ],
-        "etag": "e1c27a9442524e5641f8039216420454",
+        "lobject": [
+            "name": "Concert de Shakaponk",
+            "id": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
+            "date_start": "20150528",
+            "date_end": "20150529",
+            "date_created": "20150527T112944Z",
+            "location_name": "Stereolux\n4 Boulevard L\u00e9on Bureau\n44200 Nantes",
+            "geo": [
+                "47.205021",
+                "-1.563285"
+            ],
+            "url": "projet-ode.fr/event/8dc771d6d13a1e3096a99743c56881a9",
+            ...
+        ],
         "vobject": [
             "vcalendar",
             [
