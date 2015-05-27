@@ -243,9 +243,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'etag' => '"'.$row['etag'].'"',
             'calendarid' => $row['calendarid'],
             'size' => $row['size'],
-            //'calendardata' => $row['calendardata'],
-            //'calendardata' => $this->converter->convert('json','icalendar',$row)->serialize(),
-            'calendardata' => $this->converter->convert('json','icalendar',$row['vobject'])->serialize(),
+            'calendardata' => $row['calendardata'],
             'component' => strtolower($row['component']),
          ];
     }
@@ -286,7 +284,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $id = $this->manager->nextIdOf('caldav',$this->calendarObjectTableName);
 
-        $sizeurl = $this->addURL($vCal,$id);
+        $this->addURL($vCal,$id);
+
+        $calendarData = $vCal->serialize();
 
         $values = [
             'id' => $id,
@@ -295,12 +295,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'calendarid' => $calendarId,
             'calendardata' => $calendarData,
             'etag' => md5($calendarData),
-            'size' => strlen($calendarData)+$sizeurl,
+            'size' => strlen($calendarData),
             'component' => 'vevent',
             'uid' => $vCal->VEVENT->UID->__toString(),
+            'lobject' => $this->converter->extractToLobject($vCal)
         ];
-
-        $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
         $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, $id, $values);
 
@@ -311,7 +310,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     {
         $url = 'projet-ode.fr/event/'.$id;
         $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
-        return strlen(';VALUE=URI'.$url)+5; // 5 for 'URL:' and '\n'
     }
 
     public function updateCalendarObject($calendarId, $objectUri, $calendarData)
@@ -326,6 +324,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $id = $searchResult[0]['_source']['id'];
 
+        $calendarData = $vCal->serialize();
 
         $values = [
             'id' => $id,
@@ -337,18 +336,12 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'size' => strlen($calendarData),
             'component' => 'vevent',
             'uid' => $vCal->VEVENT->UID->__toString(),
+            'lobject' => $this->converter->extractToLobject($vCal),
         ];
-
-        $values['vobject'] = $this->converter->convert('icalendar','json',$vCal);
 
         $this->manager->simpleIndex('caldav',$this->calendarObjectTableName, $id, $values);
 
         $this->addChange($calendarId, $objectUri, 2);
-    }
-
-    protected function getDenormalizedData($calendarData)
-    {
-        return $this->converter->convert('icalendar','json',$calendarData);
     }
 
     public function deleteCalendarObject($calendarId, $objectUri)

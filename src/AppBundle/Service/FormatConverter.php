@@ -81,20 +81,30 @@ class FormatConverter
 
     // --------------- Converter functions ----------------
 
-    private function convertICalToJson($data) {
+    private function convertICalToJson($data, $fix=true) {
 
-        if ($data instanceof VObject\Component\VCalendar) {
-            $data = $data->jsonSerialize();
-        } else {
-            $data = VObject\Reader::read($data)->jsonSerialize();
+        if (!$data instanceof VObject\Component\VCalendar) {
+            $data = VObject\Reader::read($data);
         }
-        return self::jCalFix($data);
+
+        $data = $data->jsonSerialize();
+
+        if ($fix)
+        {
+            $data = self::jCalFix($data);
+        }
+            
+        return $data;
 
     }
 
-    private function convertJsonToICal($data) {
+    private function convertJsonToICal($data, $fix=true) {
 
-        $data = self::jCalUnfix($data);
+        if ($fix)
+        {
+            $data = self::jCalUnfix($data);
+        }
+        
         return VObject\Reader::readJson($data);
 
     }
@@ -116,6 +126,61 @@ class FormatConverter
     }
 
 
+
+
+
+
+    ///////////// EXTRACT /////////////
+
+    // https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
+    public $lookupTable = [
+        "name"               => "SUMARRY",
+        "id"                 => "UID",
+        "description"        => "DESCRIPTION",
+        "date_start"         => "DTSTART",
+        "date_end"           => "DTEND",
+        "date_created"       => "CREATED",
+        "date_modified"      => "LAST-MODIFIED",
+        "location_name"      => "LOCATION",
+        "location_precision" => "X-ODE-LOCATION-PRECISION",
+        "geo"                => "GEO",
+        "location_capacity"  => "X-ODE-LOCATION-CAPACITY",
+        "attendees"          => "X-ODE-ATTENDEES",
+        "duration"           => "X-ODE-DURATION",
+        "status"             => "STATUS",
+        "promoter"           => "X-ODE-PROMOTER",
+        "subevent"           => "X-ODE-SUBEVENT",
+        "superevent"         => "X-ODE-SUPEREVENT",
+        "url"                => "URL",
+        "url_promoter"       => "X-ODE-URL-PROMOTER",
+        "urls_medias"        => "X-ODE-URLS-MEDIAS",
+        "language"           => "X-ODE-LANGUAGE",
+        "price_standard"     => "X-ODE-PRICE-STANDARD",
+        "price_reduced"      => "X-ODE-PRICE-REDUCED",
+        "price_children"     => "X-ODE-PRICE-CHILDREN",
+        "contact_name"       => "X-ODE-CONTACT-NAME",
+        "contact_email"      => "X-ODE-CONTACT-EMAIL",
+        "category"           => "X-ODE-CATEGORY",
+        "tags"               => "X-ODE-TAGS"
+    ];
+
+    public function extractToVobject($lobject) {
+        // TODO
+    }
+
+    public function extractToLobject($vobject) {
+        $vevent = $vobject->VEVENT;
+
+        $lobject = [];
+
+        foreach($this->lookupTable as $jsonName => $icalName) {
+            if ($data = $vevent->__get($icalName)) {
+                $lobject[$jsonName] = $data->__toString();
+            }
+        }
+
+        return $lobject;
+    }
 
 
 
