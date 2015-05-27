@@ -19,6 +19,11 @@ class APIController extends Controller
 
     /* CALENDAR ACTIONS */
 
+    public function indexCalendarAction()
+    {
+        return $this->redirectToRoute('api_calendar_list');
+    }
+
     public function listCalendarAction()
     {
         $calendars = $this->get('esmanager')->simpleSearch('caldav','calendars');
