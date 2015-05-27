@@ -107,8 +107,43 @@ Return the list of all events of a calendar. Response is formatted as follow:
 ```
 
 
+
+
 ### Events
 -----------
+
+**List events**
+
+```
+GET /api/event/list
+```
+
+Return the list of all events of the server. Response is formatted as follow:
+
+```
+{
+    "count": 23,
+    "events": [
+        {
+            "uri": "94857AE8-45FD-46FE-9857-C62086A05EE4",
+            "calendaruri": "default",
+            "etag": "e94073062a3cef2a0879244b8733e3fc",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "http://localhost:8000/api/event/94857AE8-45FD-46FE-9857-C62086A05EE4"
+                },
+                {
+                    "rel": "calendar",
+                    "href": "http://localhost:8000/api/calendar/default"
+                }
+            ]
+        },
+        ...
+    ]
+}
+```
+
 
 **Get event by its uri**
 
