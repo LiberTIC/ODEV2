@@ -11,7 +11,17 @@ class APIController extends Controller
 
     public function indexAction()
     {
-        $data = array('ODEV2_api' => array('version' => '0.1', 'author' => 'Thibaud Courtoison'));
+        $data = array(
+            'ODEV2_api' => array(
+                'version' => '0.1', 
+                'author' => 'Thibaud Courtoison',
+                'links' => array(
+                    ['rel' => 'github', 'href' => 'https://github.com/LiberTIC/ODEV2'],
+                    ['rel' => 'documentation', 'href' => 'https://github.com/LiberTIC/ODEV2/blob/master/doc/RestAPI.md'],
+                    ['rel' => 'listOfCalendars', 'href' => $this->generateUrl('api_calendar_list',[],true)]
+                    )
+                )
+            );
 
         return $this->buildResponse($data);
     }
