@@ -106,7 +106,7 @@ class APIController extends Controller
             return $this->buildError('404','The calendar with the given uri could not be found.');
         }
 
-        $calendarId = $calendar[0]['_source']['id'];
+        $calendarId = $calendar[0]['_id'];
         $events = $this->get('esmanager')->simpleQuery('caldav','calendarobjects', ['calendarid' => $calendarId]);
     
         $ret = [];
