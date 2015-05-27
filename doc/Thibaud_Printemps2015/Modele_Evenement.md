@@ -98,11 +98,11 @@ Définition technique des noms
 | Participants      | X-ODE-ATTENDEES         | attendees              |
 | Durée             | X-ODE-DURATION          | duration               |
 | Status            | STATUS                  | status                 |
-| Organisateur      | X-ODE-ORGANIZER         | organizer              |
+| Organisateur      | X-ODE-PROMOTER          | promoter               |
 | Sous-Événement    | X-ODE-SUBEVENT          | subevent               |
 | Super-Événement   | X-ODE-SUPEREVENT        | superevent             |
 | URL               | URL                     | url                    |
-| URL orga          | X-ODE-URL-ORGA          | url_orga               |
+| URL orga          | X-ODE-URL-PROMOTER      | url_orga               |
 | URLs medias       | X-ODE-URLS-MEDIAS       | urls_medias            |
 | Langue            | X-ODE-LANGUAGE          | language               |
 | Prix standard     | X-ODE-PRICE-STANDARD    | price_standard         |
