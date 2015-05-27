@@ -18,7 +18,8 @@ class APIController extends Controller
                 'links' => array(
                     ['rel' => 'github', 'href' => 'https://github.com/LiberTIC/ODEV2'],
                     ['rel' => 'documentation', 'href' => 'https://github.com/LiberTIC/ODEV2/blob/master/doc/RestAPI.md'],
-                    ['rel' => 'listOfCalendars', 'href' => $this->generateUrl('api_calendar_list',[],true)]
+                    ['rel' => 'list-of-calendars', 'href' => $this->generateUrl('api_calendar_list',[],true)],
+                    ['rel' => 'list-of-events', 'href' => $this->generateUrl('api_event_list',[],true)]
                     )
                 )
             );
@@ -98,15 +99,6 @@ class APIController extends Controller
         return $this->buildResponse($ret);
     }
 
-
-    /* EVENT ACTIONS */
-
-
-    public function indexCalendarEventAction($uri)
-    {
-        return $this->redirectToRoute('api_calendar_event_list',['uri' => $uri]);
-    }
-
     public function listCalendarEventAction($uri)
     {
         $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
@@ -128,6 +120,40 @@ class APIController extends Controller
                         'links' => array(
                                         ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event['_source']['uid']),true)],
                                         ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)],
+                                    )
+                    );
+        }
+
+        return $this->buildResponse(['count' => count($events), 'events' => $ret]);
+    }
+
+
+    /* EVENT ACTIONS */
+
+
+    public function indexEventAction()
+    {
+        return $this->redirectToRoute('api_event_list');
+    }
+
+    public function listEventAction()
+    {
+        $events = $this->get('esmanager')->simpleSearch('caldav','calendarobjects');
+    
+        $ret = [];
+        foreach($events as $event) {
+
+            $calendar = $this->get('esmanager')->simpleGet('caldav','calendars',$event['_source']['calendarid']);
+
+            $calendarUri = $calendar['_source']['uri'];
+
+            $ret[] = array(
+                        'uri' => $event['_source']['uid'], 
+                        'calendaruri' => $calendarUri, 
+                        'etag' => $event['_source']['etag'],
+                        'links' => array(
+                                        ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event['_source']['uid']),true)],
+                                        ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendarUri),true)],
                                     )
                     );
         }
