@@ -186,5 +186,6 @@ Return the event corresponding the given uri. Response is formatted as follow:
 }
 ```
 
-*Note: vobject use the [jCal](http://tools.ietf.org/html/rfc7265) format*
+*Note1: Vobject use the [jCal](http://tools.ietf.org/html/rfc7265) format*
 
+*Note2: Vobject can be parsed thanks to [Sabre-Vobject](https://github.com/fruux/sabre-vobject)*
