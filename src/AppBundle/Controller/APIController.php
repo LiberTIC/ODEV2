@@ -192,6 +192,7 @@ class APIController extends Controller
                 'calendaruri' => $uri, 
                 'etag' => $event[0]['_source']['etag'], 
                 'links' => $links,
+                'lobject' => $event[0]['_source']['lobject'],
                 'vobject' => $vobject);
 
         return $this->buildResponse(['event' => $ret ]);

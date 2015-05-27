@@ -134,7 +134,7 @@ class FormatConverter
 
     // https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
     public $lookupTable = [
-        "name"               => "SUMARRY",
+        "name"               => "SUMMARY",
         "id"                 => "UID",
         "description"        => "DESCRIPTION",
         "date_start"         => "DTSTART",
