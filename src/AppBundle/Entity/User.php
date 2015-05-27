@@ -11,8 +11,6 @@ class User extends BaseUser implements JsonSerializable
 
     protected $id;
 
-    protected $uid;
-
     private $passwordDigesta;
 
     public function __construct()
@@ -24,14 +22,6 @@ class User extends BaseUser implements JsonSerializable
     public function setId($id)
     {
         $this->id = $id;
-    }
-
-    public function setUid($uid) {
-        $this->uid = $uid;
-    }
-
-    public function getUid() {
-        return $this->uid;
     }
 
     public function setSalt($salt)
@@ -52,8 +42,6 @@ class User extends BaseUser implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            "id" => $this->id,
-            "uid" => $this->uid,
             "username" => $this->username,
             "usernameCanonical" => $this->usernameCanonical,
             "email" => $this->email,

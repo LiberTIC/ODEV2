@@ -100,7 +100,7 @@ class ESManager
 
         //$this->incIdOf($index, $type);
 
-        $this->client->index($indexParams);
+        return $this->client->index($indexParams);
     }
 
     /**

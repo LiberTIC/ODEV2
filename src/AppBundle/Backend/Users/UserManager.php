@@ -107,9 +107,13 @@ class UserManager implements UserManagerInterface
         if ($user->getId() == null) {
 
             $this->createPrincipals($user);
+            $this->createDefaultCalendar($user);
+
+            $ret = $this->esmanager->simpleIndex('app', 'users', null, $user->jsonSerialize());
+            $user->setId($ret['_id']);
+        } else {
+            $this->esmanager->simpleIndex('app', 'users', $user->getId(), $user->jsonSerialize());
         }
-        
-        $this->esmanager->simpleIndex('app', 'users', null, $user->jsonSerialize());
     }
 
     public function updateCanonicalFields(UserInterface $user)
@@ -139,12 +143,9 @@ class UserManager implements UserManagerInterface
         }
     }
 
-
-
-
-
     public function loadUserFromArray($u)
     {
+
         $user = $this->createUser();
         $user->setId($u['_id']);
 
@@ -184,5 +185,25 @@ class UserManager implements UserManagerInterface
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
         $this->esmanager->simpleIndex('caldav', 'principals', null, $principal);
+    }
+
+    public function createDefaultCalendar($user)
+    {
+        $principalUri = 'principals/'.$user->getUsernameCanonical();
+
+        $calendar = [
+            'principaluri' => $principalUri,
+            'displayname' => $user->getUsernameCanonical(),
+            'uri' => $user->getUsernameCanonical(),
+            'synctoken' => 1,
+            'description' => null,
+            'calendarorder' => 1,
+            'calendarcolor' => null,
+            'timezone' => null,
+            'components' => ['VEVENT', 'VTODO'],
+            'transparent' => 0
+        ];
+
+        $this->esmanager->simpleIndex('caldav','calendars',null,$calendar);
     }
 }
