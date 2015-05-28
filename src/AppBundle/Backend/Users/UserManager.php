@@ -159,7 +159,10 @@ class UserManager implements UserManagerInterface
         $user->setSalt($u['salt']);
         $user->setPassword($u['password']);
         if ($u['lastLogin'] != null) {
-            $user->setLastLogin(\DateTime::createFromFormat("Y-m-d H:i:s.u", $u['lastLogin']['date']));
+            $date = \DateTime::createFromFormat("Y-m-d H:i:s", $u['lastLogin']['date']);
+            if ($date == false) 
+                $date = \DateTime::createFromFormat("Y-m-d H:i:s.u", $u['lastLogin']['date']);
+            $user->setLastLogin($date);
         }
         $user->setLocked($u['locked']);
         $user->setExpired($u['locked']);
