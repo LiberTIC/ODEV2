@@ -17,6 +17,8 @@ git clone https://github.com/LiberTIC/ODEV2.git
 VirtualHost *:80>
     ServerName ode.preprod.com
 
+    SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
+
     DocumentRoot /path/to/ODEV2/web
     <Directory /path/to/ODEV2/web>
         AllowOverride None
@@ -31,11 +33,18 @@ VirtualHost *:80>
         </IfModule>
     </Directory>
 
-    # uncomment the following lines if you install assets as symlinks
-    # or run into problems when compiling LESS/Sass/CoffeScript assets
-    # <Directory /var/www/project>
-    #     Options FollowSymlinks
-    # </Directory>
+    # Output buffering needs to be off, to prevent high memory usage
+    php_flag output_buffering off
+
+    # This is also to prevent high memory usage
+    php_flag always_populate_raw_post_data off
+
+    # This is almost a given, but magic quotes is *still* on on some
+    # linux distributions
+    php_flag magic_quotes_gpc off
+
+    # SabreDAV is not compatible with mbstring function overloading
+    php_flag mbstring.func_overload off
 
     ErrorLog /var/log/apache2/error.ode.preprod.log
     CustomLog /var/log/apache2/access.ode.preprod.log combined
