@@ -203,3 +203,13 @@ POST /app/users/
 ```
 curator delete indices --older-than 2 --time-unit days --timestring '%Y.%m.%d' --prefix .marvel-
 ```
+
+If you want to add a cronjob, do the following:
+
+```
+contab -e
+```
+then add the following line:
+```
+0 0 * * * /path/to/ODEV2/curating.sh
+```

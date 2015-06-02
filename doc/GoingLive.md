@@ -14,22 +14,26 @@ git clone https://github.com/LiberTIC/ODEV2.git
 00X-ode.preprod.com.conf:
 
 ```
-VirtualHost *:80>
-    ServerName ode.preprod.com
+<VirtualHost *:80>
+    ServerName ode.preprod.lespolypodes.com
 
     SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
 
-    DocumentRoot /path/to/ODEV2/web
-    <Directory /path/to/ODEV2/web>
+    DocumentRoot /home/lespolypodes/apps/ODEV2/web
+    <Directory /home/lespolypodes/apps/ODEV2/web>
         AllowOverride None
         Order Allow,Deny
         Allow from All
-        Require all granted
+    Require all granted
         <IfModule mod_rewrite.c>
             Options -MultiViews
             RewriteEngine On
+            #RewriteCond %{REQUEST_FILENAME} !-f
+            #RewriteCond %{HTTP:Authorization} ^(.+)$
+            #RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteRule ^(.*)$ app.php [QSA,L]
+            #RewriteRule ^(.*)$ app.php [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},QSA,L]
         </IfModule>
     </Directory>
 
@@ -45,6 +49,12 @@ VirtualHost *:80>
 
     # SabreDAV is not compatible with mbstring function overloading
     php_flag mbstring.func_overload off
+
+    # uncomment the following lines if you install assets as symlinks
+    # or run into problems when compiling LESS/Sass/CoffeScript assets
+    # <Directory /var/www/project>
+    #     Options FollowSymlinks
+    # </Directory>
 
     ErrorLog /var/log/apache2/error.ode.preprod.log
     CustomLog /var/log/apache2/access.ode.preprod.log combined
