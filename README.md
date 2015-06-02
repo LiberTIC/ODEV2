@@ -3,7 +3,7 @@
 ###/!\ Les documents ont été déplacé dans le dossier /doc ! /!\
 
 
-## Installation:
+## Installation (development):
 
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
@@ -20,7 +20,11 @@ php app/console server:run
 For the purpose of this project we needed to adapt Sabre\VObject by fixing and tweeking some code. Because of that, we created a fork of this project ([here](https://github.com/polypodes/sabre-vobject)).
 To use our own fork in composer, we followed [these instructions](http://snippets.khromov.se/composer-use-your-own-fork-for-a-package/)
 
-**Installation of ElasticSearch**
+## Installation (production):
+
+You can find more information on how to go live [here](doc/GoingLive.md)
+
+## Installation of ElasticSearch
 
 You can find detailed informations [here](doc/Elasticsearch_install.md)
 
