@@ -85,7 +85,7 @@ class ESManager
      * Simple Index mean that we index with the parameters given
      * Return the new id.
      */
-    public function simpleIndex($index, $type, $id, $params)
+    public function simpleIndex($index, $type, $id, $params,$refresh = true)
     {
         $indexParams = array();
         $indexParams['index'] = $index;
@@ -96,7 +96,7 @@ class ESManager
         }
         $indexParams['body'] = $params;
 
-        $indexParams['refresh'] = true;
+        $indexParams['refresh'] = $refresh;
 
         //$this->incIdOf($index, $type);
 

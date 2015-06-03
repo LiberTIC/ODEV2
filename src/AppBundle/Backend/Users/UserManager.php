@@ -181,13 +181,13 @@ class UserManager implements UserManagerInterface
         $email = $user->getEmail();
 
         $principal = ['uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal);
+        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal);
+        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal);
+        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
     }
 
     public function createDefaultCalendar($user)
