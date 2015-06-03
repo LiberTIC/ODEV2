@@ -31,7 +31,12 @@
         "sabre/vobject": "dev-3.4.3-elastic as 3.4.3",
         "sabre/dav": "~2.1.3",
         "friendsofsymfony/user-bundle": "~1.3",
-        "m6web/elasticsearch-bundle": "dev-master"
+        "m6web/elasticsearch-bundle": "dev-master",
+        "pomm-project/pomm-symfony-bridge": "dev-master",
+        "pomm-project/cli": "dev-master",
+        "pomm-project/model-manager": "dev-master",
+        "pomm-project/foundation": "dev-master",
+        "pomm-project/pomm-bundle": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle":      "~2.3",
