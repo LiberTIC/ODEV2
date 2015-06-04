@@ -9,10 +9,19 @@
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
 
+        {%  stylesheets
+            '@MopaBootstrapBundle/Resources/public/less/mopabootstrapbundle.less'
+
+        %}
+
+            <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+        {% endstylesheets %}
+
         {% block stylesheets %}
 
             <link href="{{ asset('bundles/app/css/bootstrap.css') }}" rel="stylesheet" />
             <link href="{{ asset('bundles/app/css/jquery-ui.css') }}" rel="stylesheet" />
+            <link href="{{ asset('bundles/mopabootstrap/components/smalot-bootstrap-datetimepicker/css/bootstrap-datetimepicker.css') }}" rel="stylesheet" media="screen">
         
         {% endblock %}
 
@@ -56,9 +65,48 @@
 
             <script type="text/javascript" src="{{ asset('bundles/app/js/jquery.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/app/js/jquery-ui.js') }}"></script>
-            <script type="text/javascript" src="{{ asset('bundles/app/js/bootstrap.css') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/app/js/bootstrap.js') }}"></script>
+
+            <script type="text/javascript" src="{{ asset('bundles/mopabootstrap/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}" charset="UTF-8"></script>
+            <script type="text/javascript" src="{{ asset('bundles/mopabootstrap/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.fr.js') }}" charset="UTF-8"></script>
 
         {% endblock %}
+
+        <script type="text/javascript">
+            $(function(){
+                $('[data-provider="datepicker"]').datetimepicker({
+                    autoclose: true,
+                    format: 'dd/mm/yyyy',
+                    language: 'fr',
+                    minView: 'month',
+                    pickerPosition: 'bottom-left',
+                    todayBtn: true,
+                    startView: 'month'
+                });
+                $('[data-provider="datetimepicker"]').datetimepicker({
+                    autoclose: true,
+                    format: 'd MM yyyy - hh:ii',
+                    language: 'fr',
+                    pickerPosition: 'bottom-left',
+                    todayBtn: true
+                });
+                $('[data-provider="timepicker"]').datetimepicker({
+                    autoclose: true,
+                    format: 'hh:ii',
+                    formatViewType: 'time',
+                    maxView: 'day',
+                    minView: 'hour',
+                    pickerPosition: 'bottom-left',
+                    startView: 'day'
+                });
+                // Restore value from hidden input
+                $('input[type=hidden]', '.date').each(function(){
+                    if($(this).val()) {
+                        $(this).parent().datetimepicker('setValue');
+                    }
+                });
+            });
+        </script>
 
     </body>
 </html>
