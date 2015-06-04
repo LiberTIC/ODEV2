@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new AppBundle\AppBundle(),
             new FOS\UserBundle\FOSUserBundle(),
             new M6Web\Bundle\ElasticsearchBundle\M6WebElasticsearchBundle(),
+            new PommProject\PommBundle\PommBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

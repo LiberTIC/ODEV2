@@ -15,7 +15,7 @@ class DefaultController extends Controller
 
     public function testAction()
     {
-        $manager = $this->get('esmanager');
+        /*$manager = $this->get('esmanager');
         $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];
 
 
@@ -75,7 +75,7 @@ VCF;
         //$response = new Response(implode(',',array_keys($event)));
         $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+        return $response;*/
     }
 
 }

@@ -90,3 +90,12 @@ m6web_elasticsearch:
                     - "%elasticsearch_user%"
                     - "%elasticsearch_password%"
                     - Basic
+
+pomm:
+    configuration:
+        caldav:
+            dsn: 'pgsql://%db_user1%:%db_password1%@%db_host1%:%db_port1%/%db_name1%'
+            class:session_builder: '\PommProject\ModelManager\SessionBuilder'
+            pomm:default: true
+    logger:
+        service: '@logger'
