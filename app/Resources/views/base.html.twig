@@ -8,11 +8,25 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+
+        {% block stylesheets %}
+
+            <link href="{{ asset('bundles/app/css/jquery-ui.css') }}" rel="stylesheet" />
+        
+        {% endblock %}
+
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
+
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+
+        {% block javascripts %}
+
+            <script type="text/javascript" src="{{ asset('bundles/app/js/jquery.js') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/app/js/jquery-ui.js') }}"></script>
+
+        {% endblock %}
+        
     </body>
 </html>

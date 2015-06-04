@@ -31,7 +31,8 @@
         "sabre/vobject": "dev-3.4.3-elastic as 3.4.3",
         "sabre/dav": "~2.1.3",
         "friendsofsymfony/user-bundle": "~1.3",
-        "m6web/elasticsearch-bundle": "dev-master"
+        "m6web/elasticsearch-bundle": "dev-master",
+        "genemu/form-bundle": "2.2.*"
     },
     "require-dev": {
         "sensio/generator-bundle":      "~2.3",

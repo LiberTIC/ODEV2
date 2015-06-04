@@ -90,3 +90,6 @@ m6web_elasticsearch:
                     - "%elasticsearch_user%"
                     - "%elasticsearch_password%"
                     - Basic
+
+genemu_form:
+    date: ~

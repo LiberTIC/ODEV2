@@ -1,28 +1,51 @@
-{{ form_start(form) }}
+{% extends 'base.html.twig' %}
 
-    {{ form_errors(form) }}
+{% block stylesheets %}
 
-    <fieldset>
-        <legend>Description</legend>
-        {{ form_row(form.nom) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.categorie) }}
-        {{ form_row(form.tags) }}
-    </fieldset>
+    {{ parent() }}
 
-    <fieldset>
-        <legend>Dates</legend>
-        {{ form_row(form.date_debut) }}
-        {{ form_row(form.date_fin) }}
-    </fieldset>
+    {{ form_stylesheet(form) }}
 
-    <fieldset>
-        <legend>Lieu</legend>
-        {{ form_row(form.lieu) }}
-        {{ form_row(form.emplacement) }}
-    </fieldset>
+{% endblock %}
 
-    <br/>
-    {{ form_row(form.create) }}
+{% block javascripts %}
 
-{{ form_end(form, {'render_rest': false}) }}
+    {{ parent() }}
+
+    {{ form_javascript(form) }}
+
+{% endblock %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+
+
+        {{ form_errors(form) }}
+
+        <fieldset>
+            <legend>Description</legend>
+            {{ form_row(form.nom) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.categorie) }}
+            {{ form_row(form.tags) }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Dates</legend>
+            {{ form_row(form.date_debut) }}
+            {{ form_row(form.date_fin) }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Lieu</legend>
+            {{ form_row(form.lieu) }}
+            {{ form_row(form.emplacement) }}
+        </fieldset>
+
+        <br/>
+        {{ form_row(form.create) }}
+
+    {{ form_end(form, {'render_rest': false}) }}
+
+{% endblock %}
