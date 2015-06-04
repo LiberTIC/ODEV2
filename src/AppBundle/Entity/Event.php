@@ -7,79 +7,62 @@ class Event
 
     // Modele disponible ici: https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
     
-    /* Nom et description */
 
-    private $nom;
+    private $properties = [
 
-    private $uid;
+        /* Nom et description */
+        "nom"               => null,
+        "uid"               => null,
+        "description"       => null,
 
-    private $description;
+        /* Date et heure */
+        "date_debut"        => null,
+        "date_fin"          => null,
+        "date_creation"     => null,
+        "date_modification" => null,
 
-    /* Date et heure */
+        /* Localisation */
+        "lieu"              => null,
+        "emplacement"       => null,
+        "geolocalisation"   => null,
+        "capacite_lieu"     => null,
 
-    private $date_debut;
+        /* Organisation */
+        "participants"      => null,
+        "duree"             => null,
+        "status"            => null,
+        "organisateur"      => null,
+        "sous_evenement"    => null,
+        "super_evenement"   => null,
 
-    private $date_fin;
+        /* URLs */
+        "url"               => null,
+        "url_orga"          => null,
+        "urls_medias"       => null,
 
-    private $date_creation;
+        /* International */
+        "langue"            => null,
 
-    private $date_modification;
+        /* Tarifs */
+        "prix_standard"     => null,
+        "prix_reduit"       => null,
+        "prix_enfant"       => null,
 
-    /* Localisation */
+        /* Contacts */
+        "contact_nom"       => null,
+        "contact_email"     => null,
 
-    private $lieu;
+        /* Categorisation */
+        "categorie"         => null,
+        "tags"              => null,
+    ];
 
-    private $emplacement;
+    public function __get($name) {
+        return $this->properties[$name];
+    }
 
-    private $geolocalisation;
+    public function __set($name,$value) {
+        $this->properties[$name] = $value;
+    }
 
-    private $capacite_lieu;
-
-    /* Organisation */
-
-    private $participants;
-
-    private $duree;
-
-    private $status;
-
-    private $organisateur;
-
-    private $sous_evenement;
-
-    private $super_evenement;
-
-    /* URLs */
-
-    private $URL;
-
-    private $URL_orga;
-
-    private $URLS_MEDIAS;
-
-    /* International */
-
-    private $langue;
-
-    /* Tarifs */
-
-    private $prix_standard;
-
-    private $prix_reduit;
-
-    private $prix_enfant;
-
-    /* Contacts */
-
-    private $contact_nom;
-
-    private $contact_email;
-
-    /* Categorisation */
-
-    private $categorie;
-
-    private $tags;
-
-    
 }

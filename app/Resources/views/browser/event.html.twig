@@ -1,0 +1,28 @@
+{{ form_start(form) }}
+
+    {{ form_errors(form) }}
+
+    <fieldset>
+        <legend>Description</legend>
+        {{ form_row(form.nom) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.categorie) }}
+        {{ form_row(form.tags) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Dates</legend>
+        {{ form_row(form.date_debut) }}
+        {{ form_row(form.date_fin) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Lieu</legend>
+        {{ form_row(form.lieu) }}
+        {{ form_row(form.emplacement) }}
+    </fieldset>
+
+    <br/>
+    {{ form_row(form.create) }}
+
+{{ form_end(form, {'render_rest': false}) }}
