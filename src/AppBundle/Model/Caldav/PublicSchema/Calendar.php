@@ -5,13 +5,13 @@ namespace AppBundle\Model\Caldav\PublicSchema;
 use PommProject\ModelManager\Model\FlexibleEntity;
 
 /**
- * Calendars
+ * Calendar
  *
  * Flexible entity for relation
- * public.calendars
+ * public.calendar
  *
  * @see FlexibleEntity
  */
-class Calendars extends FlexibleEntity
+class Calendar extends FlexibleEntity
 {
 }

@@ -10,9 +10,9 @@ namespace AppBundle\Model\Caldav\PublicSchema\AutoStructure;
 use PommProject\ModelManager\Model\RowStructure;
 
 /**
- * Calendars
+ * Calendar
  *
- * Structure class for relation public.calendars.
+ * Structure class for relation public.calendar.
  * 
  * Class and fields comments are inspected from table and fields comments.
  * Just add comments in your database and they will appear here.
@@ -22,7 +22,7 @@ use PommProject\ModelManager\Model\RowStructure;
  *
  * @see RowStructure
  */
-class Calendars extends RowStructure
+class Calendar extends RowStructure
 {
     /**
      * __construct
@@ -34,8 +34,8 @@ class Calendars extends RowStructure
     public function __construct()
     {
         $this
-            ->setRelation('public.calendars')
-            ->setPrimaryKey([])
+            ->setRelation('public.calendar')
+            ->setPrimaryKey(['uid'])
             ->addField('uid', 'int4')
             ->addField('principaluri', 'text')
             ->addField('displayname', 'text')

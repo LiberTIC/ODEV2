@@ -15,6 +15,19 @@ class DefaultController extends Controller
 
     public function testAction()
     {
+
+        $calendars = $this->get('pomm')['caldav']
+            ->getModel('\AppBundle\Model\Caldav\PublicSchema\CalendarModel')
+            ->findWhere('principaluri = $*', ['principal/admin']);
+
+        foreach($calendars as $calendar) {
+            print_r($calendar);
+            echo "<br/><br/>";
+        }
+
+        return new Response();
+
+
         /*$manager = $this->get('esmanager');
         $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];
 
