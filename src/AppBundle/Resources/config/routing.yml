@@ -16,3 +16,20 @@ caldav:
 api:
     resource: "@AppBundle/Resources/config/APIrouting.yml"
     prefix:   /api
+
+
+event_create:
+    path:     /event/create
+    defaults: { _controller: AppBundle:Browser:eventCreate }
+
+event_read:
+    path:     /event/{uid}
+    defaults: { _controller: AppBundle:Browser:eventRead }
+
+event_update:
+    path:     /event/{uid}/edit
+    defaults: { _controller: AppBundle:Browser:eventUpdate }
+
+event_delete: 
+    path:     /event/{uid}/delete
+    defaults: { _controller: AppBundle:Browser:eventDelete }
