@@ -10,6 +10,11 @@ class BrowserController extends Controller
 
     public function eventCreateAction() {
 
+        
+
+
+
+
         return new Response("eventCreateAction");
     }
 
