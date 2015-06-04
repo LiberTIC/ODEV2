@@ -1,4 +1,7 @@
-{% extends 'base.html.twig' %}
+
+{% extends 'MopaBootstrapBundle::base.html.twig' %}
+
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
 
 {% block stylesheets %}
 
@@ -18,7 +21,7 @@
 
 {% block body %}
 
-    {{ form_start(form) }}
+    <form class="well bs-example ">
 
 
         {{ form_errors(form) }}
@@ -44,8 +47,9 @@
         </fieldset>
 
         <br/>
-        {{ form_row(form.create) }}
 
-    {{ form_end(form, {'render_rest': false}) }}
+        <button type="submit" class="btn">Create</button>
+
+    </form>
 
 {% endblock %}

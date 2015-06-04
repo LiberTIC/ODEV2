@@ -93,3 +93,6 @@ m6web_elasticsearch:
 
 genemu_form:
     date: ~
+
+mopa_bootstrap:
+    form: ~  # Adds twig form theme  support

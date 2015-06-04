@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new FOS\UserBundle\FOSUserBundle(),
             new M6Web\Bundle\ElasticsearchBundle\M6WebElasticsearchBundle(),
             new Genemu\Bundle\FormBundle\GenemuFormBundle(),
+            new Mopa\Bundle\BootstrapBundle\MopaBootstrapBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
