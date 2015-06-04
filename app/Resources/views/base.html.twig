@@ -11,22 +11,54 @@
 
         {% block stylesheets %}
 
+            <link href="{{ asset('bundles/app/css/bootstrap.css') }}" rel="stylesheet" />
             <link href="{{ asset('bundles/app/css/jquery-ui.css') }}" rel="stylesheet" />
         
         {% endblock %}
 
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
-    <body>
+    <body role="document" style="padding-top: 60px">
 
-        {% block body %}{% endblock %}
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Open Data Event - v2</a>
+                </div>
+                <div id="navbar" class="navbar-right">
+                    <p class="navbar-btn">
+
+                        {% if not auth_rem %}
+                            <a href='{{ path("fos_user_security_login") }}' class="btn btn-default">
+                                Se connecter
+                            </a>
+
+                            <a href='{{ path("fos_user_registration_register") }}' class="btn btn-info">
+                                S'enregistrer
+                            </a>
+                        {% else %}
+
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="content">
+                {% block body %}
+
+                {% endblock %}
+            </div>
+        </div>
 
         {% block javascripts %}
 
             <script type="text/javascript" src="{{ asset('bundles/app/js/jquery.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/app/js/jquery-ui.js') }}"></script>
+            <script type="text/javascript" src="{{ asset('bundles/app/js/bootstrap.css') }}"></script>
 
         {% endblock %}
-        
+
     </body>
 </html>

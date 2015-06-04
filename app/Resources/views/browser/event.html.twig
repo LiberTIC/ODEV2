@@ -1,7 +1,6 @@
+{% extends 'base.html.twig' %}
 
-{% extends 'MopaBootstrapBundle::base.html.twig' %}
 
-{% form_theme form 'bootstrap_3_layout.html.twig' %}
 
 {% block stylesheets %}
 
@@ -21,35 +20,49 @@
 
 {% block body %}
 
-    <form class="well bs-example ">
+    <div class="page-header">
+        <h1>Ajouter un événement</h1>
+    </div>
+
+    <div class="col-lg-4">
+        <h3>En quelques clics</h3>
+        <p>Bla blabla blabla bla bla</p>
+
+        <h3>Accéder aux calendriers</h3>
+        <p>Bla blabla blabla bla bla</p>
+    </div>
+
+    <div class="col-lg-8">
+        <form class="well form-horizontal">
 
 
-        {{ form_errors(form) }}
+            {{ form_errors(form) }}
 
-        <fieldset>
-            <legend>Description</legend>
-            {{ form_row(form.nom) }}
-            {{ form_row(form.description) }}
-            {{ form_row(form.categorie) }}
-            {{ form_row(form.tags) }}
-        </fieldset>
+            <fieldset>
+                <legend>Description</legend>
+                {{ form_row(form.nom) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.categorie) }}
+                {{ form_row(form.tags) }}
+            </fieldset>
 
-        <fieldset>
-            <legend>Dates</legend>
-            {{ form_row(form.date_debut) }}
-            {{ form_row(form.date_fin) }}
-        </fieldset>
+            <fieldset>
+                <legend>Dates</legend>
+                {{ form_row(form.date_debut) }}
+                {{ form_row(form.date_fin) }}
+            </fieldset>
 
-        <fieldset>
-            <legend>Lieu</legend>
-            {{ form_row(form.lieu) }}
-            {{ form_row(form.emplacement) }}
-        </fieldset>
+            <fieldset>
+                <legend>Lieu</legend>
+                {{ form_row(form.lieu) }}
+                {{ form_row(form.emplacement) }}
+            </fieldset>
 
-        <br/>
+            <br/>
 
-        <button type="submit" class="btn">Create</button>
+            <button type="submit" class="btn">Ajouter</button>
 
-    </form>
+        </form>
+    </div>
 
 {% endblock %}

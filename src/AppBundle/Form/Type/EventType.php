@@ -12,13 +12,15 @@ class EventType extends AbstractType
     {
         $builder
             ->add('nom','text', array(
-                'label' => "Label name",
-                'help_block' => 'Associated help text',
+                'label' => "Titre (*)",
                 'attr' => array(
                     'placeholder' => "Some text",
                 )
             ))
-            ->add('description','textarea')
+            ->add('description','textarea',array(
+                'label' => "Description (*)",
+                )
+            )
             ->add('categorie','text')
             ->add('tags','text')
             ->add('date_debut','genemu_jquerydate', array('widget' => 'single_text'))
