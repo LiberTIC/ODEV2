@@ -33,14 +33,14 @@ class EventType extends AbstractType
                 'attr' => array('placeholder' => "Concert; Musique; Shakaponk; Rock; [...]")
                 )
             )
-            ->add('langue','text', array(
+            /*->add('langue','text', array(
                 'label' => "Langue de l'événement",
                 'required' => false,
                 'attr' => array('placeholder' => "fr"),
                 'horizontal_input_wrapper_class' => 'col-lg-2',
                 'help_block' => 'fr, en, es, ...'
                 )
-            )
+            )*/
             /* So, there is this little bug where you can't change the icon of a datetime without breaking things.
              * Which mean that if you want to change the icon, you have to tweak the code in Mopa\Bundle\BootstrapBundle\Resources\views\Form\fields.html.twig
              * There is 2 ways:
