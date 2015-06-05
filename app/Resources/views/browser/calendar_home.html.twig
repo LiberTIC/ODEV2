@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Liste des calendriers</h1>
+    </div>
+
+    <div>
+
+        {% if auth_rem %}
+            <p><a href='{{ path("calendar_create") }}' class="btn btn-success">
+                Ajouter un calendrier
+            </a></p>
+        {% endif %}
+
+        <br/>
+        <br/>
+
+        {% if calendarsUser|length > 0 %}
+            {% set calUsers = true %}
+
+            <legend>Vos calendriers</legend>
+
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th class="col-lg-4">Nom</th>
+                    <th class="col-lg-3">Utilisateur</th>
+                    <th class="col-lg-2">Nombre d'événements</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for calendar in calendarsUser %}
+                <tr>
+                    <td>{{ calendar.displayName }}</td>
+                    <td>{{ calendar.user }}</td>
+                    <td>{{ calendar.events|length }}</td>
+                    <td>
+                        <a href='{{ path("calendar_read",{"uid": calendar.id}) }}' class="btn btn-info">Voir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
+        {% endif %}
+
+        <legend>Tout les
+            {% if calUsers is defined %}
+                autres
+            {% endif %}
+        calendriers</legend>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th class="col-lg-4">Nom</th>
+                    <th class="col-lg-3">Utilisateur</th>
+                    <th class="col-lg-2">Nombre d'événements</th>
+                    <th>Actions</th>
+            </tr>
+
+            {% for calendar in calendars %}
+            <tr>
+                <td>{{ calendar.displayName }}</td>
+                <td>{{ calendar.user }}</td>
+                <td>{{ calendar.events|length }}</td>
+                <td>
+                    <a href='{{ path("calendar_read",{"uid": calendar.id}) }}' class="btn btn-info">Voir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

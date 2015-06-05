@@ -54,6 +54,39 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $this->converter = $converter;
     }
 
+    public function getCalendars() {
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName,[]);
+
+        if (!$searchResult) {
+            return [];
+        }
+
+        $calendars = [];
+
+        foreach ($searchResult as $cal) {
+            $src = $cal['_source'];
+
+            $calendar = array(  
+                      'id' => $cal['_id'],
+                      'uri' => $src['uri'],
+                      'principaluri' => $src['principaluri'],
+                      '{'.CalDAV\Plugin::NS_CALENDARSERVER.'}getctag' => 'http://sabre.io/ns/sync/'.$src['synctoken'],
+                      '{http://sabredav.org/ns}sync-token' => $src['synctoken'],
+                      '{'.CalDAV\Plugin::NS_CALDAV.'}supported-calendar-component-set' => new CalDAV\Property\SupportedCalendarComponentSet($src['components']),
+                      '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' => new CalDAV\Property\ScheduleCalendarTransp($src['transparent'] ? 'transparent' : 'opaque'),
+                      '{DAV:}displayname' => $src['displayname'],
+                      '{urn:ietf:params:xml:ns:caldav}calendar-description' => $src['description'],
+                      '{urn:ietf:params:xml:ns:caldav}calendar-timezone' => $src['timezone'],
+                      '{http://apple.com/ns/ical/}calendar-order' => $src['calendarorder'],
+                      '{http://apple.com/ns/ical/}calendar-color' => $src['calendarcolor'],
+                );
+
+            $calendars[] = $calendar;
+        }
+
+        return $calendars;
+    }
+
     public function getCalendarsForUser($principalUri)
     {
         $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['principaluri' => $principalUri]);

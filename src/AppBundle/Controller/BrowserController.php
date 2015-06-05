@@ -54,28 +54,43 @@ class BrowserController extends Controller
 
     public function calendarHomeAction() {
 
-        $tkn = $this->get('security.context')->getToken();
-        if ( $tkn instanceof AnonymousToken ) {
-            // list all calendars
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
 
-            return new Response("all Calendars");
-        } else {
+        $tkn = $this->get('security.context')->getToken();
+
+        $rawCalendars = $calendarBackend->getCalendars();
+
+        $calendars = [];
+        $calendarsUser = [];
+
+
+        foreach($rawCalendars as $raw) {
+            $calendars[] = new Calendar($raw,null);
+        }
+
+
+        foreach($calendars as $calendar) {
+            $calendar->events = $calendarBackend->getCalendarObjects($raw['id']);
+            $calendar->user = substr($calendar->principalUri,11);
+        }
+
+        if ( !$tkn instanceof AnonymousToken ) {
             // list all calendars + user's calendar
             $usr = $tkn->getUser();
+            $username = $usr->getUsernameCanonical();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
-
-            $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$usr->getUsernameCanonical());
-
-            $calendars = [];
-            foreach($rawCalendars as $raw) {
-                $calendars[] = new Calendar($raw['id'],$raw['uri'],null);
+            foreach($calendars as $key => $calendar) {
+                if ($calendar->principalUri == 'principals/'.$username) {
+                    $calendarsUser[] = $calendars[$key];
+                    unset($calendars[$key]);
+                }
             }
-
-            print_r($calendars);
-
-            return new Response("calendarHomeAction ".$usr->getUsernameCanonical());
         }
+
+        return $this->render('browser/calendar_home.html.twig', array(
+            'calendars' => $calendars,
+            'calendarsUser' => $calendarsUser,
+        ));
 
     }
 
