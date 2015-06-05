@@ -11,6 +11,8 @@ use AppBundle\Form\Type\EventType;
 class BrowserController extends Controller
 {
 
+    /*          EVENT         */
+
     public function eventCreateAction(Request $request) {
 
         $event = new Event();
@@ -43,6 +45,33 @@ class BrowserController extends Controller
     public function eventDeleteAction($uid) {
 
         return new Response("eventDeleteAction / uid: ".$uid);
+    }
+
+    /*          CALENDAR          */
+
+    public function calendarHomeAction() {
+
+        return new Response("calendarHomeAction");
+    }
+
+    public function calendarCreateAction() {
+
+        return new Response("calendarCreateAction");
+    }
+
+    public function calendarReadAction($uid) {
+
+        return new Response("calendarReadAction / uid: ".$uid);
+    }
+
+    public function calendarUpdateAction($uid) {
+
+        return new Response("calendarUpdateAction / uid: ".$uid);
+    }
+
+    public function calendarDeleteAction($uid) {
+
+        return new Response("calendarDeleteAction / uid: ".$uid);
     }
 
 }
