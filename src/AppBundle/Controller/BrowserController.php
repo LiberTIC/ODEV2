@@ -20,7 +20,7 @@ class BrowserController extends Controller
 
         if ($form->isValid()) {
 
-            return new Response("Oh yiiiss / ".$event->nom);
+            return new Response($event->getVObject()->serialize());
         }
 
         return $this->render('browser/event.html.twig', array(
