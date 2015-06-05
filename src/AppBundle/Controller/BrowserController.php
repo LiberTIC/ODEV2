@@ -18,8 +18,22 @@ class BrowserController extends Controller
 
     public function eventCreateAction(Request $request) {
 
+        $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $usr = $this->get('security.context')->getToken()->getUser();
+        $username = $usr->getUsernameCanonical();
+
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+
+        $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
+
+        $calendars = [];
+        foreach($rawCalendars as $raw) {
+            $calendars[$raw['id']] = $raw['{DAV:}displayname'];
+        }
+
         $event = new Event();
-        $form = $this->createForm(new EventType(),$event,["csrf_protection" => false]);
+        $form = $this->createForm(new EventType($calendars),$event,["csrf_protection" => false]);
 
         $form->handleRequest($request);
 
@@ -28,7 +42,7 @@ class BrowserController extends Controller
             return new Response($event->getVObject()->serialize());
         }
 
-        return $this->render('browser/event.html.twig', array(
+        return $this->render('browser/event_create.html.twig', array(
             'form' => $form->createView(),
         ));
 

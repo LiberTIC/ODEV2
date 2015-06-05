@@ -110,10 +110,14 @@ class Event
     ];
 
     public function __get($name) {
+        if ($name == 'calendrier')
+            return $this->calendar;
         return $this->properties[$name];
     }
 
     public function __set($name,$value) {
+            if ($name == 'calendrier')
+                $this->calendar = $value;
         $this->properties[$name] = $value;
     }
 
