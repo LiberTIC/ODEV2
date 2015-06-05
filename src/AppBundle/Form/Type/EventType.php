@@ -41,6 +41,12 @@ class EventType extends AbstractType
                 'help_block' => 'fr, en, es, ...'
                 )
             )
+            /* So, there is this little bug where you can't change the icon of a datetime without breaking things.
+             * Which mean that if you want to change the icon, you have to tweak the code in Mopa\Bundle\BootstrapBundle\Resources\views\Form\fields.html.twig
+             * There is 2 ways:
+             *      1- Line 355, replace 'th' with your icon (ex: calendar)
+             *      2- Comment line 266 and use 'widget_addon_append' here
+             */
             ->add('date_debut', 'datetime',array(
                 'widget' => 'single_text',
                 'horizontal_input_wrapper_class' => 'col-lg-5',
