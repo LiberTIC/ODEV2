@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
 
+{% set active="event" %}
+
 
 {% block stylesheets %}
 
@@ -28,7 +30,7 @@
         <p>Les champs marqué d'une étoile (*) sont obligatoire</p>
 
         <h3>Accéder aux calendriers</h3>
-        <p>Bla blabla blabla bla bla</p>
+        <p>Pour accéder à vos calendrier, cliquez ici: <a href="{{path('calendar_home')}}">Liste des calendriers</a></p>
 
         <div id="oembed">
             <h3>oEmbed</h3>
