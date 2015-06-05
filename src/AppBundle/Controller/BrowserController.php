@@ -5,8 +5,11 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use AppBundle\Entity\Event;
+use AppBundle\Entity\Calendar;
 use AppBundle\Form\Type\EventType;
+use AppBundle\Backend;
 
 class BrowserController extends Controller
 {
@@ -51,7 +54,29 @@ class BrowserController extends Controller
 
     public function calendarHomeAction() {
 
-        return new Response("calendarHomeAction");
+        $tkn = $this->get('security.context')->getToken();
+        if ( $tkn instanceof AnonymousToken ) {
+            // list all calendars
+
+            return new Response("all Calendars");
+        } else {
+            // list all calendars + user's calendar
+            $usr = $tkn->getUser();
+
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+
+            $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$usr->getUsernameCanonical());
+
+            $calendars = [];
+            foreach($rawCalendars as $raw) {
+                $calendars[] = new Calendar($raw['id'],$raw['uri'],null);
+            }
+
+            print_r($calendars);
+
+            return new Response("calendarHomeAction ".$usr->getUsernameCanonical());
+        }
+
     }
 
     public function calendarCreateAction() {
