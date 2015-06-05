@@ -46,7 +46,9 @@
                                 S'enregistrer
                             </a>
                         {% else %}
-
+                            <a href='{{ path("fos_user_security_logout") }}' class="btn btn-info">
+                                Se déconnecter
+                            </a>
                         {% endif %}
                     </p>
                 </div>
