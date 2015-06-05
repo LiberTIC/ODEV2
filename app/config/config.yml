@@ -95,5 +95,5 @@ genemu_form:
     date: ~
 
 mopa_bootstrap:
-    form: ~  # Adds twig form theme  support
-
+    form:
+        render_optional_text: false

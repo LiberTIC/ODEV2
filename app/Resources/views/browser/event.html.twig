@@ -12,7 +12,6 @@
 
     {{ parent() }}
 
-
 {% endblock %}
 
 {% block body %}
@@ -25,12 +24,31 @@
         <h3>En quelques clics</h3>
         <p>Bla blabla blabla bla bla</p>
 
+        <h3>(*) - Champs obligatoires</h3>
+        <p>Les champs marqué d'une étoile (*) sont obligatoire</p>
+
         <h3>Accéder aux calendriers</h3>
         <p>Bla blabla blabla bla bla</p>
+
+        <div id="oembed">
+            <h3>oEmbed</h3>
+            <p><a href="http://www.oembed.com/">oEmbed</a> est un format pour obtenir des informations relative à un média.</p>
+            <p>Globalement, il vous suffit de fournir une url appartenant à un des services suivants:
+                <ul>
+                    <li>Youtube</li>
+                    <li>Flickr</li>
+                    <li>Vimeo</li>
+                    <li>DailyMotion</li>
+                    <li>SoundCloud</li>
+                    <li>...</li>
+                </ul>
+            La liste plus complète est accessible <a href="http://www.oembed.com/#section7.1">ici</a>.
+            </p>
+        </div>
     </div>
 
     <div class="col-lg-8">
-        <form class="well form-horizontal">
+        <form class="well form-horizontal" method="post">
 
 
             {{ form_errors(form) }}
@@ -41,6 +59,7 @@
                 {{ form_row(form.description) }}
                 {{ form_row(form.categorie) }}
                 {{ form_row(form.tags) }}
+                {{ form_row(form.langue) }}
             </fieldset>
 
             <fieldset>
@@ -50,13 +69,75 @@
             </fieldset>
 
             <fieldset>
-                <legend>Lieu</legend>
-                {{ form_row(form.lieu) }}
-                {{ form_row(form.emplacement) }}
+                <legend>
+                    <a data-toggle="collapse" href="#collapseLieu">
+                        Lieu 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseLieu">
+                    {{ form_row(form.lieu) }}
+                    {{ form_row(form.emplacement) }}
+                    {{ form_row(form.capacite_lieu) }}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseOrga">
+                        Organisation 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseOrga">
+                    {{ form_row(form.participants) }}
+                    {{ form_row(form.duree) }}
+                    {{ form_row(form.status) }}
+                    {{ form_row(form.organisateur) }}
+                    {{ form_row(form.url_orga) }}
+                    
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseUrls">
+                        Contacts et medias 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseUrls">
+                    {{ form_row(form.urls_medias) }}
+                    {{ form_row(form.contact_nom) }}
+                    {{ form_row(form.contact_email) }}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseTarifs">
+                        Tarifs 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseTarifs">
+                    {{ form_row(form.prix_standard) }}
+                    {{ form_row(form.prix_reduit) }}
+                    {{ form_row(form.prix_enfant) }}
+                </div>
             </fieldset>
 
             <br/>
 
+            <p>* champ obligatoire</p>
             <button type="submit" class="btn">Ajouter</button>
 
         </form>

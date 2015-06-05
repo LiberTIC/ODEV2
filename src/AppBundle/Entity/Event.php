@@ -15,6 +15,13 @@ class Event
         "uid"               => null,
         "description"       => null,
 
+        /* Categorisation */
+        "categorie"         => null,
+        "tags"              => null,
+
+        /* International */
+        "langue"            => null,
+
         /* Date et heure */
         "date_debut"        => null,
         "date_fin"          => null,
@@ -40,21 +47,14 @@ class Event
         "url_orga"          => null,
         "urls_medias"       => null,
 
-        /* International */
-        "langue"            => null,
+        /* Contacts */
+        "contact_nom"       => null,
+        "contact_email"     => null,
 
         /* Tarifs */
         "prix_standard"     => null,
         "prix_reduit"       => null,
         "prix_enfant"       => null,
-
-        /* Contacts */
-        "contact_nom"       => null,
-        "contact_email"     => null,
-
-        /* Categorisation */
-        "categorie"         => null,
-        "tags"              => null,
     ];
 
     public function __get($name) {
