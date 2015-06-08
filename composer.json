@@ -36,7 +36,10 @@
         "pomm-project/cli": "dev-master",
         "pomm-project/model-manager": "dev-master",
         "pomm-project/foundation": "dev-master",
-        "pomm-project/pomm-bundle": "dev-master"
+        "pomm-project/pomm-bundle": "dev-master",
+        "genemu/form-bundle": "2.2.*",
+        "mopa/bootstrap-bundle": "dev-master",
+        "twbs/bootstrap": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle":      "~2.3",

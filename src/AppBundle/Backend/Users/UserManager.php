@@ -158,6 +158,7 @@ class UserManager implements UserManagerInterface
         $user->setEnabled($u['enabled']);
         $user->setSalt($u['salt']);
         $user->setPassword($u['password']);
+        $user->setPasswordDigesta($u['passwordDigesta']);
         if ($u['lastLogin'] != null) {
             $date = \DateTime::createFromFormat("Y-m-d H:i:s", $u['lastLogin']['date']);
             if ($date == false) 

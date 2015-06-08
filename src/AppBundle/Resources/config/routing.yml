@@ -16,3 +16,45 @@ caldav:
 api:
     resource: "@AppBundle/Resources/config/APIrouting.yml"
     prefix:   /api
+
+
+event_home:
+    path:     /event/
+    defaults: { _controller: AppBundle:Browser:eventHome }
+
+event_create:
+    path:     /event/create
+    defaults: { _controller: AppBundle:Browser:eventCreate }
+
+event_read:
+    path:     /event/{uid}
+    defaults: { _controller: AppBundle:Browser:eventRead }
+
+event_update:
+    path:     /event/{uid}/edit
+    defaults: { _controller: AppBundle:Browser:eventUpdate }
+
+event_delete: 
+    path:     /event/{uid}/delete
+    defaults: { _controller: AppBundle:Browser:eventDelete }
+
+
+calendar_home:
+    path:     /calendar/
+    defaults: { _controller: AppBundle:Browser:calendarHome }
+
+calendar_create:
+    path:     /calendar/create
+    defaults: { _controller: AppBundle:Browser:calendarCreate }
+
+calendar_read:
+    path:     /calendar/{uid}
+    defaults: { _controller: AppBundle:Browser:calendarRead }
+
+calendar_update:
+    path:     /calendar/{uid}/edit
+    defaults: { _controller: AppBundle:Browser:calendarUpdate }
+
+calendar_delete:
+    path:     /calendar/{uid}/delete
+    defaults: { _controller: AppBundle:Browser:calendarDelete }

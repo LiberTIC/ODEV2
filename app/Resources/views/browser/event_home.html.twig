@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+
+{% set active="event" %}
+
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Liste des événements</h1>
+    </div>
+
+    <div>
+
+        {% if auth_rem %}
+            <p><a href='{{ path("event_create") }}' class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span> Créer un événement
+            </a></p>
+        {% endif %}
+
+        <br/>
+        <br/>
+
+        {% if eventsUser|length > 0 %}
+            {% set evUsers = true %}
+
+            <legend>Vos événements</legend>
+
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th class="col-lg-1">Titre</th>
+                    <th class="col-lg-3">Description</th>
+                    <th class="col-lg-1">Catégorie</th>
+                    <th class="col-lg-1">Calendrier</th>
+                    <th class="col-lg-2">Date début</th>
+                    <th class="col-lg-2">Date fin</th>
+                    <th class="col-lg-2">Actions</th>
+                </tr>
+
+                {% for event in eventsUser %}
+                    <tr>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.description }}</td>
+                        <td>{{ event.category }}</td>
+                        <td>{{ event.calendarname }}</td>
+                        <td>{{ event.date_start|date("d/m/Y H:i") }}</td>
+                        <td>{{ event.date_end|date("d/m/Y H:i")  }}</td>
+                        <td>
+                            <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
+                            <a href='{{ path("event_update",{"uid": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <a href='{{ path("event_delete",{"uid": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+        {% endif %}
+
+        <legend>Tout les
+            {% if evUsers is defined %}
+                autres
+            {% endif %}
+            événements</legend>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th class="col-lg-1">Titre</th>
+                <th class="col-lg-3">Description</th>
+                <th class="col-lg-1">Catégorie</th>
+                <th class="col-lg-1">Calendrier</th>
+                <th class="col-lg-2">Date début</th>
+                <th class="col-lg-2">Date fin</th>
+                <th class="col-lg-2">Actions</th>
+            </tr>
+
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.category }}</td>
+                    <td>{{ event.calendarname }}</td>
+                    <td>{{ event.date_start|date("d/m/Y H:i") }}</td>
+                    <td>{{ event.date_end|date("d/m/Y H:i")  }}</td>
+                    <td>
+                        <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div> 
+
+{% endblock %}

@@ -34,7 +34,7 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        [ ]
+    bundles:        []
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -99,3 +99,10 @@ pomm:
             pomm:default: true
     logger:
         service: '@logger'
+
+genemu_form:
+    date: ~
+
+mopa_bootstrap:
+    form:
+        render_optional_text: false
