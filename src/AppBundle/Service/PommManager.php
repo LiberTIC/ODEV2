@@ -29,8 +29,15 @@ class PommManager
         return $res;
     }
 
-    public function findWhere($schema,$table,$params) {
+    public function findWhere($schema,$table,$name,$values) {
 
-        
+        if (!is_array($values))
+            $values = [$values];
+
+        $res = $this->pomm['ODE']
+            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
+            ->findWhere($name.' = $*',$values);
+
+        return $res;
     }
 }

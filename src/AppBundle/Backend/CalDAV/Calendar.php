@@ -2,11 +2,11 @@
 
 namespace AppBundle\Backend\CalDAV;
 
+use Sabre\CalDAV;
 use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
-
 
 
 
@@ -15,6 +15,16 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected $manager;
     protected $converter;
+
+
+    public $propertyMap = [
+        '{DAV:}displayname'                                   => 'displayname',
+        '{urn:ietf:params:xml:ns:caldav}calendar-description' => 'description',
+        '{urn:ietf:params:xml:ns:caldav}calendar-timezone'    => 'timezone',
+        '{http://apple.com/ns/ical/}calendar-order'           => 'calendarorder',
+        '{http://apple.com/ns/ical/}calendar-color'           => 'calendarcolor',
+    ];
+
 
     public function __construct($manager, $converter) {
         $this->manager = $manager;
@@ -25,7 +35,29 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarsForUser($principalUri) {
 
-        return [];
+        $calendars = $this->manager->findWhere('public','calendar','principaluri', $principalUri);
+
+        $raws = [];
+
+        foreach($calendars as $calendar) {
+            $raw = [
+                'id'                                                             => $calendar->uid,
+                'uri'                                                            => $calendar->uri,
+                'principaluri'                                                   => $calendar->principaluri,
+                '{'.CalDAV\Plugin::NS_CALENDARSERVER.'}getctag'                  => 'http://sabre.io/ns/sync/'.($calendar->synctoken ?: '0'),
+                '{http://sabredav.org/ns}sync-token'                             => $calendar->synctoken ?: '0',
+                '{'.CalDAV\Plugin::NS_CALDAV.'}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet($calendar->components),
+                '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp'         => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->transparent ? 'transparent' : 'opaque'),
+            ];
+
+            foreach ($this->propertyMap as $xmlName => $dbName) {
+                $raw[$xmlName] = $calendar->__get($dbName);
+            }
+
+            $raws[] = $raw;
+        }
+
+        return $raws;
     }
 
     public function createCalendar($principalUri, $calendarUri, array $properties) {
