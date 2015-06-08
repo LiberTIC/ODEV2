@@ -10,6 +10,8 @@ class Event
     
     public $calendarid = null;
 
+    public $calendarname = null;
+
     // Modele disponible ici: https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
 
     private $properties = [
@@ -113,12 +115,18 @@ class Event
         if ($name == 'calendarid')
             return $this->calendarid;
 
+        if ($name == 'calendarname')
+            return $this->calendarname;
+
         return $this->properties[$name];
     }
 
     public function __set($name,$value) {
         if ($name == 'calendarid')
             $this->calendarid = $value;
+
+        if ($name == 'calendarname')
+            $this->calendarname = $value;
 
         if ($name == 'date_start' || $name == 'date_end') {
             if (strpos($value,"T") === false) {
@@ -130,7 +138,7 @@ class Event
     }
 
     public function __isset($name) {
-        if ($name == 'calendarid')
+        if ($name == 'calendarid' || $name == 'calendarname')
             return true;
         return array_key_exists($name,$this->properties);
     }

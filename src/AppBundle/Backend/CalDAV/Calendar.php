@@ -87,6 +87,12 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendars;
     }
 
+    public function getCalendarById($id) {
+        $query = $this->manager->simpleGet('caldav',$this->calendarTableName,$id);
+
+        return $query['_source'];
+    }
+
     public function getCalendarsForUser($principalUri)
     {
         $searchResult = $this->manager->simpleQuery('caldav',$this->calendarTableName, ['principaluri' => $principalUri]);

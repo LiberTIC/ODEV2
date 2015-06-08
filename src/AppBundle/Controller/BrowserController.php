@@ -36,6 +36,10 @@ class BrowserController extends Controller
 
             $event->__set('calendarid',$raw['calendarid']);
 
+            $cal = $calendarBackend->getCalendarById($raw['calendarid']);
+
+            $event->__set('calendarname',$cal['displayname']);
+
             $events[] = $event;
         }
 
