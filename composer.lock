@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7bf9a06afeb44ee47043df740b12ae62",
+    "hash": "1f4f6951cff820a531880bafbe234f2f",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1289,12 +1289,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phiamo/MopaBootstrapBundle.git",
-                "reference": "0b467cf9e3de5b80cb7830dc758265204a5fcde5"
+                "reference": "22bc280b9a254caa42c5b44b55f43eb33ab15426"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phiamo/MopaBootstrapBundle/zipball/0b467cf9e3de5b80cb7830dc758265204a5fcde5",
-                "reference": "0b467cf9e3de5b80cb7830dc758265204a5fcde5",
+                "url": "https://api.github.com/repos/phiamo/MopaBootstrapBundle/zipball/22bc280b9a254caa42c5b44b55f43eb33ab15426",
+                "reference": "22bc280b9a254caa42c5b44b55f43eb33ab15426",
                 "shasum": ""
             },
             "require": {
@@ -1304,6 +1304,9 @@
                 "symfony/framework-bundle": "~2.3",
                 "symfony/twig-bundle": "~2.3|~3.0",
                 "twig/twig": ">=1.12"
+            },
+            "conflict": {
+                "symfony/twig-bridge": "<2.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.6"
@@ -1349,7 +1352,7 @@
                 "form",
                 "template"
             ],
-            "time": "2015-06-01 18:19:12"
+            "time": "2015-06-07 17:15:45"
         },
         {
             "name": "mopa/composer-bridge",
@@ -1787,16 +1790,16 @@
         },
         {
             "name": "sabre/dav",
-            "version": "2.1.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-dav.git",
-                "reference": "b70d781e752d71e9df3c64940db4b6238381f14d"
+                "reference": "e15b1e6642a89eeeba40ffbe1fd2a377c01ecbe5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-dav/zipball/b70d781e752d71e9df3c64940db4b6238381f14d",
-                "reference": "b70d781e752d71e9df3c64940db4b6238381f14d",
+                "url": "https://api.github.com/repos/fruux/sabre-dav/zipball/e15b1e6642a89eeeba40ffbe1fd2a377c01ecbe5",
+                "reference": "e15b1e6642a89eeeba40ffbe1fd2a377c01ecbe5",
                 "shasum": ""
             },
             "require": {
@@ -1810,14 +1813,16 @@
                 "ext-simplexml": "*",
                 "ext-spl": "*",
                 "php": ">=5.4.1",
-                "sabre/event": "~2.0.0",
-                "sabre/http": "~3.0.0",
-                "sabre/vobject": ">=3.3.4 <4"
+                "sabre/event": "~2.0",
+                "sabre/http": "~4.0",
+                "sabre/uri": "~1.0",
+                "sabre/vobject": ">=3.3.4,<4",
+                "sabre/xml": "~1.0"
             },
             "require-dev": {
                 "evert/phpdoc-md": "~0.1.0",
                 "phpunit/phpunit": "~4.2",
-                "squizlabs/php_codesniffer": "~1.5.3"
+                "sabre/cs": "~0.0.2"
             },
             "suggest": {
                 "ext-curl": "*",
@@ -1828,6 +1833,11 @@
                 "bin/naturalselection"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.0-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Sabre\\DAV\\": "lib/DAV/",
@@ -1857,7 +1867,7 @@
                 "framework",
                 "iCalendar"
             ],
-            "time": "2015-05-26 00:53:38"
+            "time": "2015-06-02 15:56:19"
         },
         {
             "name": "sabre/event",
@@ -1912,32 +1922,36 @@
         },
         {
             "name": "sabre/http",
-            "version": "3.0.5",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-http.git",
-                "reference": "6b06c03376219b3d608e1f878514ec105ed1b577"
+                "reference": "3b3ba70329e0ffc0a4d9855ca7d7583ab82b1023"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-http/zipball/6b06c03376219b3d608e1f878514ec105ed1b577",
-                "reference": "6b06c03376219b3d608e1f878514ec105ed1b577",
+                "url": "https://api.github.com/repos/fruux/sabre-http/zipball/3b3ba70329e0ffc0a4d9855ca7d7583ab82b1023",
+                "reference": "3b3ba70329e0ffc0a4d9855ca7d7583ab82b1023",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": ">=5.4",
-                "sabre/event": ">=1.0.0,<3.0.0"
+                "sabre/event": ">=1.0.0,<3.0.0",
+                "sabre/uri": "~1.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.3",
-                "squizlabs/php_codesniffer": "~1.5.3"
+                "sabre/cs": "~0.0.1"
             },
             "suggest": {
                 "ext-curl": " to make http requests with the Client class"
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "lib/functions.php"
+                ],
                 "psr-4": {
                     "Sabre\\HTTP\\": "lib/"
                 }
@@ -1959,7 +1973,58 @@
             "keywords": [
                 "http"
             ],
-            "time": "2015-05-11 15:25:57"
+            "time": "2015-05-20 09:05:01"
+        },
+        {
+            "name": "sabre/uri",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fruux/sabre-uri.git",
+                "reference": "6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fruux/sabre-uri/zipball/6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42",
+                "reference": "6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*",
+                "sabre/cs": "~0.0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/functions.php"
+                ],
+                "psr-4": {
+                    "Sabre\\Uri\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Evert Pot",
+                    "email": "me@evertpot.com",
+                    "homepage": "http://evertpot.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Functions for making sense out of URIs.",
+            "homepage": "http://sabre.io/uri/",
+            "keywords": [
+                "rfc3986",
+                "uri",
+                "url"
+            ],
+            "time": "2015-04-29 03:47:26"
         },
         {
             "name": "sabre/vobject",
@@ -2031,6 +2096,60 @@
             "time": "2015-05-20 11:25:54"
         },
         {
+            "name": "sabre/xml",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fruux/sabre-xml.git",
+                "reference": "50e8af01ed81a03cd78bdae678dddd1fe8bb2241"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fruux/sabre-xml/zipball/50e8af01ed81a03cd78bdae678dddd1fe8bb2241",
+                "reference": "50e8af01ed81a03cd78bdae678dddd1fe8bb2241",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-xmlreader": "*",
+                "ext-xmlwriter": "*",
+                "lib-libxml": ">=2.6.20",
+                "php": ">=5.4.1",
+                "sabre/uri": "~1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*",
+                "sabre/cs": "~0.0.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sabre\\Xml\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Evert Pot",
+                    "email": "me@evertpot.com",
+                    "homepage": "http://evertpot.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The Sabre XML parser is the only XML library that you may not hate.",
+            "homepage": "https://sabre.io/xml/",
+            "keywords": [
+                "XMLReader",
+                "XMLWriter",
+                "dom",
+                "xml"
+            ],
+            "time": "2015-05-26 00:11:07"
+        },
+        {
             "name": "sensio/distribution-bundle",
             "version": "v3.0.29",
             "target-dir": "Sensio/Bundle/DistributionBundle",
@@ -2092,16 +2211,16 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "v3.0.8",
+            "version": "v3.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
-                "reference": "a30fc18bf147bc25faf6b1d54bf55cfad4b63cba"
+                "reference": "0616fd568da051adc19ca63006cc808531ba2da4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/a30fc18bf147bc25faf6b1d54bf55cfad4b63cba",
-                "reference": "a30fc18bf147bc25faf6b1d54bf55cfad4b63cba",
+                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/0616fd568da051adc19ca63006cc808531ba2da4",
+                "reference": "0616fd568da051adc19ca63006cc808531ba2da4",
                 "shasum": ""
             },
             "require": {
@@ -2143,7 +2262,7 @@
                 "annotations",
                 "controllers"
             ],
-            "time": "2015-05-29 18:27:23"
+            "time": "2015-06-05 13:59:21"
         },
         {
             "name": "sensiolabs/security-checker",
@@ -2547,12 +2666,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "3487898a6af8c1d5b12f7b040d30e71b19e34923"
+                "reference": "e7a4f9b4fe9ff6562c884fb22384e1891def9386"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/3487898a6af8c1d5b12f7b040d30e71b19e34923",
-                "reference": "3487898a6af8c1d5b12f7b040d30e71b19e34923",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/e7a4f9b4fe9ff6562c884fb22384e1891def9386",
+                "reference": "e7a4f9b4fe9ff6562c884fb22384e1891def9386",
                 "shasum": ""
             },
             "replace": {
@@ -2590,7 +2709,7 @@
                 "responsive",
                 "web"
             ],
-            "time": "2015-05-26 22:15:15"
+            "time": "2015-06-03 04:36:03"
         },
         {
             "name": "twig/extensions",
@@ -4377,16 +4496,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.6.10",
+            "version": "4.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "7b5fe98b28302a8b25693b2298bca74463336975"
+                "reference": "8e0c63329c8c4185296b8d357daa5c6bae43080f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7b5fe98b28302a8b25693b2298bca74463336975",
-                "reference": "7b5fe98b28302a8b25693b2298bca74463336975",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e0c63329c8c4185296b8d357daa5c6bae43080f",
+                "reference": "8e0c63329c8c4185296b8d357daa5c6bae43080f",
                 "shasum": ""
             },
             "require": {
@@ -4397,7 +4516,7 @@
                 "ext-spl": "*",
                 "php": ">=5.3.3",
                 "phpspec/prophecy": "~1.3,>=1.3.1",
-                "phpunit/php-code-coverage": "~2.0,>=2.0.11",
+                "phpunit/php-code-coverage": "~2.1",
                 "phpunit/php-file-iterator": "~1.4",
                 "phpunit/php-text-template": "~1.2",
                 "phpunit/php-timer": "~1.0",
@@ -4419,7 +4538,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.6.x-dev"
+                    "dev-master": "4.7.x-dev"
                 }
             },
             "autoload": {
@@ -4445,7 +4564,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-03 05:03:30"
+            "time": "2015-06-06 08:36:08"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -5106,12 +5225,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "152f32c6ff9bc9f57aa7774838868b1ff0431f80"
+                "reference": "84d1b38a8a9bf113818d0d80684c10a9f407e558"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/152f32c6ff9bc9f57aa7774838868b1ff0431f80",
-                "reference": "152f32c6ff9bc9f57aa7774838868b1ff0431f80",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/84d1b38a8a9bf113818d0d80684c10a9f407e558",
+                "reference": "84d1b38a8a9bf113818d0d80684c10a9f407e558",
                 "shasum": ""
             },
             "require": {
@@ -5172,7 +5291,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2015-06-04 06:14:14"
+            "time": "2015-06-07 23:27:41"
         },
         {
             "name": "theseer/fdomdocument",
