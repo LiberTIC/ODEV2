@@ -4,11 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "hash": "45adbb881f6ecc37c2ae9547d81ec1a1",
-=======
-    "hash": "27f224d389ae700860413bd00609b41b",
->>>>>>> master
+    "hash": "7bf9a06afeb44ee47043df740b12ae62",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -827,8 +823,6 @@
                 "User management"
             ],
             "time": "2015-06-01 00:57:03"
-<<<<<<< HEAD
-=======
         },
         {
             "name": "genemu/form-bundle",
@@ -899,7 +893,6 @@
                 "form"
             ],
             "time": "2014-03-23 12:12:05"
->>>>>>> master
         },
         {
             "name": "guzzle/guzzle",
@@ -1461,12 +1454,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pomm-project/Cli.git",
-                "reference": "42a4886776d1a99f35fe63ff9bfa1b6946b60b4f"
+                "reference": "616e41cd20db05114723a54ae11e316c2ef00423"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pomm-project/Cli/zipball/42a4886776d1a99f35fe63ff9bfa1b6946b60b4f",
-                "reference": "42a4886776d1a99f35fe63ff9bfa1b6946b60b4f",
+                "url": "https://api.github.com/repos/pomm-project/Cli/zipball/616e41cd20db05114723a54ae11e316c2ef00423",
+                "reference": "616e41cd20db05114723a54ae11e316c2ef00423",
                 "shasum": ""
             },
             "require": {
@@ -1513,7 +1506,7 @@
                 "pomm",
                 "postgresql"
             ],
-            "time": "2015-05-29 08:33:50"
+            "time": "2015-06-06 14:53:08"
         },
         {
             "name": "pomm-project/foundation",
@@ -1521,12 +1514,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pomm-project/Foundation.git",
-                "reference": "78af785e399d8f1d35dedbda7d88e5810a4eebe8"
+                "reference": "314a884d2ecb3c78a26e91d61f0898cf447b8c5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pomm-project/Foundation/zipball/78af785e399d8f1d35dedbda7d88e5810a4eebe8",
-                "reference": "78af785e399d8f1d35dedbda7d88e5810a4eebe8",
+                "url": "https://api.github.com/repos/pomm-project/Foundation/zipball/314a884d2ecb3c78a26e91d61f0898cf447b8c5c",
+                "reference": "314a884d2ecb3c78a26e91d61f0898cf447b8c5c",
                 "shasum": ""
             },
             "require": {
@@ -1567,7 +1560,7 @@
                 "pomm",
                 "postgresql"
             ],
-            "time": "2015-05-27 07:33:05"
+            "time": "2015-06-03 19:07:14"
         },
         {
             "name": "pomm-project/model-manager",
@@ -1633,12 +1626,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pomm-project/pomm-bundle.git",
-                "reference": "cf58d5dec1ebf90e36604d645fa928a508166510"
+                "reference": "261e587deab8596bcd12283e9f8e5048423ef192"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pomm-project/pomm-bundle/zipball/cf58d5dec1ebf90e36604d645fa928a508166510",
-                "reference": "cf58d5dec1ebf90e36604d645fa928a508166510",
+                "url": "https://api.github.com/repos/pomm-project/pomm-bundle/zipball/261e587deab8596bcd12283e9f8e5048423ef192",
+                "reference": "261e587deab8596bcd12283e9f8e5048423ef192",
                 "shasum": ""
             },
             "require": {
@@ -1691,7 +1684,7 @@
                 "postgresql",
                 "symfony"
             ],
-            "time": "2015-06-01 08:10:05"
+            "time": "2015-06-08 08:01:28"
         },
         {
             "name": "pomm-project/pomm-symfony-bridge",
@@ -2039,30 +2032,17 @@
         },
         {
             "name": "sensio/distribution-bundle",
-<<<<<<< HEAD
-            "version": "v3.0.28",
-=======
             "version": "v3.0.29",
->>>>>>> master
             "target-dir": "Sensio/Bundle/DistributionBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioDistributionBundle.git",
-<<<<<<< HEAD
-                "reference": "8175618b07793b9d43c3be931f3d8d4c14c9e866"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioDistributionBundle/zipball/8175618b07793b9d43c3be931f3d8d4c14c9e866",
-                "reference": "8175618b07793b9d43c3be931f3d8d4c14c9e866",
-=======
                 "reference": "12e0f5410c7893c297a0a73fd0949d9d48da1e5b"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/sensiolabs/SensioDistributionBundle/zipball/12e0f5410c7893c297a0a73fd0949d9d48da1e5b",
                 "reference": "12e0f5410c7893c297a0a73fd0949d9d48da1e5b",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -2108,11 +2088,7 @@
                 "configuration",
                 "distribution"
             ],
-<<<<<<< HEAD
-            "time": "2015-06-01 15:04:20"
-=======
             "time": "2015-06-04 13:44:14"
->>>>>>> master
         },
         {
             "name": "sensio/framework-extra-bundle",
@@ -2216,23 +2192,23 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.0",
+            "version": "v5.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "31454f258f10329ae7c48763eb898a75c39e0a9f"
+                "reference": "0697e6aa65c83edf97bb0f23d8763f94e3f11421"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/31454f258f10329ae7c48763eb898a75c39e0a9f",
-                "reference": "31454f258f10329ae7c48763eb898a75c39e0a9f",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/0697e6aa65c83edf97bb0f23d8763f94e3f11421",
+                "reference": "0697e6aa65c83edf97bb0f23d8763f94e3f11421",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9.1"
+                "mockery/mockery": "~0.9.1,<0.9.4"
             },
             "type": "library",
             "extra": {
@@ -2261,10 +2237,11 @@
             "description": "Swiftmailer, free feature-rich PHP mailer",
             "homepage": "http://swiftmailer.org",
             "keywords": [
+                "email",
                 "mail",
                 "mailer"
             ],
-            "time": "2015-03-14 06:06:39"
+            "time": "2015-06-06 14:19:39"
         },
         {
             "name": "symfony/assetic-bundle",
@@ -2563,8 +2540,6 @@
                 "framework"
             ],
             "time": "2015-05-29 22:55:07"
-<<<<<<< HEAD
-=======
         },
         {
             "name": "twbs/bootstrap",
@@ -2616,7 +2591,6 @@
                 "web"
             ],
             "time": "2015-05-26 22:15:15"
->>>>>>> master
         },
         {
             "name": "twig/extensions",
@@ -2672,16 +2646,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.18.1",
+            "version": "v1.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "9f70492f44398e276d1b81c1b43adfe6751c7b7f"
+                "reference": "e8e6575abf6102af53ec283f7f14b89e304fa602"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9f70492f44398e276d1b81c1b43adfe6751c7b7f",
-                "reference": "9f70492f44398e276d1b81c1b43adfe6751c7b7f",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/e8e6575abf6102af53ec283f7f14b89e304fa602",
+                "reference": "e8e6575abf6102af53ec283f7f14b89e304fa602",
                 "shasum": ""
             },
             "require": {
@@ -2725,7 +2699,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-04-19 08:30:27"
+            "time": "2015-06-06 23:31:24"
         }
     ],
     "packages-dev": [
@@ -3789,21 +3763,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/FriendlyContexts.git",
-<<<<<<< HEAD
-                "reference": "1afb5ac7c09c07dfcccbd61aa8263f932cebc0bf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/FriendlyContexts/zipball/1afb5ac7c09c07dfcccbd61aa8263f932cebc0bf",
-                "reference": "1afb5ac7c09c07dfcccbd61aa8263f932cebc0bf",
-=======
                 "reference": "5ba856c3972ceb1477bb35f75afd7064d25093aa"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/KnpLabs/FriendlyContexts/zipball/5ba856c3972ceb1477bb35f75afd7064d25093aa",
                 "reference": "5ba856c3972ceb1477bb35f75afd7064d25093aa",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -3842,11 +3807,7 @@
                 }
             ],
             "description": "Some BEHAT contexts",
-<<<<<<< HEAD
-            "time": "2015-05-29 12:33:34"
-=======
             "time": "2015-06-04 12:59:50"
->>>>>>> master
         },
         {
             "name": "nelmio/alice",
@@ -3995,18 +3956,6 @@
         },
         {
             "name": "phploc/phploc",
-<<<<<<< HEAD
-            "version": "2.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/phploc.git",
-                "reference": "d6b05c9072ed7ec3e365722d129f220c24aa90f1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phploc/zipball/d6b05c9072ed7ec3e365722d129f220c24aa90f1",
-                "reference": "d6b05c9072ed7ec3e365722d129f220c24aa90f1",
-=======
             "version": "2.1.3",
             "source": {
                 "type": "git",
@@ -4017,7 +3966,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phploc/zipball/ab893cbe5c4b63760b1560b370fedc001eb5717f",
                 "reference": "ab893cbe5c4b63760b1560b370fedc001eb5717f",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -4057,11 +4005,7 @@
             ],
             "description": "A tool for quickly measuring the size of a PHP project.",
             "homepage": "https://github.com/sebastianbergmann/phploc",
-<<<<<<< HEAD
-            "time": "2015-05-26 14:03:47"
-=======
             "time": "2015-06-04 13:18:14"
->>>>>>> master
         },
         {
             "name": "phpmd/phpmd",
@@ -4187,16 +4131,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "2.1.3",
+            "version": "2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "28a6b34e91d789b2608072ab3c82eaae7cdb973c"
+                "reference": "3703c4bb67c8700957dd41c843254658539d091d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/28a6b34e91d789b2608072ab3c82eaae7cdb973c",
-                "reference": "28a6b34e91d789b2608072ab3c82eaae7cdb973c",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/3703c4bb67c8700957dd41c843254658539d091d",
+                "reference": "3703c4bb67c8700957dd41c843254658539d091d",
                 "shasum": ""
             },
             "require": {
@@ -4245,7 +4189,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-03 07:01:01"
+            "time": "2015-06-06 08:33:23"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -5162,21 +5106,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-<<<<<<< HEAD
-                "reference": "9dd0ada629d115e6ac9fbea7cac944f2775539ec"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9dd0ada629d115e6ac9fbea7cac944f2775539ec",
-                "reference": "9dd0ada629d115e6ac9fbea7cac944f2775539ec",
-=======
                 "reference": "152f32c6ff9bc9f57aa7774838868b1ff0431f80"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/152f32c6ff9bc9f57aa7774838868b1ff0431f80",
                 "reference": "152f32c6ff9bc9f57aa7774838868b1ff0431f80",
->>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -5237,11 +5172,7 @@
                 "phpcs",
                 "standards"
             ],
-<<<<<<< HEAD
-            "time": "2015-05-25 23:18:12"
-=======
             "time": "2015-06-04 06:14:14"
->>>>>>> master
         },
         {
             "name": "theseer/fdomdocument",
@@ -5296,16 +5227,13 @@
     "stability-flags": {
         "sabre/vobject": 20,
         "m6web/elasticsearch-bundle": 20,
-<<<<<<< HEAD
         "pomm-project/pomm-symfony-bridge": 20,
         "pomm-project/cli": 20,
         "pomm-project/model-manager": 20,
         "pomm-project/foundation": 20,
         "pomm-project/pomm-bundle": 20,
-=======
         "mopa/bootstrap-bundle": 20,
         "twbs/bootstrap": 20,
->>>>>>> master
         "squizlabs/php_codesniffer": 20,
         "phpmd/phpmd": 0,
         "fabpot/php-cs-fixer": 0,

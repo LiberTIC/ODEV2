@@ -16,14 +16,19 @@ class DefaultController extends Controller
     public function testAction()
     {
 
-        $calendars = $this->get('pomm')['caldav']
-            ->getModel('\AppBundle\Model\Caldav\PublicSchema\CalendarModel')
-            ->findWhere('principaluri = $*', ['principal/admin']);
+        /*$calendars = $this->get('pomm')['caldav']
+            ->getModel('\AppBundle\Model\Ode\PublicSchema\CalendarModel')
+            ->findWhere('principaluri = $*', ['principal/admin']);*/
+
+        $calendars = $this->get('pmanager')->findAll('public','calendar');
 
         foreach($calendars as $calendar) {
             print_r($calendar);
+            //echo $calendar->displayname;
             echo "<br/><br/>";
         }
+
+        
 
         return new Response();
 

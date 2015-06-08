@@ -5,7 +5,7 @@
  * generation.
  */
 
-namespace AppBundle\Model\Caldav\PublicSchema\AutoStructure;
+namespace AppBundle\Model\Ode\PublicSchema\AutoStructure;
 
 use PommProject\ModelManager\Model\RowStructure;
 

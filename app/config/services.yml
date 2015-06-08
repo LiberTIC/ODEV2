@@ -17,3 +17,7 @@ services:
     esmanager:
         class: AppBundle\Service\ESManager
         arguments: ["@m6web_elasticsearch.client.default"]
+
+    pmanager:
+        class: AppBundle\Service\PommManager
+        arguments: ["@pomm"]

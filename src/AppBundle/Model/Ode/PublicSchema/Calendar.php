@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Model\Caldav\PublicSchema;
+namespace AppBundle\Model\Ode\PublicSchema;
 
 use PommProject\ModelManager\Model\FlexibleEntity;
 

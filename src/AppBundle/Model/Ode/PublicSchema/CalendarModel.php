@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Model\Caldav\PublicSchema;
+namespace AppBundle\Model\Ode\PublicSchema;
 
 use PommProject\ModelManager\Model\Model;
 use PommProject\ModelManager\Model\Projection;
@@ -8,8 +8,8 @@ use PommProject\ModelManager\Model\ModelTrait\WriteQueries;
 
 use PommProject\Foundation\Where;
 
-use AppBundle\Model\Caldav\PublicSchema\AutoStructure\Calendar as CalendarStructure;
-use AppBundle\Model\Caldav\PublicSchema\Calendar;
+use AppBundle\Model\Ode\PublicSchema\AutoStructure\Calendar as CalendarStructure;
+use AppBundle\Model\Ode\PublicSchema\Calendar;
 
 /**
  * CalendarModel
@@ -32,6 +32,6 @@ class CalendarModel extends Model
     public function __construct()
     {
         $this->structure = new CalendarStructure;
-        $this->flexible_entity_class = '\AppBundle\Model\Caldav\PublicSchema\Calendar';
+        $this->flexible_entity_class = '\AppBundle\Model\Ode\PublicSchema\Calendar';
     }
 }

@@ -23,3 +23,9 @@ parameters:
     elasticsearch_port: 9200
     elasticsearch_user: ode
     elasticsearch_password: aPassword
+
+    db_host1: 127.0.0.1
+    db_port1: 5432
+    db_name1: my_db_name
+    db_user1: user
+    db_password1: pass
