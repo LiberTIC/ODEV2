@@ -8,7 +8,7 @@ use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
 
-
+use PommProject\Foundation\Where;
 
 class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
@@ -35,7 +35,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarsForUser($principalUri) {
 
-        $calendars = $this->manager->findWhere('public','calendar','principaluri', $principalUri);
+        $where = Where::create("principaluri = $*",[$principalUri]);
+
+        $calendars = $this->manager->findWhere('public','calendar',$where);
 
         $raws = [];
 
@@ -80,7 +82,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarObjects($calendarId) {
 
-        $calendarObjects = $this->manager->findWhere('public','calendarobject','calendarid',$calendarId);
+        $where = Where::create("calendarid = $*",[$calendarId]);
+
+        $calendarObjects = $this->manager->findWhere('public','calendarobject',$where);
 
         $raws = [];
 
@@ -102,14 +106,51 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getCalendarObject($calendarId, $objectUri) {
 
-        echo "gco";
-        return [];
+        $where = Where::create("calendarid = $*",[$calendarId])
+            ->andWhere("uri = $*",[$objectUri]);
+
+        $calendarObject = $this->manager->findWhere('public','calendarobject',$where);
+
+        $calendarObject = $calendarObject->get(0);
+
+        $raw = [
+            'id'           => $calendarObject->uid,
+            'uri'          => $calendarObject->uri,
+            'lastmodified' => $calendarObject->lastmodified,
+            'etag'         => '"' . $calendarObject->etag . '"',
+            'calendarid'   => $calendarObject->calendarid,
+            'size'         => (int)$calendarObject->size,
+            'calendardata' => $calendarObject->calendardata,
+            'component'    => strtolower($calendarObject->component),
+        ];
+
+        return $raw;
     }
 
     public function getMultipleCalendarObjects($calendarId, array $uris) {
 
-        echo "gmco";
-        return [];
+        $where = Where::createWhereIn('uri',$uris)
+            ->andWhere('calendarid = $*',$calendarId);
+
+        $calendarObjects = $this->manager->findWhere('public','calendarobject',$where);
+
+        $raws = [];
+
+        foreach($calendarObjects as $object) {
+
+            $raws[] = [
+                'id'           => $object->uid,
+                'uri'          => $object->uri,
+                'lastmodified' => $object->lastmodified,
+                'etag'         => '"' . $object->etag . '"',
+                'calendarid'   => $object->calendarid,
+                'size'         => (int)$object->size,
+                'calendardata' => $object->calendardata,
+                'component'    => strtolower($object->component),
+            ];
+        }
+
+        return $raws;
     }
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData) {
@@ -216,7 +257,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getSubscriptionsForUser($principalUri) {
 
-        echo "gsfu";
+        //Method called at /calendars/admin/ in browser
         return [];
     }
 
