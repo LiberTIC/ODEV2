@@ -24,10 +24,6 @@ To use our own fork in composer, we followed [these instructions](http://snippet
 
 You can find more information on how to go live [here](doc/GoingLive.md)
 
-## Installation of ElasticSearch
-
-You can find detailed informations [here](doc/Elasticsearch_install.md)
-
 ## Use of REST API
 
 You can find more information about the API [here](doc/RestAPI.md)

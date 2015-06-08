@@ -18,7 +18,7 @@ class CalDAVController extends Controller
         //$baseUri = '/caldav';
         $baseUri = '/ODEV2/web/app_dev.php/caldav';
 
-        $manager = $this->get('esmanager');
+        //$manager = $this->get('esmanager');
 
         $pmanager = $this->get('pmanager');
 
