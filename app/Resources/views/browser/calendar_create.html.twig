@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+
+{% set active="calendar" %}
+
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Ajouter un calendrier</h1>
+    </div>
+
+    <div class="col-lg-4">
+        <h3>Accéder aux calendriers</h3>
+        <p>Pour accéder à vos calendriers, cliquez ici: <a href="{{path('calendar_home')}}">Liste des calendriers</a></p>
+    </div>
+
+    <div class="col-lg-8">
+        <form class="well form-horizontal" method="post">
+
+            {{ form_errors(form) }}
+
+            {{ form_row(form.displayName) }}
+
+            <button type="submit" class="btn btn-success pull-right">Ajouter</button>
+            <div style="width:0px;height: 30px">
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}

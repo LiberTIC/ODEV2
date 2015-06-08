@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use AppBundle\Entity\Event;
 use AppBundle\Entity\Calendar;
 use AppBundle\Form\Type\EventType;
+use AppBundle\Form\Type\CalendarType;
 use AppBundle\Backend;
 
 class BrowserController extends Controller
@@ -108,9 +109,28 @@ class BrowserController extends Controller
 
     }
 
-    public function calendarCreateAction() {
+    public function calendarCreateAction(Request $request) {
 
-        return new Response("calendarCreateAction");
+        $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $usr = $this->get('security.context')->getToken()->getUser();
+
+        $calendar = new Calendar(null,$usr);
+
+        $form = $this->createForm(new CalendarType(),$calendar,["csrf_protection" => false]);
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+
+            return new Response("ouki");
+        }
+
+        return $this->render('browser/calendar_create.html.twig', array(
+            'form' => $form->createView(),
+        ));
+
+        //return new Response("calendarCreateAction");
     }
 
     public function calendarReadAction($uid) {
