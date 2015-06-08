@@ -226,6 +226,36 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
     }
 
+    public function getAllCalendarObjects() {
+
+        $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, []);
+
+        if (!$searchResult) {
+            return [];
+        }
+
+        $object = [];
+
+        foreach ($searchResult as $obj) {
+            $src = $obj['_source'];
+
+            $object = [
+                'id' => $obj['_id'],
+                'uri' => $src['uri'],
+                'lastmodified' => $src['lastmodified'],
+                //'etag' => '"'.$src['etag'].'"',
+                'calendarid' => $src['calendarid'],
+                //'size' => $src['size'],
+                //'component' => strtolower($src['component']),
+                'lobject' => $src['lobject'],
+            ];
+
+            $objects[] = $object;
+        }
+
+        return $objects;
+    }
+
     public function getCalendarObjects($calendarId)
     {
         $searchResult = $this->manager->simpleQuery('caldav',$this->calendarObjectTableName, ['calendarid' => $calendarId]);

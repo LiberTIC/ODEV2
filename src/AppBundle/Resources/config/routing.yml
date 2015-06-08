@@ -18,6 +18,10 @@ api:
     prefix:   /api
 
 
+event_home:
+    path:     /event/
+    defaults: { _controller: AppBundle:Browser:eventHome }
+
 event_create:
     path:     /event/create
     defaults: { _controller: AppBundle:Browser:eventCreate }

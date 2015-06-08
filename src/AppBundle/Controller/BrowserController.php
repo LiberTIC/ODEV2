@@ -17,6 +17,56 @@ class BrowserController extends Controller
 
     /*          EVENT         */
 
+    public function eventHomeAction() {
+
+        $tkn = $this->get('security.context')->getToken();
+
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+
+        $rawEvents = $calendarBackend->getAllCalendarObjects();
+
+        $events = [];
+        $eventsUser = [];
+
+        foreach($rawEvents as $raw) {
+            $event = new Event();
+            foreach($raw['lobject'] as $name => $value) {
+                $event->__set($name,$value);
+            }
+
+            $event->__set('calendarid',$raw['calendarid']);
+
+            $events[] = $event;
+        }
+
+        if ( !$tkn instanceof AnonymousToken ) {
+
+            $usr = $tkn->getUser();
+            $username = $usr->getUsernameCanonical();
+
+            $calendarsUser = $calendarBackend->getCalendarsForUser('principals/'.$username);
+
+            $calIds = [];
+
+            foreach($calendarsUser as $cal) {
+                $calIds[] = $cal['id'];
+            }
+
+
+            foreach($events as $key => $event) {
+                if (in_array($event->calendarid,$calIds)) {
+                    $eventsUser[] = $event;
+                    unset($events[$key]);
+                }
+            }
+        }
+
+        return $this->render('browser/event_home.html.twig', array(
+            'events' => $events,
+            'eventsUser' => $eventsUser,
+        ));
+    }
+
     public function eventCreateAction(Request $request) {
 
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');

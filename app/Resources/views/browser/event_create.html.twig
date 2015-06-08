@@ -54,18 +54,18 @@
 
             <fieldset>
                 <legend>Description</legend>
-                {{ form_row(form.nom) }}
+                {{ form_row(form.name) }}
                 {{ form_row(form.description) }}
-                {{ form_row(form.categorie) }}
-                {{ form_row(form.calendrier) }}
+                {{ form_row(form.category) }}
+                {{ form_row(form.calendarid) }}
                 {{ form_row(form.tags) }}
-                {#{ form_row(form.langue) }#}
+                {#{ form_row(form.language) }#}
             </fieldset>
 
             <fieldset>
                 <legend>Dates</legend>
-                {{ form_row(form.date_debut) }}
-                {{ form_row(form.date_fin) }}
+                {{ form_row(form.date_start) }}
+                {{ form_row(form.date_end) }}
             </fieldset>
 
             <fieldset>
@@ -78,9 +78,9 @@
                     </a>
                 </legend>
                 <div class="collapse" id="collapseLieu">
-                    {{ form_row(form.lieu) }}
-                    {{ form_row(form.emplacement) }}
-                    {{ form_row(form.capacite_lieu) }}
+                    {{ form_row(form.location_name) }}
+                    {{ form_row(form.location_precision) }}
+                    {{ form_row(form.location_capacity) }}
                 </div>
             </fieldset>
 
@@ -94,11 +94,11 @@
                     </a>
                 </legend>
                 <div class="collapse" id="collapseOrga">
-                    {{ form_row(form.participants) }}
-                    {{ form_row(form.duree) }}
+                    {{ form_row(form.attendees) }}
+                    {{ form_row(form.duration) }}
                     {{ form_row(form.status) }}
-                    {{ form_row(form.organisateur) }}
-                    {{ form_row(form.url_orga) }}
+                    {{ form_row(form.promoter) }}
+                    {{ form_row(form.url_promoter) }}
                     
                 </div>
             </fieldset>
@@ -114,7 +114,7 @@
                 </legend>
                 <div class="collapse" id="collapseUrls">
                     {{ form_row(form.urls_medias) }}
-                    {{ form_row(form.contact_nom) }}
+                    {{ form_row(form.contact_name) }}
                     {{ form_row(form.contact_email) }}
                 </div>
             </fieldset>
@@ -129,9 +129,9 @@
                     </a>
                 </legend>
                 <div class="collapse" id="collapseTarifs">
-                    {{ form_row(form.prix_standard) }}
-                    {{ form_row(form.prix_reduit) }}
-                    {{ form_row(form.prix_enfant) }}
+                    {{ form_row(form.price_standard) }}
+                    {{ form_row(form.price_reduced) }}
+                    {{ form_row(form.price_children) }}
                 </div>
             </fieldset>
 
