@@ -62,41 +62,65 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createCalendar($principalUri, $calendarUri, array $properties) {
 
+        echo "cc";
         return "null";
     }
 
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch) {
 
+        echo "uc";
     }
 
     public function deleteCalendar($calendarId) {
 
+        echo "dc";
     }
 
-    /* EVENTS */
+    /* CALENDAR OBJECTS */
 
     public function getCalendarObjects($calendarId) {
 
-        return [];
+        $calendarObjects = $this->manager->findWhere('public','calendarobject','calendarid',$calendarId);
+
+        $raws = [];
+
+        foreach($calendarObjects as $object) {
+
+            $raws[] = [
+                'id'           => $object->uid,
+                'uri'          => $object->uri,
+                'lastmodified' => $object->lastmodified,
+                'etag'         => '"' . $object->etag . '"',
+                'calendarid'   => $object->calendarid,
+                'size'         => (int)$object->size,
+                'component'    => strtolower($object->component),
+            ];
+        }
+
+        return $raws;
     }
 
     public function getCalendarObject($calendarId, $objectUri) {
 
-        return null;
+        echo "gco";
+        return [];
     }
 
     public function getMultipleCalendarObjects($calendarId, array $uris) {
 
+        echo "gmco";
         return [];
     }
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData) {
 
+        echo "cco";
         return "null";
     }
 
     public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
+        echo "uco";
         return "null";
     }
 
@@ -166,55 +190,71 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendarObject($calendarId, $objectUri) {
 
+        echo "dco";
     }
 
     public function getCalendarObjectByUID($principalUri, $uid) {
 
+        echo "gcobu";
         return null;
     }
 
+    /* CHANGES */
+
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
 
+        echo "gcfc";
         return [];
     }
 
     protected function addChange($calendarId,$objectUri, $operation) {
 
+        echo "ac";
     }
+
+    /* OTHER */
 
     public function getSubscriptionsForUser($principalUri) {
 
+        echo "gsfu";
         return [];
     }
 
     public function createSubscription($principalUri, $uri, array $properties) {
 
+        echo "cs";
         return "null";
     }
 
     public function updateSubscription($subscriptionId, \Sabre\DAV\PropPatch $propPatch) {
 
+        echo "us";
     }
 
     public function deleteSubscription($subscriptionId) {
 
+        echo "ds";
     }
 
     public function getSchedulingObject($principalUri, $objectUri) {
 
+        echo "gso";
         return [];
     }
 
     public function getSchedulingObjects($principalUri) {
 
+        echo "gso";
         return [];
     }
 
     public function deleteSchedulingObject($principalUri, $objectUri) {
 
+        echo "dso";
     }
 
     public function createSchedulingObject($principalUri, $objectUri, $objectData) {
 
+        echo "cso";
     }
 }
