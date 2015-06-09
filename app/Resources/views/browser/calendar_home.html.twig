@@ -71,7 +71,7 @@
                 <td>{{ calendar.user }}</td>
                 <td>{{ calendar.events|length }}</td>
                 <td>
-                    <a href='{{ path("calendar_read",{"uid": calendar.id}) }}' class="btn btn-info">Voir</a>
+                    <a href='{{ path("calendar_read",{"uri": calendar.uri}) }}' class="btn btn-info">Voir</a>
                 </td>
             </tr>
             {% endfor %}
