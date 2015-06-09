@@ -202,7 +202,17 @@ class BrowserController extends Controller
 
     public function calendarReadAction($uri) {
 
-        return new Response("calendarReadAction / uri: ".$uri);
+        $where = Where::create("uri = $*",[$uri]);
+
+        $calendar = $this->get('pmanager')->findWhere('public','calendar',$where)->get(0);
+
+        if ($calendar == null) {
+            return $this->redirectToRoute('calendar_home');
+        }
+
+        return $this->render('browser/calendar_read.html.twig', array(
+            'calendar' => $calendar,
+        ));
     }
 
     public function calendarUpdateAction(Request $request, $uri) {
