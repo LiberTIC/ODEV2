@@ -37,4 +37,32 @@ class PommManager
 
         return $res;
     }
+
+    public function insertOne($schema,$table,$fields) {
+
+        $res = $this->pomm['ODE']
+            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
+            ->createAndSave($fields);
+
+        return $res;
+    }
+
+    public function createOne($schema,$table,$fields) {
+
+        $res = $this->pomm['ODE']
+            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
+            ->createEntity($fields);
+
+        return $res;
+    }
+
+    public function updateOne($schema,$table,$entity,$fields_keys) {
+
+        $res = $this->pomm['ODE']
+            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
+            ->updateOne($entity,$fields_keys);
+
+        return $res;
+
+    }
 }

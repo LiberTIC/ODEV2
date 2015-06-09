@@ -18,6 +18,49 @@ class DefaultController extends Controller
     public function testAction()
     {
 
+        /*$calendar = [
+            'principaluri' => 'principals/admin',
+            'displayname' => 'Sans titre',
+            'uri' => 'D693B5E6-0EC2-4E58-AB17-E796E2A99C3A',
+            'synctoken' => 1,
+            'description' => 'Nouveau Calendrier',
+            'calendarorder' => 1,
+            'components' => ['VEVENT'],
+            'transparent' => null,
+            'timezone' => ' BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Apple Inc.//Mac OS X 10.9.5//EN
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:Europe/Paris
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+DTSTART:19810329T020000
+TZNAME:UTC+2
+TZOFFSETTO:+0200
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+DTSTART:19961027T030000
+TZNAME:UTC+1
+TZOFFSETTO:+0100
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+',
+            'calendarorder' => 2,
+            'calendarcolor' => '#0E61B9FF'
+        ];
+
+
+        $cal = $this->get('pmanager')->insertOne('public','calendar',$calendar);
+
+        print_r($cal);
+
+        return new Response();*/
+
         /*$calendars = $this->get('pomm')['caldav']
             ->getModel('\AppBundle\Model\Ode\PublicSchema\CalendarModel')
             ->findWhere('principaluri = $*', ['principal/admin']);*/
@@ -39,7 +82,7 @@ class DefaultController extends Controller
         $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];*/
 
 
-        $converter = $this->container->get('converter');
+        /*$converter = $this->container->get('converter');
 
         $data = <<<VCF
 BEGIN:VCALENDAR
@@ -80,7 +123,7 @@ VCF;
         //$response = new Response(implode(',',array_keys($event)));
         $response->headers->set('Content-Type', 'application/json');
 
-        return $response;
+        return $response;*/
     }
 
 }

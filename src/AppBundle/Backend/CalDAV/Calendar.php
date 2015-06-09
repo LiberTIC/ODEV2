@@ -81,13 +81,79 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createCalendar($principalUri, $calendarUri, array $properties) {
 
-        echo "cc";
-        return "null";
+        $values = [
+            'principaluri' => $principalUri,
+            'uri'          => $calendarUri,
+            'synctoken'    => 1,
+            'transparent'  => 0,
+        ];
+
+        // Default value
+        $sccs = '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set';
+        if (!isset($properties[$sccs])) {
+            $values['components'] = ['VEVENT','VTODO'];
+        } else {
+            if (!($properties[$sccs] instanceof CalDAV\Xml\Property\SupportedCalendarComponentSet)) {
+                throw new DAV\Exception('The ' . $sccs . ' property must be of type: \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet');
+            }
+            $values['components'] = $properties[$sccs]->getValue();
+        }
+        $transp = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
+        if (isset($properties[$transp])) {
+            $values['transparent'] = $properties[$transp]->getValue() === 'transparent';
+        }
+
+        foreach ($this->propertyMap as $xmlName => $dbName) {
+            if (isset($properties[$xmlName])) {
+
+                $values[$dbName] = $properties[$xmlName];
+            }
+        }
+
+        $calendar = $this->manager->insertOne('public','calendar',$values);
+
+        return $calendar->uid;
     }
 
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch) {
 
-        echo "uc";
+        $supportedProperties = array_keys($this->propertyMap);
+        $supportedProperties[] = '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp';
+
+        $manager = $this->manager;
+
+        $propPatch->handle($supportedProperties, function($mutations) use ($calendarId,$manager) {
+            $newValues = [];
+            foreach ($mutations as $propertyName => $propertyValue) {
+
+                switch ($propertyName) {
+                    case '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp' :
+                        $fieldName = 'transparent';
+                        $newValues[$fieldName] = $propertyValue->getValue() === 'transparent';
+                        break;
+                    default :
+                        $fieldName = $this->propertyMap[$propertyName];
+                        $newValues[$fieldName] = $propertyValue;
+                        break;
+                }
+
+            }
+
+            $calendar = $manager->findById('public','calendar',$calendarId);
+
+            foreach($newValues as $name => $value) {
+                $calendar->$name = $value;
+            }
+
+
+            $manager->updateOne('public','calendar',$calendar,array_keys($newValues));
+
+            /*$this->addChange($calendarId, "", 2);*/
+
+            return true;
+
+        });
+
     }
 
     public function deleteCalendar($calendarId) {
@@ -147,7 +213,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     public function getMultipleCalendarObjects($calendarId, array $uris) {
 
         $where = Where::createWhereIn('uri',$uris)
-            ->andWhere('calendarid = $*',$calendarId);
+            ->andWhere('calendarid = $*',[$calendarId]);
 
         $calendarObjects = $this->manager->findWhere('public','calendarobject',$where);
 
@@ -303,13 +369,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getSchedulingObject($principalUri, $objectUri) {
 
-        echo "gso";
+        //Method called by Apple Calendar Client
         return [];
     }
 
     public function getSchedulingObjects($principalUri) {
 
-        echo "gso";
+        //Method called by Apple Calendar Client
         return [];
     }
 
