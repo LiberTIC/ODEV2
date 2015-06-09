@@ -7,6 +7,7 @@ use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SyncSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
+use Sabre\VObject;
 
 use PommProject\Foundation\Where;
 
@@ -199,6 +200,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $calendarObject = $this->manager->findWhere('public','calendarobject',$where);
 
+        if ($calendarObject->count() == 0)
+            return null;
+
         $calendarObject = $calendarObject->get(0);
 
         $raw = [
@@ -250,14 +254,59 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData) {
 
-        echo "cco";
-        return "null";
+        $vCal = VObject\Reader::read($calendarData);
+
+        $this->addURL($vCal,$objectUri);
+
+        $this->extractAppleGeo($vCal);
+
+        $calendarData = $vCal->serialize();
+
+        $values = [
+            'uri' => $objectUri,
+            'lastmodified' => time(),
+            'calendarid' => $calendarId,
+            'calendardata' => $calendarData,
+            'etag' => md5($calendarData),
+            'size' => strlen($calendarData),
+            'component' => 'vevent',
+            'uid' => $vCal->VEVENT->UID->__toString(),
+            'extracted_data' => $this->converter->extractToLobject($vCal)
+        ];
+
+        $calendar = $this->manager->insertOne('public','calendarobject',$values);
+    }
+
+    protected function addURL($vCal,$id)
+    {
+        $url = 'projet-ode.fr/event/'.substr($id,0,-4);
+        $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
+    }
+
+    /* Apple Calendar use a custom property: X-APPLE-STRUCTURED-LOCATION
+     * Even if they also add a LOCATION property, they should also add a GEO property
+     * They don't do it, so we do it.
+     */
+    protected function extractAppleGeo($vCal) {
+        $struct = $vCal->VEVENT->__get('X-APPLE-STRUCTURED-LOCATION');
+        
+        if ($struct == null)
+            return null;
+
+        $geo = substr($struct->getValue(),4);
+
+        if ($vCal->VEVENT->__get('GEO') == null)
+        {
+            $vCal->VEVENT->add('GEO',explode(',',$geo));
+        }
+        else 
+        {
+            $vCal->VEVENT->GEO->setParts(explode(',',$geo));
+        }
     }
 
     public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
-        echo "uco";
-        return "null";
     }
 
     protected function getDenormalizedData($calendarData) {
@@ -326,20 +375,28 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendarObject($calendarId, $objectUri) {
 
-        echo "dco";
+        //echo "dco";
     }
 
     public function getCalendarObjectByUID($principalUri, $uid) {
 
-        echo "gcobu";
-        return null;
+        $object = $this->manager->findById('public','calendarobject',$uid);
+
+        if ($object != null) {
+            $calendar = $this->manager->findById('public','calendar',$object->calendarid);
+
+            if ($calendar != null) {
+                return $calendar->uri."/".$object->uri;
+            }
+        }
+
     }
 
     /* CHANGES */
 
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
 
-        echo "gcfc";
+        //echo "gcfc";
         return [];
     }
 
@@ -367,18 +424,18 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function createSubscription($principalUri, $uri, array $properties) {
 
-        echo "cs";
+        //echo "cs";
         return "null";
     }
 
     public function updateSubscription($subscriptionId, \Sabre\DAV\PropPatch $propPatch) {
 
-        echo "us";
+        //echo "us";
     }
 
     public function deleteSubscription($subscriptionId) {
 
-        echo "ds";
+        //echo "ds";
     }
 
     public function getSchedulingObject($principalUri, $objectUri) {
@@ -395,11 +452,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteSchedulingObject($principalUri, $objectUri) {
 
-        echo "dso";
+        //echo "dso";
     }
 
     public function createSchedulingObject($principalUri, $objectUri, $objectData) {
 
-        echo "cso";
+        //echo "cso";
     }
 }
