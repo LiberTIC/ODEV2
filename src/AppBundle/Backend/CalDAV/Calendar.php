@@ -158,7 +158,12 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendar($calendarId) {
 
-        echo "dc";
+        $this->manager->query('DELETE FROM calendarchange WHERE calendarid = '.$calendarId);
+
+        $this->manager->query('DELETE FROM calendarobject WHERE calendarid = '.$calendarId);
+
+        $this->manager->query('DELETE FROM calendar WHERE uid = '.$calendarId);
+        
     }
 
     /* CALENDAR OBJECTS */
@@ -349,7 +354,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'operation' => $operation
         ];
         
-        $this->manager->insertOne('public','calendarchanges',$change);
+        $this->manager->insertOne('public','calendarchange',$change);
     }
 
     /* OTHER */

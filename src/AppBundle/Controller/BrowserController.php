@@ -225,7 +225,21 @@ class BrowserController extends Controller
 
     public function calendarDeleteAction($uri) {
 
-        return new Response("calendarDeleteAction / uri: ".$uri);
+        $where = Where::create("uri = $*",[$uri]);
+
+        $calendar = $this->get('pmanager')->findWhere('public','calendar',$where)->get(0);
+
+        if ($calendar == null) {
+            return $this->redirectToRoute('calendar_home');
+        }
+
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+
+        $calendarBackend->deleteCalendar($calendar->uid);
+
+        $this->addFlash('success','Le calendrier "'.$calendar->displayName.'" a bien été supprimé.');
+
+        return $this->redirectToRoute('calendar_home');
     }
 
 

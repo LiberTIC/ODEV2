@@ -57,4 +57,9 @@ class PommManager
 
         return $res;
     }
+
+    public function query($sql) {
+
+        return $this->pomm['ODE']->getConnection()->executeAnonymousQuery($sql);
+    }
 }
