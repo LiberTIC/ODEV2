@@ -61,6 +61,20 @@ END:VCALENDAR
 
         return new Response();*/
 
+        $newValues = [
+            'displayname' => "Ouhlala"
+        ];
+
+        $calendar = $this->get('pmanager')->findById('public','calendar',5);
+
+        foreach($newValues as $name => $value) {
+            $calendar->$name = $value;
+        }
+
+        $this->get('pmanager')->updateOne('public','calendar',$calendar,array_keys($newValues));
+
+        return new Response();
+
         /*$calendars = $this->get('pomm')['caldav']
             ->getModel('\AppBundle\Model\Ode\PublicSchema\CalendarModel')
             ->findWhere('principaluri = $*', ['principal/admin']);*/

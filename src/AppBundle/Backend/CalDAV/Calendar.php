@@ -148,7 +148,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
             $manager->updateOne('public','calendar',$calendar,array_keys($newValues));
 
-            /*$this->addChange($calendarId, "", 2);*/
+            $this->addChange($calendarId, "", 2);
 
             return true;
 
@@ -340,7 +340,16 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected function addChange($calendarId,$objectUri, $operation) {
 
-        echo "ac";
+        $calendar = $this->manager->findById('public','calendar',$calendarId);
+
+        $change = [
+            'uri' => $objectUri,
+            'synctoken' => $calendar->synctoken,
+            'calendarid' => $calendarId,
+            'operation' => $operation
+        ];
+        
+        $this->manager->insertOne('public','calendarchanges',$change);
     }
 
     /* OTHER */

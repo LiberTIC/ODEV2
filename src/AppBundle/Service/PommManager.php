@@ -36,6 +36,7 @@ class PommManager
         return $res;
     }
 
+    // Create AND save
     public function insertOne($schema,$table,$fields) {
 
         $res = $this->getModel($schema,$table)->createAndSave($fields);
