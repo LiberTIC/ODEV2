@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+
+use PommProject\Foundation\Where;
+
 use AppBundle\Entity\Event;
 use AppBundle\Entity\Calendar;
 use AppBundle\Form\Type\EventType;
@@ -178,14 +181,37 @@ class BrowserController extends Controller
 
         if ($form->isValid()) {
 
-            return new Response("ouki");
+            $calendarUri = $this->toAscii($calendar->displayName);
+
+            // Get the next calendarUri possible with the name (Example: truc, truc-1, truc-2, etc..)
+            $i = -1;
+            do {
+                $i++;
+                $where = Where::create("uri = $*",[$calendarUri.($i==0?'':'-'.$i)]);
+                $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
+            } while(sizeof($calendars->extract()) != 0);
+
+            $calendarUri = $calendarUri.($i==0?'':'-'.$i);
+
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+
+            $raw = [
+                '{DAV:}displayname' => $calendar->displayName,
+                '{urn:ietf:params:xml:ns:caldav}calendar-description' => $calendar->description
+            ];
+
+            $principalUri = 'principals/'.$usr->getUsernameCanonical();
+
+            $calendarBackend->createCalendar($principalUri,$calendarUri,$raw);
+
+            $this->addFlash('success','Le calendrier "'.$calendar->displayName.'" a bien été créé.');
+
+            return $this->redirectToRoute('calendar_home');
         }
 
         return $this->render('browser/calendar_create.html.twig', array(
             'form' => $form->createView(),
         ));
-
-        //return new Response("calendarCreateAction");
     }
 
     public function calendarReadAction($uid) {
@@ -201,6 +227,24 @@ class BrowserController extends Controller
     public function calendarDeleteAction($uid) {
 
         return new Response("calendarDeleteAction / uid: ".$uid);
+    }
+
+
+
+
+    // thanks to: http://cubiq.org/the-perfect-php-clean-url-generator
+
+    protected function toAscii($str, $replace=array(), $delimiter='-') {
+        if( !empty($replace) ) {
+            $str = str_replace((array)$replace, ' ', $str);
+        }
+
+        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+        $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+        $clean = strtolower(trim($clean, '-'));
+        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+        return $clean;
     }
 
 }

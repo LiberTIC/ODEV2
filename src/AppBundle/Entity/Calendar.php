@@ -12,6 +12,7 @@ class Calendar
     public $uri = null;
     public $displayName = null;
     public $principalUri = null;
+    public $description = null;
 
     public function __construct($raw,$user)
     {
