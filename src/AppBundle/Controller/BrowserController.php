@@ -108,19 +108,19 @@ class BrowserController extends Controller
         //return new Response("eventCreateAction");
     }
 
-    public function eventReadAction($uid) {
+    public function eventReadAction($uri) {
 
-        return new Response("eventReadAction / uid: ".$uid);
+        return new Response("eventReadAction / uid: ".$uri);
     }
 
-    public function eventUpdateAction($uid) {
+    public function eventUpdateAction($uri) {
 
-        return new Response("eventUpdateAction / uid: ".$uid);
+        return new Response("eventUpdateAction / uid: ".$uri);
     }
 
-    public function eventDeleteAction($uid) {
+    public function eventDeleteAction($uri) {
 
-        return new Response("eventDeleteAction / uid: ".$uid);
+        return new Response("eventDeleteAction / uid: ".$uri);
     }
 
     /*          CALENDAR          */
@@ -214,19 +214,19 @@ class BrowserController extends Controller
         ));
     }
 
-    public function calendarReadAction($uid) {
+    public function calendarReadAction($uri) {
 
-        return new Response("calendarReadAction / uid: ".$uid);
+        return new Response("calendarReadAction / uri: ".$uri);
     }
 
-    public function calendarUpdateAction($uid) {
+    public function calendarUpdateAction($uri) {
 
-        return new Response("calendarUpdateAction / uid: ".$uid);
+        return new Response("calendarUpdateAction / uri: ".$uri);
     }
 
-    public function calendarDeleteAction($uid) {
+    public function calendarDeleteAction($uri) {
 
-        return new Response("calendarDeleteAction / uid: ".$uid);
+        return new Response("calendarDeleteAction / uri: ".$uri);
     }
 
 

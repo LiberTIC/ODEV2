@@ -46,9 +46,9 @@
                         <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                         <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                         <td>
-                            <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
-                            <a href='{{ path("event_update",{"uid": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-                            <a href='{{ path("event_delete",{"uid": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                            <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info">Voir</a>
+                            <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -82,7 +82,7 @@
                     <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                     <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                     <td>
-                        <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
+                        <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info">Voir</a>
                     </td>
                 </tr>
             {% endfor %}
