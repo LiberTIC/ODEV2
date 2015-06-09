@@ -38,11 +38,10 @@ class BrowserController extends Controller
                 $event->__set($name,$value);
             }
 
-            $event->__set('calendarid',$raw->calendarid);
 
             $cal = $calendarBackend->getCalendarById($raw->calendarid);
 
-            $event->__set('calendarname',$cal->displayname);
+            $event->calendar = $cal;
 
             $events[] = $event;
         }
@@ -62,7 +61,7 @@ class BrowserController extends Controller
 
 
             foreach($events as $key => $event) {
-                if (in_array($event->calendarid,$calIds)) {
+                if (in_array($event->calendar->uid,$calIds)) {
                     $eventsUser[] = $event;
                     unset($events[$key]);
                 }

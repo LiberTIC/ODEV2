@@ -42,7 +42,11 @@
                         <td>{{ event.name }}</td>
                         <td>{{ event.description }}</td>
                         <td>{{ event.category }}</td>
-                        <td>{{ event.calendarname }}</td>
+                        <td>
+                            <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
+                                {{ event.calendar.displayName }}
+                            </a>
+                        </td>
                         <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                         <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                         <td>
@@ -78,7 +82,11 @@
                     <td>{{ event.name }}</td>
                     <td>{{ event.description }}</td>
                     <td>{{ event.category }}</td>
-                    <td>{{ event.calendarname }}</td>
+                    <td>
+                        <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
+                            {{ event.calendar.displayName }}
+                        </a>
+                    </td>
                     <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                     <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                     <td>

@@ -7,10 +7,9 @@ use Sabre\VObject;
 class Event
 {
 
+    public $calendar = null;
     
     public $calendarid = null;
-
-    public $calendaruri = null;
 
     public $calendarname = null;
 
@@ -114,21 +113,17 @@ class Event
     ];
 
     public function __get($name) {
-        if ($name == 'calendarid')
-            return $this->calendarid;
 
-        if ($name == 'calendarname')
-            return $this->calendarname;
+        if ($name == 'calendar')
+            return $this->calendar;
 
         return $this->properties[$name];
     }
 
     public function __set($name,$value) {
-        if ($name == 'calendarid')
-            $this->calendarid = $value;
 
-        if ($name == 'calendarname')
-            $this->calendarname = $value;
+        if ($name == 'calendar')
+            $this->calendar = $value;
 
         if ($name == 'date_start' || $name == 'date_end') {
             if (strpos($value,"T") === false) {
@@ -140,7 +135,7 @@ class Event
     }
 
     public function __isset($name) {
-        if ($name == 'calendarid' || $name == 'calendarname')
+        if ($name == 'calendar')
             return true;
         return array_key_exists($name,$this->properties);
     }
