@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Sabre\VObject;
+
 class DefaultController extends Controller
 {
     public function indexAction()
@@ -20,7 +22,7 @@ class DefaultController extends Controller
             ->getModel('\AppBundle\Model\Ode\PublicSchema\CalendarModel')
             ->findWhere('principaluri = $*', ['principal/admin']);*/
 
-        $calendars = $this->get('pmanager')->findAll('public','calendar');
+        /*$calendars = $this->get('pmanager')->findAll('public','calendar');
 
         foreach($calendars as $calendar) {
             print_r($calendar);
@@ -30,11 +32,11 @@ class DefaultController extends Controller
 
         
 
-        return new Response();
+        return new Response();*/
 
 
         /*$manager = $this->get('esmanager');
-        $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];
+        $event = $manager->simpleGet('caldav','calendarobjects',28)['_source'];*/
 
 
         $converter = $this->container->get('converter');
@@ -44,43 +46,28 @@ BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Apple Inc.//Mac OS X 10.9.5//EN
 CALSCALE:GREGORIAN
-BEGIN:VTIMEZONE
-TZID:Europe/Paris
-BEGIN:DAYLIGHT
-TZOFFSETFROM:+0100
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-DTSTART:19810329T020000
-TZNAME:UTC+2
-TZOFFSETTO:+0200
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:+0200
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-DTSTART:19961027T030000
-TZNAME:UTC+1
-TZOFFSETTO:+0100
-END:STANDARD
-END:VTIMEZONE
 BEGIN:VEVENT
-CREATED:20150520T075724Z
-UID:0494770F-374C-4AA8-9920-83CFDCE79E0E
-DTEND;TZID=Europe/Paris:20150521T130000
-TRANSP:OPAQUE
-SUMMARY:Nouvel événement
-DTSTART;TZID=Europe/Paris:20150521T120000
-DTSTAMP:20150520T075809Z
+CREATED:20150608T090900Z
+UID:1B805B5B-F8B8-4665-AF09-C6E46AF95060
+DTEND;VALUE=DATE:20150620
+TRANSP:TRANSPARENT
+SUMMARY:Tryc
+DTSTART;VALUE=DATE:20150619
+DTSTAMP:20150608T090922Z
 SEQUENCE:2
-URL;VALUE=URI:projet-ode.fr/event/170
+URL;VALUE=URI:projet-ode.fr/event/014f03818c0782c4f8183d4e299ee05c
 END:VEVENT
 END:VCALENDAR
 
 VCF;
 
-        
+        $vCal = VObject\Reader::read($data);
 
-        $data = $converter->convert('icalendar','json',$data);
+        //$data = $converter->convert('icalendar','json',$data);
 
-        $event['vobject'] = $data;
+        $data = $converter->extractToLobject($vCal);
+
+        //$event['vobject'] = $data;
         //$manager->simpleIndex('calendarobjects', 13, $event);
 
 
@@ -93,7 +80,7 @@ VCF;
         //$response = new Response(implode(',',array_keys($event)));
         $response->headers->set('Content-Type', 'application/json');
 
-        return $response;*/
+        return $response;
     }
 
 }

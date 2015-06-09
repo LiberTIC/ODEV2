@@ -10,6 +10,9 @@ use Sabre\CalDAV\Backend\SchedulingSupport;
 
 use PommProject\Foundation\Where;
 
+use AppBundle\Entity\Event;
+use AppBundle\Entity\Calendar as Cal;
+
 class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
 
@@ -32,6 +35,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     }
 
     /* CALENDAR */
+
+    public function getCalendarById($calendarId) {
+
+        $calendar = $this->manager->findById('public','calendar',$calendarId);
+
+        return $calendar;
+    }
 
     public function getCalendarsForUser($principalUri) {
 
@@ -60,6 +70,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
 
         return $raws;
+    }
+
+    public function getAllCalendars() {
+
+        $calendars = $this->manager->findAll('public','calendar');
+
+        return $calendars;
     }
 
     public function createCalendar($principalUri, $calendarUri, array $properties) {
@@ -151,6 +168,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
 
         return $raws;
+    }
+
+    public function getAllCalendarObjects() {
+
+        $calendarObjects = $this->manager->findAll('public','calendarobject');
+
+        return $calendarObjects;
     }
 
     public function createCalendarObject($calendarId, $objectUri, $calendarData) {

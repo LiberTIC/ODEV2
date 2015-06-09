@@ -21,7 +21,7 @@ class BrowserController extends Controller
 
         $tkn = $this->get('security.context')->getToken();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
 
         $rawEvents = $calendarBackend->getAllCalendarObjects();
 
@@ -30,15 +30,16 @@ class BrowserController extends Controller
 
         foreach($rawEvents as $raw) {
             $event = new Event();
-            foreach($raw['lobject'] as $name => $value) {
+
+            foreach($raw->extracted_data as $name => $value) {
                 $event->__set($name,$value);
             }
 
-            $event->__set('calendarid',$raw['calendarid']);
+            $event->__set('calendarid',$raw->calendarid);
 
-            $cal = $calendarBackend->getCalendarById($raw['calendarid']);
+            $cal = $calendarBackend->getCalendarById($raw->calendarid);
 
-            $event->__set('calendarname',$cal['displayname']);
+            $event->__set('calendarname',$cal->displayname);
 
             $events[] = $event;
         }
@@ -78,7 +79,7 @@ class BrowserController extends Controller
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
 
         $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
 
@@ -123,11 +124,11 @@ class BrowserController extends Controller
 
     public function calendarHomeAction() {
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('esmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
 
         $tkn = $this->get('security.context')->getToken();
 
-        $rawCalendars = $calendarBackend->getCalendars();
+        $rawCalendars = $calendarBackend->getAllCalendars();
 
         $calendars = [];
         $calendarsUser = [];
@@ -139,7 +140,7 @@ class BrowserController extends Controller
 
 
         foreach($calendars as $calendar) {
-            $calendar->events = $calendarBackend->getCalendarObjects($raw['id']);
+            $calendar->events = $calendarBackend->getCalendarObjects($calendar->id);
             $calendar->user = substr($calendar->principalUri,11);
         }
 

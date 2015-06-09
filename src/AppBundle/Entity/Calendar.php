@@ -19,10 +19,10 @@ class Calendar
 
         if ($raw != null)
         {
-            $this->id = $raw['id'];
-            $this->uri = $raw['uri'];
-            $this->displayName = $raw['{DAV:}displayname'];
-            $this->principalUri = $raw['principaluri'];
+            $this->id = $raw->uid;
+            $this->uri = $raw->uri;
+            $this->displayName = $raw->displayname;
+            $this->principalUri = $raw->principaluri;
         }
     }
 

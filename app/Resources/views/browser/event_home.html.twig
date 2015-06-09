@@ -43,8 +43,8 @@
                         <td>{{ event.description }}</td>
                         <td>{{ event.category }}</td>
                         <td>{{ event.calendarname }}</td>
-                        <td>{{ event.date_start|date("d/m/Y H:i") }}</td>
-                        <td>{{ event.date_end|date("d/m/Y H:i")  }}</td>
+                        <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
+                        <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                         <td>
                             <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
                             <a href='{{ path("event_update",{"uid": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
@@ -79,8 +79,8 @@
                     <td>{{ event.description }}</td>
                     <td>{{ event.category }}</td>
                     <td>{{ event.calendarname }}</td>
-                    <td>{{ event.date_start|date("d/m/Y H:i") }}</td>
-                    <td>{{ event.date_end|date("d/m/Y H:i")  }}</td>
+                    <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
+                    <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                     <td>
                         <a href='{{ path("event_read",{"uid": event.id}) }}' class="btn btn-info">Voir</a>
                     </td>
