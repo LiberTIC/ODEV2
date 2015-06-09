@@ -10,10 +10,11 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use PommProject\Foundation\Where;
 
 use AppBundle\Entity\Event;
-use AppBundle\Entity\Calendar;
 use AppBundle\Form\Type\EventType;
 use AppBundle\Form\Type\CalendarType;
 use AppBundle\Backend;
+
+use AppBundle\Model\Ode\PublicSchema as Model;
 
 class BrowserController extends Controller
 {
@@ -130,19 +131,14 @@ class BrowserController extends Controller
 
         $tkn = $this->get('security.context')->getToken();
 
-        $rawCalendars = $calendarBackend->getAllCalendars();
+        $calendars = $calendarBackend->getAllCalendars();
 
-        $calendars = [];
+        $calendarsOthers = [];
         $calendarsUser = [];
 
 
-        foreach($rawCalendars as $raw) {
-            $calendars[] = new Calendar($raw,null);
-        }
-
-
         foreach($calendars as $calendar) {
-            $calendar->events = $calendarBackend->getCalendarObjects($calendar->id);
+            $calendar->events = $calendarBackend->getCalendarObjects($calendar->uid);
             $calendar->user = substr($calendar->principalUri,11);
         }
 
@@ -153,14 +149,15 @@ class BrowserController extends Controller
 
             foreach($calendars as $key => $calendar) {
                 if ($calendar->principalUri == 'principals/'.$username) {
-                    $calendarsUser[] = $calendars[$key];
-                    unset($calendars[$key]);
+                    $calendarsUser[] = $calendar;
+                } else {
+                    $calendarsOthers[] = $calendar;
                 }
             }
         }
 
         return $this->render('browser/calendar_home.html.twig', array(
-            'calendars' => $calendars,
+            'calendars' => $calendarsOthers,
             'calendarsUser' => $calendarsUser,
         ));
 
@@ -172,28 +169,28 @@ class BrowserController extends Controller
 
         $usr = $this->get('security.context')->getToken()->getUser();
 
-        $calendar = new Calendar(null,$usr);
-
-        $form = $this->createForm(new CalendarType(),$calendar,["csrf_protection" => false]);
+        $form = $this->createForm(new CalendarType(),null,["csrf_protection" => false]);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
 
-            $calendarUri = $this->generateCalendarUri($calendar->displayName);
+            $values = $form->getData();
+
+            $calendarUri = $this->generateCalendarUri($values['displayname']);
 
             $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
 
             $raw = [
-                '{DAV:}displayname' => $calendar->displayName,
-                '{urn:ietf:params:xml:ns:caldav}calendar-description' => $calendar->description
+                '{DAV:}displayname' => $values['displayname'],
+                '{urn:ietf:params:xml:ns:caldav}calendar-description' => $values['description']
             ];
 
             $principalUri = 'principals/'.$usr->getUsernameCanonical();
 
             $calendarBackend->createCalendar($principalUri,$calendarUri,$raw);
 
-            $this->addFlash('success','Le calendrier "'.$calendar->displayName.'" a bien été créé.');
+            $this->addFlash('success','Le calendrier "'.$values['displayname'].'" a bien été créé.');
 
             return $this->redirectToRoute('calendar_home');
         }
@@ -249,6 +246,7 @@ class BrowserController extends Controller
 
         return $this->render('browser/calendar_update.html.twig', array(
             'form' => $form->createView(),
+            'uri' => $uri
         ));
     }
 

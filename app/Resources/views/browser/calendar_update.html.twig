@@ -20,10 +20,13 @@
 
             {{ form_errors(form) }}
 
-            {{ form_row(form.displayName) }}
+            {{ form_row(form.displayname) }}
 
             {{ form_row(form.description) }}
 
+            <a href='{{ path("calendar_read",{"uri":uri}) }}' class="btn btn-default pull-left">
+                Annuler
+            </a>
             <button type="submit" class="btn btn-info pull-right">Modifier</button>
             <div style="width:0px;height: 30px">
             </div>
