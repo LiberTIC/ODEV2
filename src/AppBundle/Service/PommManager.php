@@ -11,58 +11,49 @@ class PommManager
         $this->pomm = $pomm;
     }
 
+    public function getModel($schema,$table) {
+        return $this->pomm['ODE']->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model');
+    }
+
     public function findAll($schema,$table) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->findAll();
+        $res = $this->getModel($schema,$table)->findAll();
 
         return $res;
     }
 
     public function findById($schema,$table,$id) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->findByPK(['uid' => $id]);
+        $res = $this->getModel($schema,$table)->findByPK(['uid' => $id]);
 
         return $res;
     }
 
     public function findWhere($schema,$table,$where) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->findWhere($where);
+        $res = $this->getModel($schema,$table)->findWhere($where);
 
         return $res;
     }
 
     public function insertOne($schema,$table,$fields) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->createAndSave($fields);
+        $res = $this->getModel($schema,$table)->createAndSave($fields);
 
         return $res;
     }
 
     public function createOne($schema,$table,$fields) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->createEntity($fields);
+        $res = $this->getModel($schema,$table)->createEntity($fields);
 
         return $res;
     }
 
     public function updateOne($schema,$table,$entity,$fields_keys) {
 
-        $res = $this->pomm['ODE']
-            ->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model')
-            ->updateOne($entity,$fields_keys);
+        $res = $this->getModel($schema,$table)->updateOne($entity,$fields_keys);
 
         return $res;
-
     }
 }
