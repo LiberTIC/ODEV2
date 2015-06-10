@@ -139,7 +139,35 @@ class BrowserController extends Controller
 
     public function eventDeleteAction($uri) {
 
-        return new Response("eventDeleteAction / uid: ".$uri);
+        $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $usr = $this->get('security.context')->getToken()->getUser();
+
+        $where = Where::create("uid = $*",[$uri]);
+
+        $events = $this->get('pmanager')->findWhere('public','calendarobject',$where);
+
+        if ($events->count() == 0) {
+            return $this->redirectToRoute('event_home');
+        }
+
+        $event = $events->get(0);
+
+        $calendar = $this->get('pmanager')->findById('public','calendar',$event->calendarid);
+
+        if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
+            $this->addFlash('danger','Cet événement ne fait pas parti de vos calendriers.');
+
+            return $this->redirectToRoute('event_read',['uri'=>$uri]);
+        }
+
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+
+        $calendarBackend->deleteCalendarObject($event->calendarid,$event->uri);
+
+        $this->addFlash('success','L\'événement a bien été supprimé.');
+
+        return $this->redirectToRoute('event_home');
     }
 
     /*          CALENDAR          */
