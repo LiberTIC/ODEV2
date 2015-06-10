@@ -156,7 +156,11 @@ class Event
 
             if ($value != null) {
                 $name = $this->convertTable[$key];
-                $vobject->VEVENT->add($name);
+
+                if (!$vobject->VEVENT->__isset($name)) {
+                    $vobject->VEVENT->add($name);
+                }
+                
                 $vobject->VEVENT->__set($name,$value);
             }
            

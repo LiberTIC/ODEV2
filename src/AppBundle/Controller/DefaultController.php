@@ -23,6 +23,8 @@ class DefaultController extends Controller
         $this->get('pmanager')->query('DELETE FROM calendarobject WHERE calendarid = ?',[9]);
 
         $this->get('pmanager')->query('DELETE FROM calendar WHERE uid = ?',[9]);*/
+
+        print_r($this->get('pmanager')->findById('public','calendarobject',"A5C45656-71F6-4AD0-BC30-4E8C02185551"));
     
         return new Response('');
     }

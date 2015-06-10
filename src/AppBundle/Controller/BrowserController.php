@@ -49,7 +49,8 @@ class BrowserController extends Controller
             } else {
                 $event->calendar = $calendars[$raw->calendarid];
             }
-            
+
+            $event->id = $raw->uid;            
 
             $events[] = $event;
         }
