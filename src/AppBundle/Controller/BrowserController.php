@@ -207,11 +207,13 @@ class BrowserController extends Controller
 
         $where = Where::create("uri = $*",[$uri]);
 
-        $calendar = $this->get('pmanager')->findWhere('public','calendar',$where)->get(0);
+        $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
-        if ($calendar == null) {
+        if ($calendars->count() == 0) {
             return $this->redirectToRoute('calendar_home');
         }
+
+        $calendar = $calendars->get(0);
 
         $ownCalendar = false;
 
@@ -239,11 +241,13 @@ class BrowserController extends Controller
 
         $where = Where::create("uri = $*",[$uri]);
 
-        $calendar = $this->get('pmanager')->findWhere('public','calendar',$where)->get(0);
+        $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
-        if ($calendar == null) {
+        if ($calendars->count() == 0) {
             return $this->redirectToRoute('calendar_home');
         }
+
+        $calendar = $calendars->get(0);
 
         if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
             $this->addFlash('danger','Ce calendrier ne vous appartient pas.');
@@ -278,12 +282,24 @@ class BrowserController extends Controller
 
     public function calendarDeleteAction($uri) {
 
+        $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $usr = $this->get('security.context')->getToken()->getUser();
+
         $where = Where::create("uri = $*",[$uri]);
 
-        $calendar = $this->get('pmanager')->findWhere('public','calendar',$where)->get(0);
+        $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
-        if ($calendar == null) {
+        if ($calendars->count() == 0) {
             return $this->redirectToRoute('calendar_home');
+        }
+
+        $calendar = $calendars->get(0);
+
+        if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
+            $this->addFlash('danger','Ce calendrier ne vous appartient pas.');
+
+            return $this->redirectToRoute('calendar_read',['uri'=>$uri]);
         }
 
         $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
