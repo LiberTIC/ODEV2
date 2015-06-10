@@ -25,7 +25,7 @@ class CalDAVController extends Controller
         //$pdo = new \PDO('mysql:dbname=sabredav;host=127.0.0.1','root','');
 
         #Backends
-        $authBackend = new AppBundle\Backend\CalDAV\Auth($manager);
+        $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
         //$calendarBackend = new AppBundle\Backend\CalDAV\CalendarOld($manager,$this->get('converter'));
         $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->get('converter'));
         //$calendarBackend = new \Sabre\CalDAV\Backend\PDO($pdo);
