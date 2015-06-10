@@ -404,7 +404,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function deleteCalendarObject($calendarId, $objectUri) {
 
-        //echo "dco";
+        $this->manager->query('DELETE FROM calendarobject WHERE uri = \''.$objectUri.'\' AND calendarid = '.$calendarId);
+
+        $this->addChange($calendarId, $objectUri, 3);
     }
 
     public function getCalendarObjectByUID($principalUri, $uid) {
