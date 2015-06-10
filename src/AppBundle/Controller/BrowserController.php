@@ -171,6 +171,7 @@ class BrowserController extends Controller
 
         return $this->render('browser/event_update.html.twig', array(
             'form' => $form->createView(),
+            'uri' => $uri
         ));
     }
 
