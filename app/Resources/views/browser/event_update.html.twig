@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+
+{% set active="event" %}
+
+
+{% block stylesheets %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Modifier un événement</h1>
+    </div>
+
+    <div class="col-lg-4">
+        <h3>(*) - Champs obligatoires</h3>
+        <p>Les champs marqués d'une étoile (*) sont obligatoires</p>
+
+        <h3>Accéder aux calendriers</h3>
+        <p>Pour accéder à vos calendriers, cliquez ici: <a href="{{path('calendar_home')}}">Liste des calendriers</a></p>
+
+        <div id="oembed">
+            <h3>oEmbed</h3>
+            <p><a href="http://www.oembed.com/">oEmbed</a> est un format permettant d'obtenir des informations relative à un média.</p>
+            <p>Globalement, il vous suffit de fournir une url appartenant à un des services suivants:
+                <ul>
+                    <li>Youtube</li>
+                    <li>Flickr</li>
+                    <li>Vimeo</li>
+                    <li>DailyMotion</li>
+                    <li>SoundCloud</li>
+                    <li>...</li>
+                </ul>
+            La liste plus complète est accessible <a href="http://www.oembed.com/#section7.1" target="_blank">ici</a>.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <form class="well form-horizontal" method="post">
+
+
+            {{ form_errors(form) }}
+
+            <fieldset>
+                <legend>Description</legend>
+                {{ form_row(form.name) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.category) }}
+                {{ form_row(form.tags) }}
+                {#{ form_row(form.language) }#}
+            </fieldset>
+
+            <fieldset>
+                <legend>Dates</legend>
+                {{ form_row(form.date_start) }}
+                {{ form_row(form.date_end) }}
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseLieu">
+                        Lieu 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseLieu">
+                    {{ form_row(form.location_name) }}
+                    {{ form_row(form.location_precision) }}
+                    {{ form_row(form.location_capacity) }}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseOrga">
+                        Organisation 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseOrga">
+                    {{ form_row(form.attendees) }}
+                    {{ form_row(form.duration) }}
+                    {{ form_row(form.status) }}
+                    {{ form_row(form.promoter) }}
+                    {{ form_row(form.url_promoter) }}
+                    
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseUrls">
+                        Contacts et medias 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseUrls">
+                    {{ form_row(form.urls_medias) }}
+                    {{ form_row(form.contact_name) }}
+                    {{ form_row(form.contact_email) }}
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <a data-toggle="collapse" href="#collapseTarifs">
+                        Tarifs 
+                        <span style="float: right">
+                            {{ mopa_bootstrap_icon('plus') }}
+                        </span>
+                    </a>
+                </legend>
+                <div class="collapse" id="collapseTarifs">
+                    {{ form_row(form.price_standard) }}
+                    {{ form_row(form.price_reduced) }}
+                    {{ form_row(form.price_children) }}
+                </div>
+            </fieldset>
+
+            <br/>
+
+            <p>* champ obligatoire</p>
+            <button type="submit" class="btn btn-success">Modifier</button>
+
+        </form>
+    </div>
+
+{% endblock %}

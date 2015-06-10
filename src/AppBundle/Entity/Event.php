@@ -130,6 +130,7 @@ class Event
                 if (strpos($value,"T") === false) {
                     $value = $value."T000000Z";
                 }
+                $value = new \DateTime($value);
             }
         }
 
@@ -162,6 +163,21 @@ class Event
         }
 
         return $vobject;
+    }
+
+    public function loadFromCalData($calendarData) {
+        $vCal = VObject\Reader::read($calendarData);
+
+        $vevent = $vCal->VEVENT;
+
+        foreach($this->convertTable as $jsonName => $icalName) {
+            if ($vevent->$icalName != null) {
+                $value = $vevent->$icalName->getParts();
+                if (count($value) == 1)
+                    $value = $value[0];
+                $this->__set($jsonName, $value);
+            }
+        }
     }
 
 }

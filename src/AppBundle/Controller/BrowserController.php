@@ -76,6 +76,9 @@ class BrowserController extends Controller
             }
         }
 
+        $eventsUser = $this->sortByDateField($eventsUser,"date_start");
+        $events = $this->sortByDateField($events,"date_start");
+
         return $this->render('browser/event_home.html.twig', array(
             'events' => $events,
             'eventsUser' => $eventsUser,
@@ -132,9 +135,42 @@ class BrowserController extends Controller
         return new Response("eventReadAction / uid: ".$uri);
     }
 
-    public function eventUpdateAction($uri) {
+    public function eventUpdateAction(Request $request, $uri) {
 
-        return new Response("eventUpdateAction / uid: ".$uri);
+        $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $usr = $this->get('security.context')->getToken()->getUser();
+        $username = $usr->getUsernameCanonical();
+
+        $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$uri);
+
+        if ($rawEvent == null) {
+            return $this->redirectToRoute('event_home');
+        }
+
+        $event = new Event();
+        $event->loadFromCalData($rawEvent->calendarData);
+
+        $form = $this->createForm(new EventType(),$event,["csrf_protection" => false]);
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+
+            $vevent = $event->getVObject();
+
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+
+            $calendarBackend->updateCalendarObject($rawEvent->calendarid,$uri.".ics",$vevent->serialize());
+            
+            $this->addFlash('success',"L'événement a bien été modifié.");
+
+            return $this->redirectToRoute('event_read',['uri' => $uri]);
+        }
+
+        return $this->render('browser/event_update.html.twig', array(
+            'form' => $form->createView(),
+        ));
     }
 
     public function eventDeleteAction($uri) {
@@ -203,8 +239,13 @@ class BrowserController extends Controller
                 }
             }
         } else {
-            $calendarsOthers = $calendars;
+            foreach($calendars as $calendar){
+                $calendarsOthers[] = $calendar;
+            }
         }
+
+        $calendarsUser = $this->sortByStringField($calendarsUser,"displayname");
+        $calendarsOthers = $this->sortByStringField($calendarsOthers,"displayname");
 
         return $this->render('browser/calendar_home.html.twig', array(
             'calendars' => $calendarsOthers,
@@ -405,6 +446,20 @@ class BrowserController extends Controller
         } while(sizeof($calendars->extract()) != 0);
 
         return $calendarUri.($i==0?'':'-'.$i);
+    }
+
+    protected function sortByStringField($data,$fieldName) {
+        usort($data,function ($a,$b) use ($fieldName) {
+            return strcmp($a->$fieldName,$b->$fieldName);
+        });
+        return $data;
+    }
+
+    protected function sortByDateField($data,$fieldName) {
+        usort($data,function ($a,$b) use ($fieldName) {
+            return $a->$fieldName > $b->$fieldName;
+        });
+        return $data;
     }
 
 }

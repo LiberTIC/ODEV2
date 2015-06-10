@@ -11,7 +11,7 @@ class EventType extends AbstractType
 {
     private $calendars;
 
-    public function __construct($calendars) {
+    public function __construct($calendars = []) {
         $this->calendars = $calendars;
     }
 
