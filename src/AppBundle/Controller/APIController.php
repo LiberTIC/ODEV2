@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+use PommProject\Foundation\Where;
+
 class APIController extends Controller
 {
     public $acceptedMimeFormat = ['application/json','text/html','application/xml','text/csv'];
@@ -37,17 +39,17 @@ class APIController extends Controller
 
     public function listCalendarAction()
     {
-        $calendars = $this->get('esmanager')->simpleSearch('caldav','calendars');
+        $calendars = $this->get('pmanager')->findAll('public','calendar');
 
         $ret = [];
         foreach($calendars as $calendar)
         {
             $ret[] = array(
-                        'uri' => $calendar['_source']['uri'], 
-                        'displayname' => $calendar['_source']['displayname'],
+                        'displayname' => $calendar->displayname,
+                        'uri' => $calendar->uri, 
                         'links' => array(
-                                        ['rel' => 'self', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar['_source']['uri']),true)],
-                                        //['rel' => 'events', 'href' => $this->generateUrl('api_calendar_event_list',array('uri' => $calendar['_source']['uri']),true)]
+                                        ['rel' => 'self', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
+                                        ['rel' => 'events', 'href' => $this->generateUrl('api_calendar_event_list',array('uri' => $calendar->uri),true)]
                                     )
                     );
         }
@@ -57,74 +59,63 @@ class APIController extends Controller
 
     public function getCalendarAction($uri)
     {
-        $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
+        $where = Where::create('uri = $*',[$uri]);
 
-        if ($calendar == null)
+        $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
+
+        if ($calendars->count() == 0)
         {
             return $this->buildError('404','The calendar with the given uri could not be found.');
         }
 
-        $ret = [];
+        $calendar = $calendars->get(0)->extract();
 
-        $attr = ['displayname','uri','synctoken','description'];
 
-        foreach($attr as $a) $ret['calendar'][$a] = $calendar[0]['_source'][$a];
+        $ret = $this->get('pmanager')->query('SELECT COUNT(*) as count FROM calendarobject WHERE calendarid = '.$calendar['uid']);
 
-        $ret['calendar']['links'][] = 
+        $calendar['total_events'] = $ret->fetchRow(0)['count'];
+
+
+        $calendar['links'][] = 
             ["rel" => "self", "href" => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)];
-        $ret['calendar']['links'][] = 
+        $calendar['links'][] = 
             ["rel" => "events", "href" => $this->generateUrl('api_calendar_event_list',array('uri' => $uri),true)];
-        $ret['calendar']['links'][] = ["rel" => "owner", "href" => "not implemented yet"];
-        /*$ret['calendar']['events']['total'] = 0;
 
-        $events = $this->get('esmanager')->simpleQuery('caldav','calendarobjects', ['calendarid' => $calendar[0]['_source']['id']]);
-
-        if ($events != null)
-        {
-            $ret['calendar']['events']['links'] = [];
-            $nb = 0;
-            foreach($events as $event)
-            {
-                $nb++;
-                $ret['calendar']['events']['links'][] = 
-                    [ 
-                      'rel' => 'event',
-                      'href' => $this->generateUrl('api_calendar_event_get',array('uri' => $uri, 'uriEvent' => $event['_source']['uid']))
-                    ];
-            }
-
-            $ret['calendar']['events']['total'] = $nb;
-        }*/
-
-        return $this->buildResponse($ret);
+        return $this->buildResponse(['calendar' => $calendar]);
     }
 
     public function listCalendarEventAction($uri)
     {
-        $calendar = $this->get('esmanager')->simpleQuery('caldav','calendars',['uri' => $uri]);
+        $where = Where::create('uri = $*',[$uri]);
 
-        if ($calendar == null)
+        $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
+
+        if ($calendars->count() == 0)
         {
             return $this->buildError('404','The calendar with the given uri could not be found.');
         }
 
-        $calendarId = $calendar[0]['_id'];
-        $events = $this->get('esmanager')->simpleQuery('caldav','calendarobjects', ['calendarid' => $calendarId]);
-    
+        $calendar = $calendars->get(0);
+
+        $where = Where::create('calendarid = $*',[$calendar->uid]);
+
+        $events = $this->get('pmanager')->findWhere('public','calendarobject',$where);
+        
         $ret = [];
         foreach($events as $event) {
             $ret[] = array(
-                        'uri' => $event['_source']['uid'], 
+                        'name' => $event->extracted_data['name'],
+                        'uri' => $event->uid, 
                         'calendaruri' => $uri, 
-                        'etag' => $event['_source']['etag'],
+                        'etag' => $event->etag,
                         'links' => array(
-                                        ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event['_source']['uid']),true)],
+                                        ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event->uid),true)],
                                         ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)],
                                     )
                     );
         }
 
-        return $this->buildResponse(['count' => count($events), 'events' => $ret]);
+        return $this->buildResponse(['count' => $events->count(), 'events' => $ret]);
     }
 
 
@@ -138,22 +129,21 @@ class APIController extends Controller
 
     public function listEventAction()
     {
-        $events = $this->get('esmanager')->simpleSearch('caldav','calendarobjects');
+        $events = $this->get('pmanager')->findAll('public','calendarobject');
     
         $ret = [];
         foreach($events as $event) {
 
-            $calendar = $this->get('esmanager')->simpleGet('caldav','calendars',$event['_source']['calendarid']);
-
-            $calendarUri = $calendar['_source']['uri'];
+            $calendar = $this->get('pmanager')->findById('public','calendar',$event->calendarid);
 
             $ret[] = array(
-                        'uri' => $event['_source']['uid'], 
-                        'calendaruri' => $calendarUri, 
-                        'etag' => $event['_source']['etag'],
+                        'name' => $event->extracted_data['name'],
+                        'uri' => $event->uid, 
+                        'calendaruri' => $calendar->uri, 
+                        'etag' => $event->etag,
                         'links' => array(
-                                        ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event['_source']['uid']),true)],
-                                        ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendarUri),true)],
+                                        ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event->uid),true)],
+                                        ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
                                     )
                     );
         }
@@ -163,37 +153,32 @@ class APIController extends Controller
 
     public function getEventAction($uriEvent)
     {
-        $event = $this->get('esmanager')->simpleQuery('caldav','calendarobjects',['uid' => $uriEvent/*, 'calendarid' => $calendarId*/]);
-        // Well, in fact, we use the uid, not the uri
+        $event = $this->get('pmanager')->findById('public','calendarobject',$uriEvent);
 
         if ($event == null)
         {
             return $this->buildError('404','The event with the given uri could not be found.');
         }
 
-        $calendarData = $event[0]['_source']['calendardata'];
+        $calendarData = $event->calendardata;
         $vobject = $this->get('converter')->convert('icalendar','json',$calendarData,false);
 
-        $calendar = $this->get('esmanager')->simpleGet('caldav','calendars',$event[0]['_source']['calendarid']);
-
-        $uri = null;
-        if ($calendar != null)
-        {
-            $uri = $calendar['_source']['uri'];
-        }
+        $calendar = $this->get('pmanager')->findById('public','calendar',$event->calendarid);
 
         $links = array(
                 ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $uriEvent),true)],
-                ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)],
+                ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
             );
 
-        $ret = array(
+        $ret = [
+                'name' => $event->extracted_data['name'],
                 'uri' => $uriEvent, 
-                'calendaruri' => $uri, 
-                'etag' => $event[0]['_source']['etag'], 
+                'calendaruri' => $calendar->uri, 
+                'etag' => $event->etag, 
                 'links' => $links,
-                'lobject' => $event[0]['_source']['lobject'],
-                'vobject' => $vobject);
+                'extracted_data' => $event->extracted_data,
+                'jCal' => $vobject
+            ];
 
         return $this->buildResponse(['event' => $ret ]);
     }
