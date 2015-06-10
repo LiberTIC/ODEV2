@@ -32,6 +32,8 @@ class BrowserController extends Controller
         $events = [];
         $eventsUser = [];
 
+        $calendars = [];
+
         foreach($rawEvents as $raw) {
             $event = new Event();
 
@@ -40,9 +42,14 @@ class BrowserController extends Controller
             }
 
 
-            $cal = $calendarBackend->getCalendarById($raw->calendarid);
-
-            $event->calendar = $cal;
+            if (!isset($calendars[$raw->calendarid])) {
+                $cal = $calendarBackend->getCalendarById($raw->calendarid);
+                $event->calendar = $cal;
+                $calendars[$raw->calendarid] = $cal;
+            } else {
+                $event->calendar = $calendars[$raw->calendarid];
+            }
+            
 
             $events[] = $event;
         }

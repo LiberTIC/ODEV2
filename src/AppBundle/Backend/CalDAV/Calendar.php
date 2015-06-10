@@ -309,6 +309,33 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
+        $where = Where::create("calendarid = $*",[$calendarId])
+            ->andWhere("uri = $*",[$objectUri]);
+
+        $calendarobjects = $this->manager->findWhere('public','calendarobject',$where);
+
+        if ($calendarobjects->count() == 0) {
+            return;
+        }
+
+        $object = $calendarobjects->get(0);
+
+        $vCal = VObject\Reader::read($calendarData);
+
+        $this->extractAppleGeo($vCal);
+
+        $calendarData = $vCal->serialize();
+
+        $object->lastmodified = time();
+        $object->calendardata = $calendarData;
+        $object->etag = md5($calendarData);
+        $object->extracted_data = $this->converter->extractToLobject($vCal);
+        $object->size = strlen($calendarData);
+
+        $this->manager->updateOne('public','calendarobject',$object,['lastmodified','etag','calendardata','extracted_data','size']);
+
+        $this->addChange($calendarId, $objectUri, 2);
+
     }
 
     protected function getDenormalizedData($calendarData) {
