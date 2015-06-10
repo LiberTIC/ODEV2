@@ -30,10 +30,12 @@
                 Retour
             </a>
 
-            <div class="pull-right">
-                <a href='{{ path("calendar_update",{"uri": calendar.uri}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-                <a href='{{ path("calendar_delete",{"uri": calendar.uri}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
-            </div>
+            {% if ownCalendar %}
+                <div class="pull-right">
+                    <a href='{{ path("calendar_update",{"uri": calendar.uri}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <a href='{{ path("calendar_delete",{"uri": calendar.uri}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                </div>
+            {% endif %}
             <br/>
         </div>
     </div>

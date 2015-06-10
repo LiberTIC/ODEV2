@@ -147,6 +147,7 @@ class BrowserController extends Controller
             $usr = $tkn->getUser();
             $username = $usr->getUsernameCanonical();
 
+
             foreach($calendars as $key => $calendar) {
                 if ($calendar->principalUri == 'principals/'.$username) {
                     $calendarsUser[] = $calendar;
@@ -154,6 +155,8 @@ class BrowserController extends Controller
                     $calendarsOthers[] = $calendar;
                 }
             }
+        } else {
+            $calendarsOthers = $calendars;
         }
 
         return $this->render('browser/calendar_home.html.twig', array(
@@ -210,8 +213,21 @@ class BrowserController extends Controller
             return $this->redirectToRoute('calendar_home');
         }
 
+        $ownCalendar = false;
+
+        $tkn = $this->get('security.context')->getToken();
+        if ( !$tkn instanceof AnonymousToken ) {
+            $usr = $tkn->getUser();
+            $username = $usr->getUsernameCanonical();
+
+            if ($calendar->principaluri == "principals/".$username) {
+                $ownCalendar = true;
+            }
+        } 
+
         return $this->render('browser/calendar_read.html.twig', array(
             'calendar' => $calendar,
+            'ownCalendar' => $ownCalendar,
         ));
     }
 
