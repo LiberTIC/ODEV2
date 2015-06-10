@@ -18,18 +18,12 @@ class CalDAVController extends Controller
         //$baseUri = '/caldav';
         $baseUri = '/ODEV2/web/app_dev.php/caldav';
 
-        $manager = $this->get('esmanager');
-
         $pmanager = $this->get('pmanager');
-
-        //$pdo = new \PDO('mysql:dbname=sabredav;host=127.0.0.1','root','');
 
         #Backends
         $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
-        //$calendarBackend = new AppBundle\Backend\CalDAV\CalendarOld($manager,$this->get('converter'));
         $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->get('converter'));
-        //$calendarBackend = new \Sabre\CalDAV\Backend\PDO($pdo);
-        $principalBackend = new AppBundle\Backend\CalDAV\Principals($manager);
+        $principalBackend = new AppBundle\Backend\CalDAV\Principals($pmanager);
 
         $tree = [
             new Sabre\CalDAV\Principal\Collection($principalBackend),
