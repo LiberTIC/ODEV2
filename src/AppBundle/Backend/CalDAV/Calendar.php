@@ -18,7 +18,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 {
 
     protected $manager;
-    protected $converter;
 
 
     public $propertyMap = [
@@ -30,9 +29,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     ];
 
 
-    public function __construct($manager, $converter) {
+    public function __construct($manager) {
         $this->manager = $manager;
-        $this->converter = $converter;
     }
 
     /* CALENDAR */
@@ -271,7 +269,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'size' => strlen($calendarData),
             'component' => 'vevent',
             'uid' => $vCal->VEVENT->UID->__toString(),
-            'extracted_data' => $this->converter->extractToLobject($vCal)
+            'extracted_data' => Event::extractData($vCal)
         ];
 
         $this->addChange($calendarId, $objectUri, 1);
@@ -329,7 +327,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $object->lastmodified = time();
         $object->calendardata = $calendarData;
         $object->etag = md5($calendarData);
-        $object->extracted_data = $this->converter->extractToLobject($vCal);
+        $object->extracted_data = Event::extractData($vCal);
         $object->size = strlen($calendarData);
 
         $this->manager->updateOne('public','calendarobject',$object,['lastmodified','etag','calendardata','extracted_data','size']);

@@ -25,7 +25,7 @@ class BrowserController extends Controller
 
         $tkn = $this->get('security.context')->getToken();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $rawEvents = $calendarBackend->getAllCalendarObjects();
 

@@ -11,9 +11,6 @@ services:
         class: AppBundle\Backend\Users\UserManager
         arguments: ["@pmanager"]
 
-    converter:
-        class: AppBundle\Service\FormatConverter
-
     pmanager:
         class: AppBundle\Service\PommManager
         arguments: ["@pomm"]

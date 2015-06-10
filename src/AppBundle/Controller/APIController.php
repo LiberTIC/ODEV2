@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 use PommProject\Foundation\Where;
 
+use Sabre\VObject;
+
 class APIController extends Controller
 {
     public $acceptedMimeFormat = ['application/json','text/html','application/xml','text/csv'];
@@ -161,7 +163,7 @@ class APIController extends Controller
         }
 
         $calendarData = $event->calendardata;
-        $vobject = $this->get('converter')->convert('icalendar','json',$calendarData,false);
+        $vobject = VObject\Reader::read($calendarData);
 
         $calendar = $this->get('pmanager')->findById('public','calendar',$event->calendarid);
 
@@ -177,7 +179,7 @@ class APIController extends Controller
                 'etag' => $event->etag, 
                 'links' => $links,
                 'extracted_data' => $event->extracted_data,
-                'jCal' => $vobject
+                'jCal' => $vobject->jsonSerialize()
             ];
 
         return $this->buildResponse(['event' => $ret ]);
@@ -201,12 +203,16 @@ class APIController extends Controller
         $format = $format == 'html' ? 'json' : $format; // Set html behavior as json behavior
 
         if ($format == 'json' ) {
+
             $response = new Response(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
         } else {
-            $data = $this->container->get('converter')->convert('json',$format,$data);
+
+            throw new \Exception("Not Supported Yet.");
+
+            // here, convert from json to whatever you like;
 
             return new Response($data);
         }

@@ -64,7 +64,7 @@ class Event
         "price_children"    => null,
     ];
 
-    private $convertTable = [
+    public static $convertTable = [
          /* Nom et description */
         "name"              => "SUMMARY",
         "id"                => "UID",
@@ -155,7 +155,7 @@ class Event
         foreach($this->properties as $key => $value) {
 
             if ($value != null) {
-                $name = $this->convertTable[$key];
+                $name = self::$convertTable[$key];
 
                 if (!$vobject->VEVENT->__isset($name)) {
                     $vobject->VEVENT->add($name);
@@ -174,7 +174,7 @@ class Event
 
         $vevent = $vCal->VEVENT;
 
-        foreach($this->convertTable as $jsonName => $icalName) {
+        foreach(self::$convertTable as $jsonName => $icalName) {
             if ($vevent->$icalName != null) {
                 $value = $vevent->$icalName->getParts();
                 if (count($value) == 1)
@@ -182,6 +182,24 @@ class Event
                 $this->__set($jsonName, $value);
             }
         }
+    }
+
+    public static function extractData($vobject) {
+        $vevent = $vobject->VEVENT;
+
+        $lobject = [];
+
+        foreach(self::$convertTable as $jsonName => $icalName) {
+            if ($data = $vevent->__get($icalName)) {
+                $parts = $data->getParts();
+                if (sizeof($parts) == 1) {
+                    $parts = $parts[0];
+                }
+                $lobject[$jsonName] = $parts;
+            }
+        }
+
+        return $lobject;
     }
 
 }
