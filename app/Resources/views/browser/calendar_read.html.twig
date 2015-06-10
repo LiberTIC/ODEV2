@@ -40,4 +40,34 @@
         </div>
     </div>
 
+    <legend>Evénements</legend>
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th class="col-lg-2">Titre</th>
+            <th class="col-lg-3">Description</th>
+            <th class="col-lg-1">Catégorie</th>
+            <th class="col-lg-2">Date début</th>
+            <th class="col-lg-2">Date fin</th>
+            <th class="col-lg-2">Actions</th>
+        </tr>
+
+        {% for event in events %}
+            <tr>
+                <td>{{ event.name }}</td>
+                <td>{{ event.description }}</td>
+                <td>{{ event.category }}</td>
+                <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
+                <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
+                <td>
+                    <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info">Voir</a>
+                    {% if ownCalendar %}
+                        <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
 {% endblock %}

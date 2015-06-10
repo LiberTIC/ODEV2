@@ -237,11 +237,28 @@ class BrowserController extends Controller
             if ($calendar->principaluri == "principals/".$username) {
                 $ownCalendar = true;
             }
-        } 
+        }
+
+        $where = Where::create("calendarid = $*",[$calendar->uid]);
+
+        $rawEvents = $this->get('pmanager')->findWhere('public','calendarobject',$where);
+
+        $events = [];
+
+        foreach($rawEvents as $raw) {
+            $event = new Event();
+
+            foreach($raw->extracted_data as $name => $value) {
+                $event->__set($name,$value);
+            }
+
+            $events[] = $event;
+        }
 
         return $this->render('browser/calendar_read.html.twig', array(
             'calendar' => $calendar,
             'ownCalendar' => $ownCalendar,
+            'events' => $events
         ));
     }
 
