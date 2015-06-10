@@ -35,8 +35,8 @@ class Users extends RowStructure
     {
         $this
             ->setRelation('public.users')
-            ->setPrimaryKey(['uid'])
-            ->addField('uid', 'int4')
+            ->setPrimaryKey(['id'])
+            ->addField('id', 'int4')
             ->addField('username', 'text')
             ->addField('username_canonical', 'text')
             ->addField('email', 'text')
@@ -44,7 +44,6 @@ class Users extends RowStructure
             ->addField('salt', 'text')
             ->addField('password', 'text')
             ->addField('password_digesta', 'text')
-            ->addField('last_login', 'text')
             ->addField('locked', 'bool')
             ->addField('expired', 'bool')
             ->addField('expires_at', 'text')
@@ -54,6 +53,7 @@ class Users extends RowStructure
             ->addField('credentials_expired', 'bool')
             ->addField('credentials_expire_at', 'text')
             ->addField('enabled', 'bool')
+            ->addField('last_login', 'timestamp')
             ;
     }
 }
