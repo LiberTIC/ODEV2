@@ -15,14 +15,15 @@ class CalDAVController extends Controller
     {
         date_default_timezone_set('Europe/Paris');
 
-        $baseUri = '/caldav';
+        //$baseUri = '/caldav';
+        $baseUri = '/ODEV2/web/app_dev.php/caldav';
 
-        $manager = $this->get('esmanager');
+        $pmanager = $this->get('pmanager');
 
         #Backends
-        $authBackend = new AppBundle\Backend\CalDAV\Auth($manager);
-        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($manager,$this->get('converter'));
-        $principalBackend = new AppBundle\Backend\CalDAV\Principals($manager);
+        $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
+        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->get('converter'));
+        $principalBackend = new AppBundle\Backend\CalDAV\Principals($pmanager);
 
         $tree = [
             new Sabre\CalDAV\Principal\Collection($principalBackend),

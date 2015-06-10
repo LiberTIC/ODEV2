@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+
+{% set active="calendar" %}
+
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Calendrier "{{ calendar.displayname }}"</h1>
+    </div>
+
+    <div class="col-lg-4">
+        <h3>Accéder aux calendriers</h3>
+        <p>Pour accéder à vos calendriers, cliquez ici: <a href="{{path('calendar_home')}}">Liste des calendriers</a></p>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="well form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-sm-3">Nom</label>
+                <p class="col-sm-9" style="padding-top: 8px;">{{ calendar.displayname }}</p>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">Description</label>
+                <p class="col-sm-9" style="padding-top: 8px;">{{ calendar.description }}</p>
+            </div>
+
+            <a href='{{ path("calendar_home") }}' class="btn btn-default pull-left">
+                Retour
+            </a>
+
+            {% if ownCalendar %}
+                <div class="pull-right">
+                    <a href='{{ path("calendar_update",{"uri": calendar.uri}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <a href='{{ path("calendar_delete",{"uri": calendar.uri}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                </div>
+            {% endif %}
+            <br/>
+        </div>
+    </div>
+
+    <legend>Evénements</legend>
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th class="col-lg-2">Titre</th>
+            <th class="col-lg-3">Description</th>
+            <th class="col-lg-1">Catégorie</th>
+            <th class="col-lg-2">Date début</th>
+            <th class="col-lg-2">Date fin</th>
+            <th class="col-lg-2">Actions</th>
+        </tr>
+
+        {% for event in events %}
+            <tr>
+                <td>{{ event.name }}</td>
+                <td>{{ event.description }}</td>
+                <td>{{ event.category }}</td>
+                <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
+                <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
+                <td>
+                    <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info">Voir</a>
+                    {% if ownCalendar %}
+                        <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

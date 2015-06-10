@@ -39,26 +39,31 @@ class User extends BaseUser implements JsonSerializable
         $this->passwordDigesta = $passwordDigesta;
     }
 
+    public function __set($name,$value) {
+        $name = preg_replace('/_(.?)/e',"strtoupper('$1')",$name);
+        $this->$name = $value;
+    }
+
     public function jsonSerialize()
     {
         return [
             "username" => $this->username,
-            "usernameCanonical" => $this->usernameCanonical,
+            "username_canonical" => $this->usernameCanonical,
             "email" => $this->email,
-            "emailCanonical" => $this->emailCanonical,
+            "email_canonical" => $this->emailCanonical,
             "enabled" => $this->enabled,
             "salt" => $this->salt,
             "password" => $this->password,
-            "passwordDigesta" => $this->passwordDigesta,
-            "lastLogin" => $this->lastLogin,
+            "password_digesta" => $this->passwordDigesta,
+            "last_login" => $this->lastLogin,
             "locked" => $this->locked,
             "expired" => $this->expired,
             "expires_at" => $this->expiresAt,
-            "confirmationToken" => $this->confirmationToken,
-            "passwordRequestedAt" => $this->passwordRequestedAt,
+            "confirmation_token" => $this->confirmationToken,
+            "password_requested_at" => $this->passwordRequestedAt,
             "roles" => $this->roles,
-            "credentialsExpired" => $this->credentialsExpired,
-            "credentialsExpireAt" => $this->credentialsExpireAt
+            "credentials_expired" => $this->credentialsExpired,
+            "credentials_expire_at" => $this->credentialsExpireAt
         ];
     }
 }

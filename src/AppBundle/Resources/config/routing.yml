@@ -27,15 +27,15 @@ event_create:
     defaults: { _controller: AppBundle:Browser:eventCreate }
 
 event_read:
-    path:     /event/{uid}
+    path:     /event/{uri}
     defaults: { _controller: AppBundle:Browser:eventRead }
 
 event_update:
-    path:     /event/{uid}/edit
+    path:     /event/{uri}/edit
     defaults: { _controller: AppBundle:Browser:eventUpdate }
 
 event_delete: 
-    path:     /event/{uid}/delete
+    path:     /event/{uri}/delete
     defaults: { _controller: AppBundle:Browser:eventDelete }
 
 
@@ -48,13 +48,13 @@ calendar_create:
     defaults: { _controller: AppBundle:Browser:calendarCreate }
 
 calendar_read:
-    path:     /calendar/{uid}
+    path:     /calendar/{uri}
     defaults: { _controller: AppBundle:Browser:calendarRead }
 
 calendar_update:
-    path:     /calendar/{uid}/edit
+    path:     /calendar/{uri}/edit
     defaults: { _controller: AppBundle:Browser:calendarUpdate }
 
 calendar_delete:
-    path:     /calendar/{uid}/delete
+    path:     /calendar/{uri}/delete
     defaults: { _controller: AppBundle:Browser:calendarDelete }

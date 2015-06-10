@@ -4,18 +4,18 @@ namespace AppBundle\Backend\Users;
 
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
-use Elasticsearch\Client;
-use AppBundle\Backend\ESManager;
+
+use PommProject\Foundation\Where;
 
 class UserManager implements UserManagerInterface
 {
-    private $esmanager;
+    private $manager;
 
     private $encoderFactory;
 
     public function __construct($manager)
     {
-        $this->esmanager = $manager;
+        $this->manager = $manager;
     }
 
     public function createUser()
@@ -24,42 +24,49 @@ class UserManager implements UserManagerInterface
         return new $class;
     }
 
+    public function createFromDatabase($dbUser)
+    {
+        $user = $this->createUser();
+
+        $dbUser = $dbUser->extract();
+
+        foreach($dbUser as $name => $value) {
+            $user->$name = $value;
+        }
+
+        return $user;
+    }
+
     public function deleteUser(UserInterface $user)
     {
-        $this->esmanager->simpleDelete('app', 'users', $user->getId());
+        $this->manager->query('DELETE FROM users WHERE id = '.$user->getId());
     }
 
     public function findUserBy(array $criteria)
     {
 
-        if (isset($criteria['id'])) {
-            $u = $this->esmanager->simpleGet('app','users',$criteria['id']);
+        $key = array_keys($criteria)[0];
+        $where = Where::create($key." = $*",[$criteria[$key]]);
 
-            if ($u == null) {
-                return null;
-            }
+        $users = $this->manager->findWhere('public','users',$where);
 
-        } else {
-            $searchResult = $this->esmanager->simpleQuery('app', 'users', $criteria);
-
-            if ($searchResult == null) {
-                return null;
-            }
-
-            $u = $searchResult[0];
+        if ($users->count() == 0) {
+            return null;
         }
 
-        return $this->loadUserFromArray($u);
+        $ret = $this->createFromDatabase($users->get(0));
+        return $ret;
+        
     }
 
     public function findUserByUsername($username)
     {
-        return $this->findUserBy(['usernameCanonical' => $username]);
+        return $this->findUserBy(['username_canonical' => $username]);
     }
 
     public function findUserByEmail($email)
     {
-        return $this->findUserBy(['emailCanonical' => $email]);
+        return $this->findUserBy(['email_canonical' => $email]);
     }
 
     public function findUserByUsernameOrEmail($usernameOrEmail)
@@ -73,20 +80,20 @@ class UserManager implements UserManagerInterface
 
     public function findUserByConfirmationToken($token)
     {
-        return $this->findUserByUsername(['confirmationToken' => $token]);
+        return $this->findUserByUsername(['confirmation_token' => $token]);
     }
 
     public function findUsers()
     {
-        $searchResult = $this->esmanager->simpleSearch('app', 'users');
-        $t = null;
-        echo $t->truc();
-        $users = [];
-        foreach ($searchResult as $u) {
-            $users[] = $this->loadUserFromArray($u);
+
+        $users = $this->manager->findAll('public','users');
+
+        $ret = [];
+        foreach($users as $user) {
+            $ret[] = $this->createFromDatabase($user);
         }
 
-        return $users;
+        return $ret;
     }
 
     public function getClass()
@@ -109,10 +116,22 @@ class UserManager implements UserManagerInterface
             $this->createPrincipals($user);
             $this->createDefaultCalendar($user);
 
-            $ret = $this->esmanager->simpleIndex('app', 'users', null, $user->jsonSerialize());
-            $user->setId($ret['_id']);
+            $ret = $this->manager->insertOne('public','users',$user->jsonSerialize());
+
+            $user->setId($ret->id);
+
         } else {
-            $this->esmanager->simpleIndex('app', 'users', $user->getId(), $user->jsonSerialize());
+
+            $where = Where::create('id = $*',[$user->getId()]);
+            $dbUser = $this->manager->findWhere('public','users',$where)->get(0);
+
+            $data = $user->jsonSerialize();
+            foreach($data as $name => $value) {
+                $dbUser->$name = $value;
+            }
+
+            $this->manager->updateOne('public','users',$dbUser,array_keys($data));
+            
         }
     }
 
@@ -143,57 +162,27 @@ class UserManager implements UserManagerInterface
         }
     }
 
-    public function loadUserFromArray($u)
-    {
-
-        $user = $this->createUser();
-        $user->setId($u['_id']);
-
-        $u = $u['_source'];
-
-        $user->setUsername($u['username']);
-        $user->setUsernameCanonical($u['usernameCanonical']);
-        $user->setEmail($u['email']);
-        $user->setEmailCanonical($u['emailCanonical']);
-        $user->setEnabled($u['enabled']);
-        $user->setSalt($u['salt']);
-        $user->setPassword($u['password']);
-        $user->setPasswordDigesta($u['passwordDigesta']);
-        if ($u['lastLogin'] != null) {
-            $date = \DateTime::createFromFormat("Y-m-d H:i:s", $u['lastLogin']['date']);
-            if ($date == false) 
-                $date = \DateTime::createFromFormat("Y-m-d H:i:s.u", $u['lastLogin']['date']);
-            $user->setLastLogin($date);
-        }
-        $user->setLocked($u['locked']);
-        $user->setExpired($u['locked']);
-        $user->setConfirmationToken($u['confirmationToken']);
-        foreach ($u['roles'] as $role) {
-            $user->addRole($role);
-        }
-
-        return $user;
-    }
-
     public function createPrincipals($user)
     {
+
         $username = $user->getUsername();
         $usernameCanonical = $user->getUsernameCanonical();
         $email = $user->getEmail();
 
         $principal = ['uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
+        $this->manager->insertOne('public','principal',$principal);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
+        $this->manager->insertOne('public','principal',$principal);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
-        $this->esmanager->simpleIndex('caldav', 'principals', null, $principal,false);
+        $this->manager->insertOne('public','principal',$principal);
+
     }
 
     public function createDefaultCalendar($user)
     {
-        $principalUri = 'principals/'.$user->getUsernameCanonical();
+        /*$principalUri = 'principals/'.$user->getUsernameCanonical();
 
         $calendar = [
             'principaluri' => $principalUri,
@@ -208,6 +197,6 @@ class UserManager implements UserManagerInterface
             'transparent' => 0
         ];
 
-        $this->esmanager->simpleIndex('caldav','calendars',null,$calendar);
+        $this->esmanager->simpleIndex('caldav','calendars',null,$calendar);*/
     }
 }

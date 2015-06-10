@@ -7,6 +7,7 @@ use Sabre\VObject;
 class Event
 {
 
+    public $calendar = null;
     
     public $calendarid = null;
 
@@ -112,25 +113,24 @@ class Event
     ];
 
     public function __get($name) {
-        if ($name == 'calendarid')
-            return $this->calendarid;
 
-        if ($name == 'calendarname')
-            return $this->calendarname;
+        if ($name == 'calendar')
+            return $this->calendar;
 
         return $this->properties[$name];
     }
 
     public function __set($name,$value) {
-        if ($name == 'calendarid')
-            $this->calendarid = $value;
 
-        if ($name == 'calendarname')
-            $this->calendarname = $value;
+        if ($name == 'calendar')
+            $this->calendar = $value;
 
         if ($name == 'date_start' || $name == 'date_end') {
-            if (strpos($value,"T") === false) {
-                $value = $value."T000000Z";
+            if (is_string($value)) {
+                if (strpos($value,"T") === false) {
+                    $value = $value."T000000Z";
+                }
+                $value = new \DateTime($value);
             }
         }
 
@@ -138,7 +138,7 @@ class Event
     }
 
     public function __isset($name) {
-        if ($name == 'calendarid' || $name == 'calendarname')
+        if ($name == 'calendar')
             return true;
         return array_key_exists($name,$this->properties);
     }
@@ -156,13 +156,32 @@ class Event
 
             if ($value != null) {
                 $name = $this->convertTable[$key];
-                $vobject->VEVENT->add($name);
+
+                if (!$vobject->VEVENT->__isset($name)) {
+                    $vobject->VEVENT->add($name);
+                }
+                
                 $vobject->VEVENT->__set($name,$value);
             }
            
         }
 
         return $vobject;
+    }
+
+    public function loadFromCalData($calendarData) {
+        $vCal = VObject\Reader::read($calendarData);
+
+        $vevent = $vCal->VEVENT;
+
+        foreach($this->convertTable as $jsonName => $icalName) {
+            if ($vevent->$icalName != null) {
+                $value = $vevent->$icalName->getParts();
+                if (count($value) == 1)
+                    $value = $value[0];
+                $this->__set($jsonName, $value);
+            }
+        }
     }
 
 }

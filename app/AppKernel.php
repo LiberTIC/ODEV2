@@ -18,7 +18,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
             new FOS\UserBundle\FOSUserBundle(),
-            new M6Web\Bundle\ElasticsearchBundle\M6WebElasticsearchBundle(),
+            new PommProject\PommBundle\PommBundle(),
             new Genemu\Bundle\FormBundle\GenemuFormBundle(),
             new Mopa\Bundle\BootstrapBundle\MopaBootstrapBundle(),
         );

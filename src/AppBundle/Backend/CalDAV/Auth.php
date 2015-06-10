@@ -4,6 +4,8 @@ namespace AppBundle\Backend\CalDAV;
 
 use Sabre\DAV\Auth\Backend\AbstractDigest;
 
+use PommProject\Foundation\Where;
+
 class Auth extends AbstractDigest
 {
     protected $manager;
@@ -15,12 +17,15 @@ class Auth extends AbstractDigest
 
     public function getDigestHash($realm, $username)
     {
-        $searchResult = $this->manager->simpleQuery('app','users', ['usernameCanonical' => strtolower($username)]);
 
-        if ($searchResult == null) {
+        $where = Where::create('username_canonical = $*',[$username]);
+
+        $users = $this->manager->findWhere('public','users',$where);
+
+        if ($users->count() == 0) {
             return;
         }
 
-        return $searchResult[0]['_source']['passwordDigesta'];
+        return $users->get(0)->password_digesta;
     }
 }

@@ -12,9 +12,14 @@ class CalendarType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('displayName','text',array(
+            ->add('displayname','text',array(
                 'label' => 'Nom',
                 'attr' => array('placeholder' => 'Concert saison 2015-2016')
+                )
+            )
+            ->add('description','text',array(
+                'label' => 'Description',
+                'attr' => array('placeholder' => 'Calendrier des concert de la saison 2015-2016')
                 )
             );
     }

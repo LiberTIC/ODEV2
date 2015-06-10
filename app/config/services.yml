@@ -9,11 +9,11 @@ services:
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
     app.user_manager:
         class: AppBundle\Backend\Users\UserManager
-        arguments: ["@esmanager"]
+        arguments: ["@pmanager"]
 
     converter:
         class: AppBundle\Service\FormatConverter
 
-    esmanager:
-        class: AppBundle\Service\ESManager
-        arguments: ["@m6web_elasticsearch.client.default"]
+    pmanager:
+        class: AppBundle\Service\PommManager
+        arguments: ["@pomm"]
