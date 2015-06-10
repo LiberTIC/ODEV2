@@ -79,18 +79,6 @@ fos_user:
     service:
         user_manager: app.user_manager
 
-m6web_elasticsearch:
-    default_client: my_client
-    clients:
-        my_client:
-            hosts:
-                - "%elasticsearch_host%:%elasticsearch_port%"
-            connectionParams:
-                auth:
-                    - "%elasticsearch_user%"
-                    - "%elasticsearch_password%"
-                    - Basic
-
 pomm:
     configuration:
         ODE:
