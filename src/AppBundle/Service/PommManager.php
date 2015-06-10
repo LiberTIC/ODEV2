@@ -29,9 +29,9 @@ class PommManager
         return $res;
     }
 
-    public function findWhere($schema,$table,$where) {
+    public function findWhere($schema,$table,$where,$extra=null) {
 
-        $res = $this->getModel($schema,$table)->findWhere($where);
+        $res = $this->getModel($schema,$table)->findWhere($where,[],$extra);
 
         return $res;
     }

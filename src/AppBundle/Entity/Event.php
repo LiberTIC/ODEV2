@@ -126,8 +126,10 @@ class Event
             $this->calendar = $value;
 
         if ($name == 'date_start' || $name == 'date_end') {
-            if (strpos($value,"T") === false) {
-                $value = $value."T000000Z";
+            if (is_string($value)) {
+                if (strpos($value,"T") === false) {
+                    $value = $value."T000000Z";
+                }
             }
         }
 

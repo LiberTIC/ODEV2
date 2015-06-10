@@ -8,17 +8,17 @@ use PommProject\ModelManager\Model\ModelTrait\WriteQueries;
 
 use PommProject\Foundation\Where;
 
-use AppBundle\Model\Ode\PublicSchema\AutoStructure\Calendarchanges as CalendarchangesStructure;
-use AppBundle\Model\Ode\PublicSchema\Calendarchanges;
+use AppBundle\Model\Ode\PublicSchema\AutoStructure\Calendarchange as CalendarchangeStructure;
+use AppBundle\Model\Ode\PublicSchema\Calendarchange;
 
 /**
- * CalendarchangesModel
+ * CalendarchangeModel
  *
- * Model class for table calendarchanges.
+ * Model class for table calendarchange.
  *
  * @see Model
  */
-class CalendarchangesModel extends Model
+class CalendarchangeModel extends Model
 {
     use WriteQueries;
 
@@ -31,7 +31,7 @@ class CalendarchangesModel extends Model
      */
     public function __construct()
     {
-        $this->structure = new CalendarchangesStructure;
-        $this->flexible_entity_class = '\AppBundle\Model\Ode\PublicSchema\Calendarchanges';
+        $this->structure = new CalendarchangeStructure;
+        $this->flexible_entity_class = '\AppBundle\Model\Ode\PublicSchema\Calendarchange';
     }
 }

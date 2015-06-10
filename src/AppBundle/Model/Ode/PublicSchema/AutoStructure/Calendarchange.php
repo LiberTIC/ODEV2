@@ -10,9 +10,9 @@ namespace AppBundle\Model\Ode\PublicSchema\AutoStructure;
 use PommProject\ModelManager\Model\RowStructure;
 
 /**
- * Calendarchanges
+ * Calendarchange
  *
- * Structure class for relation public.calendarchanges.
+ * Structure class for relation public.calendarchange.
  * 
  * Class and fields comments are inspected from table and fields comments.
  * Just add comments in your database and they will appear here.
@@ -22,7 +22,7 @@ use PommProject\ModelManager\Model\RowStructure;
  *
  * @see RowStructure
  */
-class Calendarchanges extends RowStructure
+class Calendarchange extends RowStructure
 {
     /**
      * __construct
@@ -34,7 +34,7 @@ class Calendarchanges extends RowStructure
     public function __construct()
     {
         $this
-            ->setRelation('public.calendarchanges')
+            ->setRelation('public.calendarchange')
             ->setPrimaryKey(['id'])
             ->addField('id', 'int4')
             ->addField('uri', 'text')

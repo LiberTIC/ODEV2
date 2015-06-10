@@ -86,6 +86,12 @@ class BrowserController extends Controller
 
         $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
 
+        if ($rawCalendars == []) {
+            $this->addFlash('danger','Vous devez créer au moins 1 calendrier avant de pouvoir créer des événements.');
+
+            return $this->redirectToRoute('event_home');
+        }
+
         $calendars = [];
         foreach($rawCalendars as $raw) {
             $calendars[$raw['id']] = $raw['{DAV:}displayname'];
@@ -98,7 +104,13 @@ class BrowserController extends Controller
 
         if ($form->isValid()) {
 
-            return new Response($event->getVObject()->serialize());
+            $vevent = $event->getVObject();
+
+            $calendarBackend->createCalendarObject($event->calendarid,$vevent->VEVENT->UID.".ics",$vevent->serialize());
+            
+            $this->addFlash('success',"L'événement a bien été créé.");
+
+            return $this->redirectToRoute('event_read',['uri' => $vevent->VEVENT->UID]);
         }
 
         return $this->render('browser/event_create.html.twig', array(

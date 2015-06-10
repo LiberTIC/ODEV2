@@ -5,13 +5,13 @@ namespace AppBundle\Model\Ode\PublicSchema;
 use PommProject\ModelManager\Model\FlexibleEntity;
 
 /**
- * Calendarchanges
+ * Calendarchange
  *
  * Flexible entity for relation
- * public.calendarchanges
+ * public.calendarchange
  *
  * @see FlexibleEntity
  */
-class Calendarchanges extends FlexibleEntity
+class Calendarchange extends FlexibleEntity
 {
 }

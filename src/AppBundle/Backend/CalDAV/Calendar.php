@@ -274,6 +274,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'extracted_data' => $this->converter->extractToLobject($vCal)
         ];
 
+        $this->addChange($calendarId, $objectUri, 1);
+
         $calendar = $this->manager->insertOne('public','calendarobject',$values);
     }
 
@@ -396,8 +398,64 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null) {
 
-        //echo "gcfc";
-        return [];
+        // Current synctoken
+        $calendar = $this->manager->findById('public','calendar',$calendarId);
+        $currentToken = $calendar->synctoken;
+
+        if (is_null($currentToken)) return null;
+
+        $result = [
+            'syncToken' => $currentToken,
+            'added'     => [],
+            'modified'  => [],
+            'deleted'   => [],
+        ];
+
+        if ($syncToken) {
+
+            $where = Where::create("synctoken >= $*",[$syncToken])
+                        ->andWhere("synctoken < $*",[$currentToken])
+                        ->andWhere("calendarid = $*",[$calendarId]);
+
+            // Fetching all changes
+            $calendarChanges = $this->manager->findWhere('public','calendarchange',$where,'ORDER BY synctoken');
+
+            $changes = [];
+
+            // This loop ensures that any duplicates are overwritten, only the
+            // last change on a node is relevant.
+            foreach ($calendarChanges as $change) {
+
+                $changes[$change->uri] = $change->operation;
+
+            }
+
+            foreach ($changes as $uri => $operation) {
+
+                switch ($operation) {
+                    case 1 :
+                        $result['added'][] = $uri;
+                        break;
+                    case 2 :
+                        $result['modified'][] = $uri;
+                        break;
+                    case 3 :
+                        $result['deleted'][] = $uri;
+                        break;
+                }
+
+            }
+        } else {
+
+            // No synctoken supplied, this is the initial sync.
+            $objects = $this->manager->findAll('public','calendarobject');
+
+            foreach ($objects as $object) {
+                $result['added'] = $object->uri;
+            }
+        }
+        return $result;
+
     }
 
     protected function addChange($calendarId,$objectUri, $operation) {
@@ -412,6 +470,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         ];
         
         $this->manager->insertOne('public','calendarchange',$change);
+
+        $sql = 'UPDATE calendar SET synctoken = synctoken + 1 WHERE uid = '.$calendarId;
+        $this->manager->query($sql);
     }
 
     /* OTHER */
