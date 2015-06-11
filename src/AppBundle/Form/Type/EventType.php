@@ -111,7 +111,7 @@ class EventType extends AbstractType
             )
             ->add('status','choice', array(
                 'label' => 'Status',
-                'choices' => array('1' => 'Confirmé', '2' => 'Annulé', '3' => 'Reporté'),
+                'choices' => array('CONFIRMED' => 'Confirmé', 'CANCELLED' => 'Annulé'),
                 'horizontal_input_wrapper_class' => 'col-lg-4'
                 )
             )

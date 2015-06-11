@@ -109,7 +109,7 @@ class BrowserController extends Controller
         }
 
         $event = new Event();
-        $form = $this->createForm(new EventType($calendars),$event,["csrf_protection" => false]);
+        $form = $this->createForm(new EventType($calendars,$request->query->get('calendar')),$event,["csrf_protection" => false]);
 
         $form->handleRequest($request);
 
@@ -133,7 +133,17 @@ class BrowserController extends Controller
 
     public function eventReadAction($uri) {
 
-        return new Response("eventReadAction / uid: ".$uri);
+        $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$uri);
+
+        $event = new Event();
+        $event->loadFromCalData($rawEvent->calendarData);
+
+        $calendar = $this->get('pmanager')->findById('public','calendar',$rawEvent->calendarid);
+
+        return $this->render('browser/event_read.html.twig',array(
+            'event' => $event,
+            'calendar' => $calendar
+        ));
     }
 
     public function eventUpdateAction(Request $request, $uri) {

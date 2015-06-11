@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+
+{% set active="event" %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/simplecalendar.js') }}"></script>
+
+{% endblock %}
+
+{% block stylesheets %}
+    
+    {{ parent() }}
+    <style>
+
+        .oneday {
+            border-radius: 15px 15px 15px 15px;
+        }
+
+        .firstday {
+            border-radius: 15px 0px 0px 15px;
+        }
+
+        .lastday {
+            border-radius: 0px 15px 15px 0px;
+        }
+
+        .betweenday {
+            border-radius: 0px 0px 0px 0px;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block body %}
+
+    <div class="page-header">
+        <h1>Evénement "{{ event.name }}"
+        <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+        </h1>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="col-lg-6">
+            <legend>Description</legend>
+
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2">Titre:</label>
+                    <p class="col-lg-9 pull-right">{{ event.name }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Description:</label>
+                    <p class="col-lg-9 pull-right">{{ event.description }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Catégorie:</label>
+                    <p class="col-lg-9 pull-right">{{ event.category }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Calendrier:</label>
+                    <p class="col-lg-9 pull-right">
+                        <a href="{{ path('calendar_read',{'uri': calendar.uri}) }}">
+                            {{ calendar.displayName }}
+                        </a>
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Tags:</label>
+                    <p class="col-lg-9 pull-right">{{ event.tags }}</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+            <legend>Dates</legend>
+
+            {% set mois = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"] %}
+            {% set mois_nb = event.date_start|date('n')-1 %}
+
+            <h3 class="text-center" >{{ mois[mois_nb] }} {{ event.date_start|date('Y') }}</h3>
+
+            <input type="hidden" id="year" value="{{ event.date_start|date('Y') }}" />
+            <input type="hidden" id="month" value="{{ event.date_start|date('m') }}" />
+
+            <input type="hidden" id="date_start" value="{{ event.date_start|date('Y-m-d H:i',false) }}"/>
+            <input type="hidden" id="date_end" value="{{ event.date_end|date('Y-m-d H:i',false) }}"/>
+
+            <table id="calendar" class='table table-bordered'>
+
+            </table>
+
+            <p class="text-center">
+                Du <b>{{ event.date_start|date('d/m/Y') }}</b> à <b>{{ event.date_start|date('H:i') }}</b>
+                au <b>{{ event.date_end|date('d/m/Y') }}</b> à <b>{{ event.date_end|date('H:i') }}</b>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+
+        <div class="col-lg-6">
+            <legend>Lieu</legend>
+
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2">Lieu:</label>
+                    <p class="col-lg-9 pull-right">{{ event.location_name }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Emplacement:</label>
+                    <p class="col-lg-9 pull-right">{{ event.location_precision }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-4">Capacité du lieu:</label>
+                    <p class="col-lg-8 pull-left">{{ event.location_capacity }} personnes</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+            <legend>Organisation</legend>
+
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2">Participants:</label>
+                    <p class="col-lg-9 pull-right">{{ event.attendees }}<p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Durée:</label>
+                    <p class="col-lg-9 pull-right">{{ event.duration }}<p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Status:</label>
+
+                    {% set status = {"CONFIRMED": "Confirmé", "CANCELLED": "Annulé"} %}
+
+                    <p class="col-lg-9 pull-right">{{ status[event.status] }}<p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Organisateur:</label>
+                    <p class="col-lg-9 pull-right">
+                        <a href="{{ event.url_promoter }}">
+                            {{ event.promoter }}
+                        </a>
+                    <p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-12">
+
+        <div class="col-lg-6">
+            <legend>Contacts et medias</legend>
+
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-2">Contact:</label>
+                    <p class="col-lg-9 pull-right">{{ event.contact_name }}</p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2">Email:</label>
+                    <p class="col-lg-9 pull-right">{{ event.contact_email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <legend>Tarifs</legend>
+
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="col-lg-3">Tarif standard:</label>
+                    <p class="col-lg-8 pull-right">{{ event.price_standard }}
+                    <span class="glyphicon glyphicon-euro" aria-hidden="true"></span></p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3">Tarif réduit:</label>
+                    <p class="col-lg-8 pull-right">{{ event.price_reduced}}
+                    <span class="glyphicon glyphicon-euro" aria-hidden="true"></span></p>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3">Tarif enfant:</label>
+                    <p class="col-lg-8 pull-right">{{ event.price_children}}
+                    <span class="glyphicon glyphicon-euro" aria-hidden="true"></span></p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

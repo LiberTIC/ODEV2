@@ -52,7 +52,7 @@ class Event
         /* URLs */
         "url"               => null,
         "url_promoter"      => null,
-        "urls_medias"       => null,
+        "urls_medias"       => [],
 
         /* Contacts */
         "contact_name"       => null,
@@ -177,7 +177,7 @@ class Event
         foreach(self::$convertTable as $jsonName => $icalName) {
             if ($vevent->$icalName != null) {
                 $value = $vevent->$icalName->getParts();
-                if (count($value) == 1)
+                if (count($value) == 1 && !is_array($this->properties[$jsonName]))
                     $value = $value[0];
                 $this->__set($jsonName, $value);
             }
