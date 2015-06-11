@@ -93,7 +93,7 @@ class BrowserController extends Controller
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
 
@@ -160,7 +160,7 @@ class BrowserController extends Controller
 
             $vevent = $event->getVObject();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
             $calendarBackend->updateCalendarObject($rawEvent->calendarid,$uri.".ics",$vevent->serialize());
             
@@ -199,7 +199,7 @@ class BrowserController extends Controller
             return $this->redirectToRoute('event_read',['uri'=>$uri]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendarObject($event->calendarid,$event->uri);
 
@@ -212,7 +212,7 @@ class BrowserController extends Controller
 
     public function calendarHomeAction() {
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $tkn = $this->get('security.context')->getToken();
 
@@ -272,7 +272,7 @@ class BrowserController extends Controller
 
             $calendarUri = $this->generateCalendarUri($values['displayname']);
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
             $raw = [
                 '{DAV:}displayname' => $values['displayname'],
@@ -409,7 +409,7 @@ class BrowserController extends Controller
             return $this->redirectToRoute('calendar_read',['uri'=>$uri]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->get('converter'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendar($calendar->uid);
 
