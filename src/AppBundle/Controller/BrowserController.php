@@ -142,9 +142,22 @@ class BrowserController extends Controller
 
         $calendar = $this->get('pmanager')->findById('public','calendar',$rawEvent->calendarid);
 
+        $ownEvent = false;
+
+        $tkn = $this->get('security.context')->getToken();
+        if ( !$tkn instanceof AnonymousToken ) {
+            $usr = $tkn->getUser();
+            $username = $usr->getUsernameCanonical();
+
+            if ($calendar->principaluri == "principals/".$username) {
+                $ownEvent = true;
+            }
+        }
+
         return $this->render('browser/event_read.html.twig',array(
             'event' => $event,
             'calendar' => $calendar,
+            'ownEvent' => $ownEvent
         ));
     }
 

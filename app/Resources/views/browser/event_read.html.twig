@@ -51,8 +51,10 @@
 
     <div class="page-header">
         <h1>Evénement "{{ event.name }}"
-        <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+        {% if ownEvent %}
+            <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+        {% endif %}
         </h1>
     </div>
 
