@@ -55,6 +55,7 @@ Ce dépôt conserve les documents et l'analyse de la v1 et ceux du prototype de 
 - [Plan de travail de la journée de juin 2014 organisée à Stereolux](http://www.stereolux.org/labo-arts-techs/ouverture-des-donnees-evenementielles-lancement-officiel-du-site-10-06-2014)
 - [sources de la v1](https://github.com/LiberTIC/ODE): Python, Dango, Pyramid
 - [source du prototype de la v2](https://github.com/polypodes/CalDAVClientPrototype): Symfony2, CalendarServer 
+- [Sources de jquery-oembed-all](https://github.com/nfl/jquery-oembed-all)
 
 ## Discutons !
 
