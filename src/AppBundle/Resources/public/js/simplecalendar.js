@@ -94,7 +94,7 @@ MBCalendar.prototype.toHTML = function() {
     return ret;
 };
  
-window.onload = function() {
+$(document).ready(function() {
     var $ = function(s) {return document.getElementById(s)};
     var c;
     var y = $('year').value;
@@ -105,4 +105,4 @@ window.onload = function() {
 
     c = new MBCalendar(m, y, date_start, date_end);
     $('calendar').innerHTML = c.toHTML();
-};
+});
