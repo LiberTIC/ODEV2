@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 use PommProject\Foundation\Where;
 
+use Embed\Embed;
+
 use AppBundle\Entity\Event;
 use AppBundle\Form\Type\EventType;
 use AppBundle\Form\Type\CalendarType;
@@ -142,7 +144,7 @@ class BrowserController extends Controller
 
         return $this->render('browser/event_read.html.twig',array(
             'event' => $event,
-            'calendar' => $calendar
+            'calendar' => $calendar,
         ));
     }
 
