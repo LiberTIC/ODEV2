@@ -11,6 +11,8 @@ use Sabre\VObject;
 
 use PommProject\Foundation\Where;
 
+use Cocur\Slugify\Slugify as Slugify;
+
 use AppBundle\Entity\Event;
 use AppBundle\Entity\Calendar as Cal;
 
@@ -18,6 +20,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 {
 
     protected $manager;
+
+    protected $slugify;
 
     protected $pathForUrl;
 
@@ -30,8 +34,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     ];
 
 
-    public function __construct($manager,$pathForUrl) {
+    public function __construct($manager,$pathForUrl = null,Slugify $slugify = null) {
         $this->manager = $manager;
+        $this->slugify = $slugify;
         $this->pathForUrl = $pathForUrl;
     }
 
@@ -87,6 +92,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'uri'          => $calendarUri,
             'synctoken'    => 1,
             'transparent'  => 0,
+            'slug'         => $this->generateSlug($properties['{DAV:}displayname'],'calendar')
         ];
 
         // Default value
@@ -115,6 +121,24 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         return $calendar->uid;
     }
+
+
+
+    // Get the next calendarSlug possible with the name (Example: truc, truc-1, truc-2, etc..)
+    public function generateSlug($str,$table) {
+        $calendarUri = $this->slugify->slugify($str);
+           
+        $i = -1;
+        do {
+            $i++;
+            $where = Where::create("slug = $*",[$calendarUri.($i==0?'':'-'.$i)]);
+            $calendars = $this->manager->findWhere('public',$table,$where);
+        } while(sizeof($calendars->extract()) != 0);
+
+        return $calendarUri.($i==0?'':'-'.$i);
+    }
+
+
 
     public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch) {
 
@@ -146,6 +170,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                 $calendar->$name = $value;
             }
 
+            if ($calendar->displayname != $newValues['displayname']) {
+                $newValues['slug'] = true;
+                $calendar->slug = $this->generateSlug($calendar->displayname,'calendar');
+            }
 
             $manager->updateOne('public','calendar',$calendar,array_keys($newValues));
 
@@ -256,7 +284,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $vCal = VObject\Reader::read($calendarData);
 
-        $this->addURL($vCal,$objectUri);
+        $slug = $this->generateSlug($vCal->VEVENT->SUMMARY->getValue(),'calendarobject');
+
+        $this->addURL($vCal,$slug);
 
         $this->extractAppleGeo($vCal);
 
@@ -271,7 +301,8 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             'size' => strlen($calendarData),
             'component' => 'vevent',
             'uid' => $vCal->VEVENT->UID->__toString(),
-            'extracted_data' => Event::extractData($vCal)
+            'extracted_data' => Event::extractData($vCal),
+            'slug' => $slug
         ];
 
         $this->addChange($calendarId, $objectUri, 1);
@@ -279,9 +310,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $calendar = $this->manager->insertOne('public','calendarobject',$values);
     }
 
-    protected function addURL($vCal,$id)
+    protected function addURL($vCal,$slug)
     {
-        $url = $this->pathForUrl.'/'.substr($id,0,-4);
+        $url = $this->pathForUrl.'/'.$slug;
         $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
     }
 
@@ -331,8 +362,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $object->etag = md5($calendarData);
         $object->extracted_data = Event::extractData($vCal);
         $object->size = strlen($calendarData);
+        if ($object->extracted_data['name'] != $vCal->VEVENT->SUMMARY) {
+            $object->slug = $this->generateSlug($object->extracted_data['name'],'calendarobject');
+        }
 
-        $this->manager->updateOne('public','calendarobject',$object,['lastmodified','etag','calendardata','extracted_data','size']);
+        $this->manager->updateOne('public','calendarobject',$object,['lastmodified','etag','calendardata','extracted_data','size','slug']);
 
         $this->addChange($calendarId, $objectUri, 2);
 

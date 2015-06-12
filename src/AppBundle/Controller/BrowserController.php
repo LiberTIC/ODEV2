@@ -27,7 +27,7 @@ class BrowserController extends Controller
 
         $tkn = $this->get('security.context')->getToken();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $rawEvents = $calendarBackend->getAllCalendarObjects();
 
@@ -52,7 +52,9 @@ class BrowserController extends Controller
                 $event->calendar = $calendars[$raw->calendarid];
             }
 
-            $event->id = $raw->uid;            
+            $event->id = $raw->uid;
+
+            $event->slug = $raw->slug;      
 
             $events[] = $event;
         }
@@ -95,7 +97,7 @@ class BrowserController extends Controller
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read',[],true),$this->get('slugify'));
 
         $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
 
@@ -110,7 +112,7 @@ class BrowserController extends Controller
             $calendars[$raw['id']] = $raw['{DAV:}displayname'];
         }
 
-        $where = Where::create('uri = $*',[$request->query->get('calendar')]);
+        $where = Where::create('slug = $*',[$request->query->get('calendar')]);
         $raws = $this->get('pmanager')->findWhere('public','calendar',$where);
         
         $calendar = null;
@@ -131,7 +133,9 @@ class BrowserController extends Controller
             
             $this->addFlash('success',"L'événement a bien été créé.");
 
-            return $this->redirectToRoute('event_read',['uri' => $vevent->VEVENT->UID]);
+            $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$vevent->VEVENT->UID);
+
+            return $this->redirectToRoute('event_read',['slug' => $rawEvent->slug]);
         }
 
         return $this->render('browser/event_create.html.twig', array(
@@ -141,12 +145,20 @@ class BrowserController extends Controller
         //return new Response("eventCreateAction");
     }
 
-    public function eventReadAction($uri) {
+    public function eventReadAction($slug) {
 
-        $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$uri);
+        $where = Where::create('slug = $*',[$slug]);
+        $rawEvents = $this->get('pmanager')->findWhere('public','calendarobject',$where);
+
+        if ($rawEvents->count() == 0) {
+            return $this->redirectToRoute('event_home');
+        }
+
+        $rawEvent = $rawEvents->get(0);
 
         $event = new Event();
         $event->loadFromCalData($rawEvent->calendarData);
+        $event->slug = $slug;
 
         $calendar = $this->get('pmanager')->findById('public','calendar',$rawEvent->calendarid);
 
@@ -169,18 +181,21 @@ class BrowserController extends Controller
         ));
     }
 
-    public function eventUpdateAction(Request $request, $uri) {
+    public function eventUpdateAction(Request $request, $slug) {
 
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
-        $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$uri);
+        $where = Where::create('slug = $*',[$slug]);
+        $rawEvents = $this->get('pmanager')->findWhere('public','calendarobject',$where);
 
-        if ($rawEvent == null) {
+        if ($rawEvents->count() == 0) {
             return $this->redirectToRoute('event_home');
         }
+
+        $rawEvent = $rawEvents->get(0);
 
         $event = new Event();
         $event->loadFromCalData($rawEvent->calendarData);
@@ -193,28 +208,30 @@ class BrowserController extends Controller
 
             $vevent = $event->getVObject();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),null,$this->get('slugify'));
 
-            $calendarBackend->updateCalendarObject($rawEvent->calendarid,$uri.".ics",$vevent->serialize());
+            $calendarBackend->updateCalendarObject($rawEvent->calendarid,$rawEvent->uri,$vevent->serialize());
             
             $this->addFlash('success',"L'événement a bien été modifié.");
 
-            return $this->redirectToRoute('event_read',['uri' => $uri]);
+            $rawEvent = $this->get('pmanager')->findById('public','calendarobject',$event->id);
+
+            return $this->redirectToRoute('event_read',['slug' => $rawEvent->slug]);
         }
 
         return $this->render('browser/event_update.html.twig', array(
             'form' => $form->createView(),
-            'uri' => $uri
+            'slug' => $slug
         ));
     }
 
-    public function eventDeleteAction($uri) {
+    public function eventDeleteAction($slug) {
 
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
         $usr = $this->get('security.context')->getToken()->getUser();
 
-        $where = Where::create("uid = $*",[$uri]);
+        $where = Where::create("slug = $*",[$slug]);
 
         $events = $this->get('pmanager')->findWhere('public','calendarobject',$where);
 
@@ -229,10 +246,10 @@ class BrowserController extends Controller
         if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
             $this->addFlash('danger','Cet événement ne fait pas parti de vos calendriers.');
 
-            return $this->redirectToRoute('event_read',['uri'=>$uri]);
+            return $this->redirectToRoute('event_read',['uri'=>$slug]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendarObject($event->calendarid,$event->uri);
 
@@ -245,7 +262,7 @@ class BrowserController extends Controller
 
     public function calendarHomeAction() {
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $tkn = $this->get('security.context')->getToken();
 
@@ -303,9 +320,9 @@ class BrowserController extends Controller
 
             $values = $form->getData();
 
-            $calendarUri = $this->generateCalendarUri($values['displayname']);
+            $calendarUri = $this->generateCalendarUri();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),null,$this->get('slugify'));
 
             $raw = [
                 '{DAV:}displayname' => $values['displayname'],
@@ -314,11 +331,14 @@ class BrowserController extends Controller
 
             $principalUri = 'principals/'.$usr->getUsernameCanonical();
 
-            $calendarBackend->createCalendar($principalUri,$calendarUri,$raw);
+            $calendarBackend->createCalendar($principalUri,$calendarUri,$raw,$this->get('cocur_slugify'));
 
             $this->addFlash('success','Le calendrier "'.$values['displayname'].'" a bien été créé.');
 
-            return $this->redirectToRoute('calendar_home');
+            $where = Where::create('uri = $*',[$calendarUri]);
+            $rawCalendars = $this->get('pmanager')->findWhere('public','calendar',$where);
+
+            return $this->redirectToRoute('calendar_read',['slug' => $rawCalendars->get(0)->slug]);
         }
 
         return $this->render('browser/calendar_create.html.twig', array(
@@ -326,9 +346,9 @@ class BrowserController extends Controller
         ));
     }
 
-    public function calendarReadAction($uri) {
+    public function calendarReadAction($slug) {
 
-        $where = Where::create("uri = $*",[$uri]);
+        $where = Where::create("slug = $*",[$slug]);
 
         $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
@@ -363,6 +383,8 @@ class BrowserController extends Controller
                 $event->__set($name,$value);
             }
 
+            $event->slug = $raw->slug;
+
             $events[] = $event;
         }
 
@@ -376,13 +398,13 @@ class BrowserController extends Controller
         ));
     }
 
-    public function calendarUpdateAction(Request $request, $uri) {
+    public function calendarUpdateAction(Request $request, $slug) {
 
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
         $usr = $this->get('security.context')->getToken()->getUser();
 
-        $where = Where::create("uri = $*",[$uri]);
+        $where = Where::create("slug = $*",[$slug]);
 
         $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
@@ -395,7 +417,7 @@ class BrowserController extends Controller
         if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
             $this->addFlash('danger','Ce calendrier ne vous appartient pas.');
 
-            return $this->redirectToRoute('calendar_read',['uri'=>$uri]);
+            return $this->redirectToRoute('calendar_read',['slug'=>$slug]);
         }
 
         $previousName = $calendar->displayname;
@@ -407,29 +429,32 @@ class BrowserController extends Controller
         if ($form->isValid()) {
 
             if ($previousName != $calendar->displayname) {
-                $calendar->uri = $this->generateCalendarUri($calendar->displayname);
+
+                $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),null,$this->get('slugify'));
+
+                $calendar->slug = $calendarBackend->generateSlug($calendar->displayname,'calendar');
             }
             
-            $this->get('pmanager')->updateOne('public','calendar',$calendar,['uri','displayname','description']);
+            $this->get('pmanager')->updateOne('public','calendar',$calendar,['slug','displayname','description']);
 
             $this->addFlash('success','Le calendrier "'.$calendar->displayName.'" a bien été modifié.');
 
-            return $this->redirectToRoute('calendar_read',['uri'=>$calendar->uri]);
+            return $this->redirectToRoute('calendar_read',['slug'=>$calendar->slug]);
         }
 
         return $this->render('browser/calendar_update.html.twig', array(
             'form' => $form->createView(),
-            'uri' => $uri
+            'slug' => $slug
         ));
     }
 
-    public function calendarDeleteAction($uri) {
+    public function calendarDeleteAction($slug) {
 
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
         $usr = $this->get('security.context')->getToken()->getUser();
 
-        $where = Where::create("uri = $*",[$uri]);
+        $where = Where::create("slug = $*",[$slug]);
 
         $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
 
@@ -442,10 +467,10 @@ class BrowserController extends Controller
         if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
             $this->addFlash('danger','Ce calendrier ne vous appartient pas.');
 
-            return $this->redirectToRoute('calendar_read',['uri'=>$uri]);
+            return $this->redirectToRoute('calendar_read',['slug'=>$slug]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'),$this->generateUrl('event_read'));
+        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendar($calendar->uid);
 
@@ -457,33 +482,28 @@ class BrowserController extends Controller
 
 
 
-    // thanks to: http://cubiq.org/the-perfect-php-clean-url-generator
+    // thanks to: http://php.net/manual/fr/function.uniqid.php#94959
+    protected function generateCalendarUri() {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 
-    protected function toAscii($str, $replace=array(), $delimiter='-') {
-        if( !empty($replace) ) {
-            $str = str_replace((array)$replace, ' ', $str);
-        }
+            // 32 bits for "time_low"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
 
-        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
-        $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
-        $clean = strtolower(trim($clean, '-'));
-        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+            // 16 bits for "time_mid"
+            mt_rand(0, 0xffff),
 
-        return $clean;
-    }
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 4
+            mt_rand(0, 0x0fff) | 0x4000,
 
-    // Get the next calendarUri possible with the name (Example: truc, truc-1, truc-2, etc..)
-    protected function generateCalendarUri($str) {
-        $calendarUri = $this->toAscii($str);
-           
-        $i = -1;
-        do {
-            $i++;
-            $where = Where::create("uri = $*",[$calendarUri.($i==0?'':'-'.$i)]);
-            $calendars = $this->get('pmanager')->findWhere('public','calendar',$where);
-        } while(sizeof($calendars->extract()) != 0);
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            mt_rand(0, 0x3fff) | 0x8000,
 
-        return $calendarUri.($i==0?'':'-'.$i);
+            // 48 bits for "node"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
     }
 
     protected function sortByStringField($data,$fieldName) {

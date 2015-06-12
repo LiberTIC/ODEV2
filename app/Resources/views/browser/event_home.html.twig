@@ -43,16 +43,16 @@
                         <td>{{ event.description|length > 140 ? event.description|slice(0, 140) ~ '...' : event.description }}</td>
                         <td>{{ event.category }}</td>
                         <td>
-                            <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
+                            <a href='{{ path("calendar_read",{"slug": event.calendar.slug}) }}'>
                                 {{ event.calendar.displayName }}
                             </a>
                         </td>
                         <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                         <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                         <td>
-                            <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
-                            <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-                            <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                            <a href='{{ path("event_read",{"slug": event.slug}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a href='{{ path("event_update",{"slug": event.slug}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <a href='{{ path("event_delete",{"slug": event.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -83,14 +83,14 @@
                     <td>{{ event.description|length > 140 ? event.description|slice(0, 140) ~ '...' : event.description }}</td>
                     <td>{{ event.category }}</td>
                     <td>
-                        <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
+                        <a href='{{ path("calendar_read",{"slug": event.calendar.slug}) }}'>
                             {{ event.calendar.displayName }}
                         </a>
                     </td>
                     <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                     <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
                     <td>
-                        <a href='{{ path("event_read",{"uri": event.id}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
+                        <a href='{{ path("event_read",{"slug": event.slug}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
                     </td>
                 </tr>
             {% endfor %}

@@ -40,9 +40,9 @@
                     <td>{{ calendar.user }}</td>
                     <td>{{ calendar.events|length }}</td>
                     <td>
-                        <a href='{{ path("calendar_read",{"uri": calendar.uri}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
-                        <a href='{{ path("calendar_update",{"uri": calendar.uri}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href='{{ path("calendar_delete",{"uri": calendar.uri}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                        <a href='{{ path("calendar_read",{"slug": calendar.slug}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
+                        <a href='{{ path("calendar_update",{"slug": calendar.slug}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href='{{ path("calendar_delete",{"slug": calendar.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -71,7 +71,7 @@
                 <td>{{ calendar.user }}</td>
                 <td>{{ calendar.events|length }}</td>
                 <td>
-                    <a href='{{ path("calendar_read",{"uri": calendar.uri}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href='{{ path("calendar_read",{"slug": calendar.slug}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
                 </td>
             </tr>
             {% endfor %}

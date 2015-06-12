@@ -12,7 +12,7 @@ class EventType extends AbstractType
     private $calendars;
     private $calendar;
 
-    public function __construct($calendars = [],$calendar) {
+    public function __construct($calendars = [],$calendar = null) {
         $this->calendars = $calendars;
         $this->calendar = $calendar;
     }

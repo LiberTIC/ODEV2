@@ -45,6 +45,7 @@ class Calendarobject extends RowStructure
             ->addField('extracted_data', 'json')
             ->addField('uid', 'text')
             ->addField('component', 'text')
+            ->addField('slug', 'text')
             ;
     }
 }

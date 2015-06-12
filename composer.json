@@ -28,7 +28,8 @@
         "pomm-project/pomm-bundle": "dev-master",
         "genemu/form-bundle": "2.2.*",
         "mopa/bootstrap-bundle": "dev-master",
-        "twbs/bootstrap": "dev-master"
+        "twbs/bootstrap": "dev-master",
+        "cocur/slugify": "1.0"
     },
     "require-dev": {
         "sensio/generator-bundle":      "~2.3",

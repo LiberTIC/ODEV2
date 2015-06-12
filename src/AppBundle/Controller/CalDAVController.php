@@ -21,7 +21,7 @@ class CalDAVController extends Controller
 
         #Backends
         $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
-        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->generateUrl('event_read',[],true));
+        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->generateUrl('event_read',[],true),$this->get('cocur_slugify'));
         $principalBackend = new AppBundle\Backend\CalDAV\Principals($pmanager);
 
         $tree = [

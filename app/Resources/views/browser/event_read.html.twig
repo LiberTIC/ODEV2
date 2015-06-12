@@ -52,8 +52,8 @@
     <div class="page-header">
         <h1>Evénement "{{ event.name }}"
         {% if ownEvent %}
-            <a href='{{ path("event_update",{"uri": event.id}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a href='{{ path("event_delete",{"uri": event.id}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+            <a href='{{ path("event_update",{"slug": event.slug}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href='{{ path("event_delete",{"slug": event.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
         {% endif %}
         </h1>
     </div>
@@ -78,7 +78,7 @@
                 <div class="form-group">
                     <label class="col-lg-2">Calendrier:</label>
                     <p class="col-lg-9 pull-right">
-                        <a href="{{ path('calendar_read',{'uri': calendar.uri}) }}">
+                        <a href="{{ path('calendar_read',{'slug': calendar.slug}) }}">
                             {{ calendar.displayName }}
                         </a>
                     </p>

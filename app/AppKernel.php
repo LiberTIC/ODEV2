@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new PommProject\PommBundle\PommBundle(),
             new Genemu\Bundle\FormBundle\GenemuFormBundle(),
             new Mopa\Bundle\BootstrapBundle\MopaBootstrapBundle(),
+            new Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

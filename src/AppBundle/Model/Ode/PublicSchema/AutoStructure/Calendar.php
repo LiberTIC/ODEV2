@@ -47,6 +47,7 @@ class Calendar extends RowStructure
             ->addField('timezone', 'text')
             ->addField('components', 'text[]')
             ->addField('transparent', 'int4')
+            ->addField('slug', 'text')
             ;
     }
 }

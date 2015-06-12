@@ -13,6 +13,8 @@ class Event
 
     public $calendarname = null;
 
+    public $slug = null;
+
     // Modele disponible ici: https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
 
     private $properties = [
