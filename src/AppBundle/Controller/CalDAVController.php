@@ -15,8 +15,7 @@ class CalDAVController extends Controller
     {
         date_default_timezone_set('Europe/Paris');
 
-        $baseUri = '/caldav';
-        //$baseUri = '/ODEV2/web/app_dev.php/caldav';
+        $baseUri = $this->generateUrl('caldav');
 
         $pmanager = $this->get('pmanager');
 
