@@ -55,7 +55,7 @@
         {% for event in events %}
             <tr>
                 <td>{{ event.name }}</td>
-                <td>{{ event.description }}</td>
+                <td>{{ event.description|length > 70 ? event.description|slice(0, 70) ~ '...' : event.description }}</td>
                 <td>{{ event.category }}</td>
                 <td>{{ event.date_start|date("d/m/Y H:i",false) }}</td>
                 <td>{{ event.date_end|date("d/m/Y H:i",false)  }}</td>
