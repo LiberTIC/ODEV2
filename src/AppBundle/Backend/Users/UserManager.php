@@ -114,7 +114,6 @@ class UserManager implements UserManagerInterface
         if ($user->getId() == null) {
 
             $this->createPrincipals($user);
-            $this->createDefaultCalendar($user);
 
             $ret = $this->manager->insertOne('public','users',$user->jsonSerialize());
 
@@ -178,25 +177,5 @@ class UserManager implements UserManagerInterface
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
         $this->manager->insertOne('public','principal',$principal);
 
-    }
-
-    public function createDefaultCalendar($user)
-    {
-        /*$principalUri = 'principals/'.$user->getUsernameCanonical();
-
-        $calendar = [
-            'principaluri' => $principalUri,
-            'displayname' => $user->getUsernameCanonical(),
-            'uri' => $user->getUsernameCanonical(),
-            'synctoken' => 1,
-            'description' => null,
-            'calendarorder' => 1,
-            'calendarcolor' => null,
-            'timezone' => null,
-            'components' => ['VEVENT', 'VTODO'],
-            'transparent' => 0
-        ];
-
-        $this->esmanager->simpleIndex('caldav','calendars',null,$calendar);*/
     }
 }
