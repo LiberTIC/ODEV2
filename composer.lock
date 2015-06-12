@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fc8941d8a816dd95eb5d793b9ed2875b",
+    "hash": "fff748d5672e2b8bde33a2242d2d2bdb",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -796,12 +796,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phiamo/MopaBootstrapBundle.git",
-                "reference": "22bc280b9a254caa42c5b44b55f43eb33ab15426"
+                "reference": "4d4b6291b47fc70491a4f92105be39d6bcccbb95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phiamo/MopaBootstrapBundle/zipball/22bc280b9a254caa42c5b44b55f43eb33ab15426",
-                "reference": "22bc280b9a254caa42c5b44b55f43eb33ab15426",
+                "url": "https://api.github.com/repos/phiamo/MopaBootstrapBundle/zipball/4d4b6291b47fc70491a4f92105be39d6bcccbb95",
+                "reference": "4d4b6291b47fc70491a4f92105be39d6bcccbb95",
                 "shasum": ""
             },
             "require": {
@@ -859,7 +859,7 @@
                 "form",
                 "template"
             ],
-            "time": "2015-06-07 17:15:45"
+            "time": "2015-06-11 12:44:01"
         },
         {
             "name": "mopa/composer-bridge",
@@ -1489,16 +1489,16 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "dev-3.4.3-elastic",
+            "version": "3.4.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/polypodes/sabre-vobject.git",
-                "reference": "5596703c7ad140eb3026b01721878f3a1699e15e"
+                "url": "https://github.com/fruux/sabre-vobject.git",
+                "reference": "5c0cf39f54bd9bee01820f67ce0e6c890a021ef7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/polypodes/sabre-vobject/zipball/5596703c7ad140eb3026b01721878f3a1699e15e",
-                "reference": "5596703c7ad140eb3026b01721878f3a1699e15e",
+                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/5c0cf39f54bd9bee01820f67ce0e6c890a021ef7",
+                "reference": "5c0cf39f54bd9bee01820f67ce0e6c890a021ef7",
                 "shasum": ""
             },
             "require": {
@@ -1524,6 +1524,7 @@
                     "Sabre\\VObject\\": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -1550,11 +1551,7 @@
                 "jCard",
                 "vCard"
             ],
-            "support": {
-                "forum": "https://groups.google.com/group/sabredav-discuss",
-                "source": "https://github.com/fruux/sabre-vobject"
-            },
-            "time": "2015-05-20 11:25:54"
+            "time": "2015-05-19 08:08:16"
         },
         {
             "name": "sabre/xml",
@@ -4003,16 +4000,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "eab81d02569310739373308137284e0158424330"
+                "reference": "db63be1159c81df649cd0260e30249a586d4129e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/eab81d02569310739373308137284e0158424330",
-                "reference": "eab81d02569310739373308137284e0158424330",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/db63be1159c81df649cd0260e30249a586d4129e",
+                "reference": "db63be1159c81df649cd0260e30249a586d4129e",
                 "shasum": ""
             },
             "require": {
@@ -4048,20 +4045,20 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2015-04-08 04:46:07"
+            "time": "2015-06-12 07:34:24"
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.7.2",
+            "version": "4.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8e0c63329c8c4185296b8d357daa5c6bae43080f"
+                "reference": "41fea1e84ed84d373f5ac099a1276c4358c90708"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e0c63329c8c4185296b8d357daa5c6bae43080f",
-                "reference": "8e0c63329c8c4185296b8d357daa5c6bae43080f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/41fea1e84ed84d373f5ac099a1276c4358c90708",
+                "reference": "41fea1e84ed84d373f5ac099a1276c4358c90708",
                 "shasum": ""
             },
             "require": {
@@ -4120,20 +4117,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-06 08:36:08"
+            "time": "2015-06-11 16:20:25"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "2.3.3",
+            "version": "2.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "253c005852591fd547fc18cd5b7b43a1ec82d8f7"
+                "reference": "92408bb1968a81b3217a6fdf6c1a198da83caa35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/253c005852591fd547fc18cd5b7b43a1ec82d8f7",
-                "reference": "253c005852591fd547fc18cd5b7b43a1ec82d8f7",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/92408bb1968a81b3217a6fdf6c1a198da83caa35",
+                "reference": "92408bb1968a81b3217a6fdf6c1a198da83caa35",
                 "shasum": ""
             },
             "require": {
@@ -4175,7 +4172,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2015-05-29 05:19:18"
+            "time": "2015-06-11 15:55:48"
         },
         {
             "name": "react/promise",
@@ -4890,17 +4887,9 @@
             "time": "2015-05-27 22:58:02"
         }
     ],
-    "aliases": [
-        {
-            "alias": "3.4.3",
-            "alias_normalized": "3.4.3.0",
-            "version": "dev-3.4.3-elastic",
-            "package": "sabre/vobject"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "sabre/vobject": 20,
         "pomm-project/pomm-symfony-bridge": 20,
         "pomm-project/cli": 20,
         "pomm-project/model-manager": 20,
