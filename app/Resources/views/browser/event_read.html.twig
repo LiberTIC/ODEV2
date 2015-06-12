@@ -110,8 +110,8 @@
             </table>
 
             <p class="text-center">
-                Du <b>{{ event.date_start|date('d/m/Y') }}</b> à <b>{{ event.date_start|date('H:i') }}</b>
-                au <b>{{ event.date_end|date('d/m/Y') }}</b> à <b>{{ event.date_end|date('H:i') }}</b>
+                Du <b>{{ event.date_start|date('d/m/Y',false) }}</b> à <b>{{ event.date_start|date('H:i',false) }}</b>
+                au <b>{{ event.date_end|date('d/m/Y',false) }}</b> à <b>{{ event.date_end|date('H:i',false) }}</b>
             </p>
 
         </div>

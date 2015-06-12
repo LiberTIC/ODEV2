@@ -17,6 +17,15 @@ function MBCalendar(m, y, date_start, date_end)
     this.date_end.setMilliseconds(0);
 
     this.sameDay = this.date_start.getTime() == this.date_end.getTime();
+
+    var date_tmp_start = new Date(date_start);
+    var date_tmp_end = new Date(date_end);
+    if (date_tmp_start.getHours() == 0 && 
+        date_tmp_start.getMinutes() == 0 &&
+        date_tmp_start.getSeconds() == 0 &&
+        date_tmp_end.getTime() - date_tmp_start.getTime() == 86400000) {
+        this.sameDay = true;
+    }
 }
  
 MBCalendar.prototype.$ =  function(s) {return document.getElementById(s)};
@@ -66,13 +75,13 @@ MBCalendar.prototype.toHTML = function() {
         if (this.sameDay && equalDate(dates[i-first],this.date_start)) {
             ret += '<td class="oneday info">';
         } 
-        else if (equalDate(dates[i-first],this.date_start)) {
+        else if (!this.sameDay && equalDate(dates[i-first],this.date_start)) {
             ret += '<td class="firstday info">';
         }
-        else if (equalDate(dates[i-first],this.date_end)) {
+        else if (!this.sameDay && equalDate(dates[i-first],this.date_end)) {
             ret += '<td class="lastday info">';
         }
-        else if (dates[i-first] > this.date_start && dates[i-first] < this.date_end) {
+        else if (!this.sameDay && dates[i-first] > this.date_start && dates[i-first] < this.date_end) {
             ret += '<td class="betweenday info">';
         }
         else {
