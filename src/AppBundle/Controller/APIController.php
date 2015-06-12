@@ -48,9 +48,11 @@ class APIController extends Controller
         {
             $ret[] = array(
                         'displayname' => $calendar->displayname,
+                        'slug' => $calendar->slug,
                         'uri' => $calendar->uri, 
                         'links' => array(
                                         ['rel' => 'self', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
+                                        ['rel' => 'pretty_self', 'href' => $this->generateUrl('calendar_read',array('slug' => $calendar->slug),true)],
                                         ['rel' => 'events', 'href' => $this->generateUrl('api_calendar_event_list',array('uri' => $calendar->uri),true)]
                                     )
                     );
@@ -80,6 +82,8 @@ class APIController extends Controller
 
         $calendar['links'][] = 
             ["rel" => "self", "href" => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)];
+        $calendar['links'][] =
+            ['rel' => 'pretty_self', 'href' => $this->generateUrl('calendar_read',array('slug' => $calendar['slug']),true)];
         $calendar['links'][] = 
             ["rel" => "events", "href" => $this->generateUrl('api_calendar_event_list',array('uri' => $uri),true)];
 
@@ -107,11 +111,13 @@ class APIController extends Controller
         foreach($events as $event) {
             $ret[] = array(
                         'name' => $event->extracted_data['name'],
+                        'slug' => $event->slug,
                         'uri' => $event->uid, 
                         'calendaruri' => $uri, 
                         'etag' => $event->etag,
                         'links' => array(
                                         ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event->uid),true)],
+                                        ['rel' => 'pretty_self', 'href' => $this->generateUrl('event_read',array('slug' => $event->slug),true)],
                                         ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $uri),true)],
                                     )
                     );
@@ -145,6 +151,7 @@ class APIController extends Controller
                         'etag' => $event->etag,
                         'links' => array(
                                         ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $event->uid),true)],
+                                        ['rel' => 'pretty_self', 'href' => $this->generateUrl('event_read',array('slug' => $event->slug),true)],
                                         ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
                                     )
                     );
@@ -169,11 +176,13 @@ class APIController extends Controller
 
         $links = array(
                 ['rel' => 'self', 'href' => $this->generateUrl('api_event_get',array('uriEvent' => $uriEvent),true)],
+                ['rel' => 'pretty_self', 'href' => $this->generateUrl('event_read',array('slug' => $event->slug),true)],
                 ['rel' => 'calendar', 'href' => $this->generateUrl('api_calendar_get',array('uri' => $calendar->uri),true)],
             );
 
         $ret = [
                 'name' => $event->extracted_data['name'],
+                'slug' => $event->slug,
                 'uri' => $uriEvent, 
                 'calendaruri' => $calendar->uri, 
                 'etag' => $event->etag, 
