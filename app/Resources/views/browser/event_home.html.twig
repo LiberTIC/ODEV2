@@ -40,7 +40,7 @@
                 {% for event in eventsUser %}
                     <tr>
                         <td>{{ event.name }}</td>
-                        <td>{{ event.description|length > 70 ? event.description|slice(0, 70) ~ '...' : event.description }}</td>
+                        <td>{{ event.description|length > 140 ? event.description|slice(0, 140) ~ '...' : event.description }}</td>
                         <td>{{ event.category }}</td>
                         <td>
                             <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
@@ -80,7 +80,7 @@
             {% for event in events %}
                 <tr>
                     <td>{{ event.name }}</td>
-                    <td>{{ event.description|length > 70 ? event.description|slice(0, 70) ~ '...' : event.description }}</td>
+                    <td>{{ event.description|length > 140 ? event.description|slice(0, 140) ~ '...' : event.description }}</td>
                     <td>{{ event.category }}</td>
                     <td>
                         <a href='{{ path("calendar_read",{"uri": event.calendar.uri}) }}'>
