@@ -10,9 +10,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class EventType extends AbstractType
 {
     private $calendars;
+    private $calendar;
 
-    public function __construct($calendars = []) {
+    public function __construct($calendars = [],$calendar) {
         $this->calendars = $calendars;
+        $this->calendar = $calendar;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -37,6 +39,7 @@ class EventType extends AbstractType
                 'label' => "Calendrier (*)",
                 'horizontal_input_wrapper_class' => 'col-lg-5',
                 'choices' => $this->calendars,
+                'data' => $this->calendar,
                 )
             )
             ->add('tags','text', array(

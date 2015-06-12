@@ -110,8 +110,16 @@ class BrowserController extends Controller
             $calendars[$raw['id']] = $raw['{DAV:}displayname'];
         }
 
+        $where = Where::create('uri = $*',[$request->query->get('calendar')]);
+        $raws = $this->get('pmanager')->findWhere('public','calendar',$where);
+        
+        $calendar = null;
+        if ($raws->count() > 0) {
+            $calendar = $raws->get(0)->uid;
+        }
+
         $event = new Event();
-        $form = $this->createForm(new EventType($calendars,$request->query->get('calendar')),$event,["csrf_protection" => false]);
+        $form = $this->createForm(new EventType($calendars,$calendar),$event,["csrf_protection" => false]);
 
         $form->handleRequest($request);
 
