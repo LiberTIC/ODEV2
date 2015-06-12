@@ -4,7 +4,6 @@ namespace AppBundle\Backend\Users;
 
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
-
 use PommProject\Foundation\Where;
 
 class UserManager implements UserManagerInterface
@@ -21,7 +20,8 @@ class UserManager implements UserManagerInterface
     public function createUser()
     {
         $class = $this->getClass();
-        return new $class;
+
+        return new $class();
     }
 
     public function createFromDatabase($dbUser)
@@ -30,7 +30,7 @@ class UserManager implements UserManagerInterface
 
         $dbUser = $dbUser->extract();
 
-        foreach($dbUser as $name => $value) {
+        foreach ($dbUser as $name => $value) {
             $user->$name = $value;
         }
 
@@ -44,19 +44,18 @@ class UserManager implements UserManagerInterface
 
     public function findUserBy(array $criteria)
     {
-
         $key = array_keys($criteria)[0];
-        $where = Where::create($key." = $*",[$criteria[$key]]);
+        $where = Where::create($key.' = $*', [$criteria[$key]]);
 
-        $users = $this->manager->findWhere('public','users',$where);
+        $users = $this->manager->findWhere('public', 'users', $where);
 
         if ($users->count() == 0) {
-            return null;
+            return;
         }
 
         $ret = $this->createFromDatabase($users->get(0));
+
         return $ret;
-        
     }
 
     public function findUserByUsername($username)
@@ -85,11 +84,10 @@ class UserManager implements UserManagerInterface
 
     public function findUsers()
     {
-
-        $users = $this->manager->findAll('public','users');
+        $users = $this->manager->findAll('public', 'users');
 
         $ret = [];
-        foreach($users as $user) {
+        foreach ($users as $user) {
             $ret[] = $this->createFromDatabase($user);
         }
 
@@ -108,29 +106,24 @@ class UserManager implements UserManagerInterface
 
     public function updateUser(UserInterface $user)
     {
-
         $this->updatePassword($user);
 
         if ($user->getId() == null) {
-
             $this->createPrincipals($user);
 
-            $ret = $this->manager->insertOne('public','users',$user->jsonSerialize());
+            $ret = $this->manager->insertOne('public', 'users', $user->jsonSerialize());
 
             $user->setId($ret->id);
-
         } else {
-
-            $where = Where::create('id = $*',[$user->getId()]);
-            $dbUser = $this->manager->findWhere('public','users',$where)->get(0);
+            $where = Where::create('id = $*', [$user->getId()]);
+            $dbUser = $this->manager->findWhere('public', 'users', $where)->get(0);
 
             $data = $user->jsonSerialize();
-            foreach($data as $name => $value) {
+            foreach ($data as $name => $value) {
                 $dbUser->$name = $value;
             }
 
-            $this->manager->updateOne('public','users',$dbUser,array_keys($data));
-            
+            $this->manager->updateOne('public', 'users', $dbUser, array_keys($data));
         }
     }
 
@@ -143,13 +136,13 @@ class UserManager implements UserManagerInterface
     public function updatePassword(UserInterface $user)
     {
         if (0 !== strlen($password = $user->getPlainPassword())) {
-            $passwordDigesta = md5($user->getUsernameCanonical().":SabreDAV:".$password);
+            $passwordDigesta = md5($user->getUsernameCanonical().':SabreDAV:'.$password);
 
             $salt = $user->getSalt();
             $salted = $password.'{'.$salt.'}';
             $digest = hash('sha512', $salted, true);
 
-            for ($i=1; $i<5000; $i++) {
+            for ($i = 1; $i < 5000; $i++) {
                 $digest = hash('sha512', $digest.$salted, true);
             }
 
@@ -163,19 +156,17 @@ class UserManager implements UserManagerInterface
 
     public function createPrincipals($user)
     {
-
         $username = $user->getUsername();
         $usernameCanonical = $user->getUsernameCanonical();
         $email = $user->getEmail();
 
         $principal = ['uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
-        $this->manager->insertOne('public','principal',$principal);
+        $this->manager->insertOne('public', 'principal', $principal);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
-        $this->manager->insertOne('public','principal',$principal);
+        $this->manager->insertOne('public', 'principal', $principal);
 
         $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
-        $this->manager->insertOne('public','principal',$principal);
-
+        $this->manager->insertOne('public', 'principal', $principal);
     }
 }

@@ -4,9 +4,6 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Sabre\VObject;
 
 class DefaultController extends Controller
 {
@@ -17,9 +14,8 @@ class DefaultController extends Controller
 
     public function testAction()
     {
+        $this->get('converter')->convert('icalendar', 'json', null);
 
-        $this->get('converter')->convert('icalendar','json',null);
         return new Response('');
     }
-
 }

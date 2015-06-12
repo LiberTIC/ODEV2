@@ -21,7 +21,7 @@ class CalDAVController extends Controller
 
         #Backends
         $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
-        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager,$this->generateUrl('event_read',[],true),$this->get('cocur_slugify'));
+        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager, $this->generateUrl('event_read', [], true), $this->get('cocur_slugify'));
         $principalBackend = new AppBundle\Backend\CalDAV\Principals($pmanager);
 
         $tree = [
@@ -55,18 +55,18 @@ class CalDAVController extends Controller
         $browser = new Sabre\DAV\Browser\Plugin();
         $server->addPlugin($browser);
 
-        $callback = function () use ($server,$request) {
+        $callback = function () use ($server, $request) {
 
             /* These two lines fix a weird bug
                where SabreDAV would give the correct answer to a propfind */
             $url = $server->httpRequest->getUrl();
-            $server->httpRequest = new Sabre\HTTP\Request($request->getMethod(),$url,$request->headers->all(),$request->getContent());
+            $server->httpRequest = new Sabre\HTTP\Request($request->getMethod(), $url, $request->headers->all(), $request->getContent());
 
             $server->exec();
 
             /* These two lines log the request and the response */
             $responseBody = $server->httpResponse->getBodyAsString();
-            $this->logIt($request, $server->httpResponse,$responseBody);
+            $this->logIt($request, $server->httpResponse, $responseBody);
         };
 
         return new StreamedResponse($callback);

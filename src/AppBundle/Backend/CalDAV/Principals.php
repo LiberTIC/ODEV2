@@ -5,12 +5,10 @@ namespace AppBundle\Backend\CalDAV;
 use Sabre\DAV;
 use Sabre\HTTP\URLUtil;
 use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
-
 use PommProject\Foundation\Where;
 
 class Principals extends AbstractBackend
 {
-
     protected $manager;
 
     protected $fieldMap = [
@@ -26,13 +24,14 @@ class Principals extends AbstractBackend
         ],
     ];
 
-    public function __construct($manager) {
+    public function __construct($manager)
+    {
         $this->manager = $manager;
     }
 
     public function getPrincipalsByPrefix($prefixPath)
     {
-        $dbPrincipals = $this->manager->findAll('public','principal');
+        $dbPrincipals = $this->manager->findAll('public', 'principal');
 
         if ($dbPrincipals->count() == 0) {
             return;
@@ -63,9 +62,9 @@ class Principals extends AbstractBackend
 
     public function getPrincipalByPath($path)
     {
-        $where = Where::create('uri = $*',[$path]);
+        $where = Where::create('uri = $*', [$path]);
 
-        $principals = $this->manager->findWhere('public','principal',$where);
+        $principals = $this->manager->findWhere('public', 'principal', $where);
 
         if ($principals->count() == 0) {
             return [];
@@ -78,7 +77,7 @@ class Principals extends AbstractBackend
             'uri' => $principal->uri,
         ];
 
-        foreach($this->fieldMap as $key => $value) {
+        foreach ($this->fieldMap as $key => $value) {
             $ret[$key] = $principal->$value['dbField'];
         }
 

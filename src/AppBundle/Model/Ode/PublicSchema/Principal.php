@@ -5,7 +5,7 @@ namespace AppBundle\Model\Ode\PublicSchema;
 use PommProject\ModelManager\Model\FlexibleEntity;
 
 /**
- * Principal
+ * Principal.
  *
  * Flexible entity for relation
  * public.principal

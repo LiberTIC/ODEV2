@@ -5,7 +5,7 @@ namespace AppBundle\Model\Ode\PublicSchema;
 use PommProject\ModelManager\Model\FlexibleEntity;
 
 /**
- * Calendarobject
+ * Calendarobject.
  *
  * Flexible entity for relation
  * public.calendarobject

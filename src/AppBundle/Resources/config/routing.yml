@@ -34,7 +34,7 @@ event_update:
     path:     /event/{slug}/edit
     defaults: { _controller: AppBundle:Browser:eventUpdate }
 
-event_delete: 
+event_delete:
     path:     /event/{slug}/delete
     defaults: { _controller: AppBundle:Browser:eventDelete }
 
