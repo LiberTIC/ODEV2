@@ -36,6 +36,9 @@ class CalDAVController extends Controller
         $aclPlugin = new Sabre\DAVACL\Plugin();
         $server->addPlugin($aclPlugin);
 
+        $icsPlugin = new \Sabre\CalDAV\ICSExportPlugin();
+        $server->addPlugin($icsPlugin);
+
         $caldavPlugin = new Sabre\CalDAV\Plugin();
         $server->addPlugin($caldavPlugin);
 
