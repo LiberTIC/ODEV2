@@ -28,7 +28,7 @@ event_create:
 
 event_read:
     path:     /event/{uri}
-    defaults: { _controller: AppBundle:Browser:eventRead }
+    defaults: { _controller: AppBundle:Browser:eventRead, uri: null }
 
 event_update:
     path:     /event/{uri}/edit

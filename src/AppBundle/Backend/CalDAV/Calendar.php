@@ -19,6 +19,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected $manager;
 
+    protected $pathForUrl;
 
     public $propertyMap = [
         '{DAV:}displayname'                                   => 'displayname',
@@ -29,8 +30,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     ];
 
 
-    public function __construct($manager) {
+    public function __construct($manager,$pathForUrl) {
         $this->manager = $manager;
+        $this->pathForUrl = $pathForUrl;
     }
 
     /* CALENDAR */
@@ -279,7 +281,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     protected function addURL($vCal,$id)
     {
-        $url = 'projet-ode.fr/event/'.substr($id,0,-4);
+        $url = $this->pathForUrl.'/'.substr($id,0,-4);
         $vCal->VEVENT->add('URL', $url, ['VALUE'=>"URI"]);
     }
 

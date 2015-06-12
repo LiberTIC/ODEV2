@@ -154,7 +154,7 @@
                 <div class="form-group">
                     <label class="col-lg-2">Status:</label>
 
-                    {% set status = {"CONFIRMED": "Confirmé", "CANCELLED": "Annulé"} %}
+                    {% set status = {"":"", "CONFIRMED": "Confirmé", "CANCELLED": "Annulé"} %}
 
                     <p class="col-lg-9 pull-right">{{ status[event.status] }}<p>
                 </div>
