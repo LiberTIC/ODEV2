@@ -358,10 +358,13 @@ class BrowserController extends Controller
             $events[] = $event;
         }
 
+        $exportUrl = $this->generateUrl('caldav',['url' => 'calendars/'.substr($calendar->principaluri,11).'/'.$calendar->uri,'export' => '']);
+
         return $this->render('browser/calendar_read.html.twig', array(
             'calendar' => $calendar,
             'ownCalendar' => $ownCalendar,
-            'events' => $events
+            'events' => $events,
+            'exportUrl' => $exportUrl,
         ));
     }
 
