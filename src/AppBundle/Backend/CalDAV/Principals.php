@@ -5,12 +5,25 @@ namespace AppBundle\Backend\CalDAV;
 use Sabre\DAV;
 use Sabre\HTTP\URLUtil;
 use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
+use Sabre\DAV\PropPatch;
 use PommProject\Foundation\Where;
+use AppBundle\Service\PommManager;
 
+/**
+ * Class Principals
+ *
+ * @package AppBundle\Backend\CalDAV
+ */
 class Principals extends AbstractBackend
 {
+    /**
+     * @var PommManager
+     */
     protected $manager;
 
+    /**
+     * @var array
+     */
     protected $fieldMap = [
 
         '{DAV:}displayname' => [
@@ -24,23 +37,32 @@ class Principals extends AbstractBackend
         ],
     ];
 
+    /**
+     * @param PommManager $manager
+     */
     public function __construct($manager)
     {
         $this->manager = $manager;
     }
 
+    /**
+     * @param string $prefixPath
+     *
+     * @return array|null
+     */
     public function getPrincipalsByPrefix($prefixPath)
     {
         $dbPrincipals = $this->manager->findAll('public', 'principal');
 
         if ($dbPrincipals->count() == 0) {
-            return;
+            return null;
         }
 
         $principals = [];
 
         foreach ($dbPrincipals as $dbPrincipal) {
             // Checking if the principal is in the prefix
+            // @todo: splitPath is @deprecated, use Sabre\Uri\split().
             list($rowPrefix) = URLUtil::splitPath($dbPrincipal->uri);
             if ($rowPrefix !== $prefixPath) {
                 continue;
@@ -60,6 +82,11 @@ class Principals extends AbstractBackend
         return $principals;
     }
 
+    /**
+     * @param string $path
+     *
+     * @return array
+     */
     public function getPrincipalByPath($path)
     {
         $where = Where::create('uri = $*', [$path]);
@@ -84,30 +111,57 @@ class Principals extends AbstractBackend
         return $ret;
     }
 
-    public function updatePrincipal($path, \Sabre\DAV\PropPatch $PropPatch)
+    /**
+     * @param string    $path
+     * @param PropPatch $propPatch
+     *
+     * @return null;
+     */
+    public function updatePrincipal($path, PropPatch $propPatch)
     {
-        //echo "up";
+        return null;
     }
 
+    /**
+     * @param string $prefixPath
+     * @param array  $searchProperties
+     * @param string $test
+     *
+     * @return array
+     */
     public function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof')
     {
-        //echo "sp";
+        return array();
     }
 
+    /**
+     * @param string $principal
+     *
+     * @return array
+     */
     public function getGroupMemberSet($principal)
     {
-        //echo "ggms";
-        return [];
+        return array();
     }
 
+    /**
+     * @param string $principal
+     *
+     * @return array
+     */
     public function getGroupMembership($principal)
     {
-        //echo "ggm";
-        return [];
+        return array();
     }
 
+    /**
+     * @param string $principal
+     * @param array  $members
+     *
+     * @return null
+     */
     public function setGroupMemberSet($principal, array $members)
     {
-        //echo "sgms";
+        return null;
     }
 }

@@ -5,8 +5,17 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Class CalendarType
+ *
+ * @package AppBundle\Form\Type
+ */
 class CalendarType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -22,6 +31,9 @@ class CalendarType extends AbstractType
             );
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'app_calendar';

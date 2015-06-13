@@ -7,10 +7,22 @@ use Symfony\Component\HttpFoundation\Response;
 use PommProject\Foundation\Where;
 use Sabre\VObject;
 
+/**
+ * Class APIController
+ *
+ * @package AppBundle\Controller
+ */
 class APIController extends Controller
 {
+    /**
+     * @var array
+     */
     public $acceptedMimeFormat = ['application/json','text/html','application/xml','text/csv'];
 
+    /**
+     * @return Response
+     * @throws \Exception
+     */
     public function indexAction()
     {
         $data = array(
@@ -31,11 +43,18 @@ class APIController extends Controller
 
     /* CALENDAR ACTIONS */
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function indexCalendarAction()
     {
         return $this->redirectToRoute('api_calendar_list');
     }
 
+    /**
+     * @return Response
+     * @throws \Exception
+     */
     public function listCalendarAction()
     {
         $calendars = $this->get('pmanager')->findAll('public', 'calendar');
@@ -57,6 +76,12 @@ class APIController extends Controller
         return $this->buildResponse(['count' => count($calendars), 'calendars' => $ret]);
     }
 
+    /**
+     * @param string $uri
+     *
+     * @return Response
+     * @throws \Exception
+     */
     public function getCalendarAction($uri)
     {
         $where = Where::create('uri = $*', [$uri]);
@@ -83,6 +108,12 @@ class APIController extends Controller
         return $this->buildResponse(['calendar' => $calendar]);
     }
 
+    /**
+     * @param string $uri
+     *
+     * @return Response
+     * @throws \Exception
+     */
     public function listCalendarEventAction($uri)
     {
         $where = Where::create('uri = $*', [$uri]);
@@ -120,11 +151,18 @@ class APIController extends Controller
 
     /* EVENT ACTIONS */
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function indexEventAction()
     {
         return $this->redirectToRoute('api_event_list');
     }
 
+    /**
+     * @return Response
+     * @throws \Exception
+     */
     public function listEventAction()
     {
         $events = $this->get('pmanager')->findAll('public', 'calendarobject');
@@ -149,6 +187,12 @@ class APIController extends Controller
         return $this->buildResponse(['count' => count($events), 'events' => $ret]);
     }
 
+    /**
+     * @param string $uriEvent
+     *
+     * @return Response
+     * @throws \Exception
+     */
     public function getEventAction($uriEvent)
     {
         $event = $this->get('pmanager')->findById('public', 'calendarobject', $uriEvent);
@@ -184,6 +228,12 @@ class APIController extends Controller
 
     /* END */
 
+    /**
+     * @param mixed $data
+     *
+     * @return Response
+     * @throws \Exception
+     */
     public function buildResponse($data)
     {
         $format = 'json';
@@ -206,11 +256,18 @@ class APIController extends Controller
             throw new \Exception('Not Supported Yet.');
 
             // here, convert from json to whatever you like;
-
+            // @todo @tofix: unreachable statement.
             return new Response($data);
         }
     }
 
+    /**
+     * @param int    $code
+     * @param string $message
+     *
+     * @return Response
+     * @throws \Exception
+     */
     public function buildError($code, $message)
     {
         $error = ['error' => ['code' => $code, 'message' => $message]];

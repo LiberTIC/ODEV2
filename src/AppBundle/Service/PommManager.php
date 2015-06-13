@@ -2,63 +2,124 @@
 
 namespace AppBundle\Service;
 
+use PommProject\Foundation\Pomm;
+use PommProject\Foundation\Where;
+use PommProject\ModelManager\Model\CollectionIterator;
+use PommProject\ModelManager\Model\FlexibleEntity\FlexibleEntityInterface;
+use PommProject\ModelManager\Model\Model;
+use PommProject\Foundation\Session\ResultHandler;
+
+/**
+ * Class PommManager
+ *
+ * @package AppBundle\Service
+ */
 class PommManager
 {
+
+    /**
+     * @var Pomm
+     */
     private $pomm;
 
-    public function __construct($pomm)
+    /**
+     * @param Pomm $pomm
+     */
+    public function __construct(Pomm $pomm)
     {
         $this->pomm = $pomm;
     }
 
+    /**
+     * @param string $schema
+     * @param string $table
+     *
+     * @return Model
+     */
     public function getModel($schema, $table)
     {
         return $this->pomm['ODE']->getModel('\AppBundle\Model\Ode\\'.ucfirst($schema).'Schema\\'.ucfirst($table).'Model');
     }
 
+    /**
+     * @param string $schema
+     * @param string $table
+     *
+     * @return CollectionIterator|null
+     */
     public function findAll($schema, $table)
     {
-        $res = $this->getModel($schema, $table)->findAll();
-
-        return $res;
+        return $this->getModel($schema, $table)->findAll();
     }
 
+    /**
+     * @param string $schema
+     * @param string $table
+     * @param string $id
+     *
+     * @return FlexibleEntityInterface|null
+     */
     public function findById($schema, $table, $id)
     {
-        $res = $this->getModel($schema, $table)->findByPK(['uid' => $id]);
-
-        return $res;
+        return $this->getModel($schema, $table)->findByPK(['uid' => $id]);
     }
 
-    public function findWhere($schema, $table, $where, $extra = null)
+    /**
+     * @param string $schema
+     * @param string $table
+     * @param Where  $where
+     * @param string $suffix
+     *
+     * @return CollectionIterator|null
+     */
+    public function findWhere($schema, $table, $where, $suffix = '')
     {
-        $res = $this->getModel($schema, $table)->findWhere($where, [], $extra);
-
-        return $res;
+        return $this->getModel($schema, $table)->findWhere($where, [], $suffix);
     }
 
     // Create AND save
+    /**
+     * @param string $schema
+     * @param string $table
+     * @param array  $fields
+     *
+     * @return Model|null
+     */
     public function insertOne($schema, $table, $fields)
     {
-        $res = $this->getModel($schema, $table)->createAndSave($fields);
-
-        return $res;
+        return $this->getModel($schema, $table)->createAndSave($fields);
     }
 
+    /**
+     * @param string $schema
+     * @param string $table
+     * @param array  $fields
+     *
+     * @return FlexibleEntityInterface|null
+     */
     public function createOne($schema, $table, $fields)
     {
-        $res = $this->getModel($schema, $table)->createEntity($fields);
-
-        return $res;
+        return $this->getModel($schema, $table)->createEntity($fields);
     }
 
-    public function updateOne($schema, $table, $entity, $fields_keys)
+    /**
+     * @param string                  $schema
+     * @param string                  $table
+     * @param FlexibleEntityInterface $entity
+     * @param array                   $fieldsKeys
+     *
+     * @return Model|null
+     */
+    public function updateOne($schema, $table, $entity, $fieldsKeys)
     {
-        $res = $this->getModel($schema, $table)->updateOne($entity, $fields_keys);
-
-        return $res;
+        return $this->getModel($schema, $table)->updateOne($entity, $fieldsKeys);
     }
 
+    /**
+     * @param string $sql
+     *
+     * @return ResultHandler|array
+     */
     public function query($sql)
     {
         return $this->pomm['ODE']->getConnection()->executeAnonymousQuery($sql);

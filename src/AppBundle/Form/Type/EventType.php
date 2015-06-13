@@ -5,17 +5,36 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Class EventType
+ *
+ * @package AppBundle\Form\Type
+ */
 class EventType extends AbstractType
 {
+    /**
+     * @var array
+     */
     private $calendars;
+
+    /**
+     * @var null
+     */
     private $calendar;
 
+    /**
+     * @param array $calendars
+     * @param null  $calendar
+     */
     public function __construct($calendars = [], $calendar = null)
     {
         $this->calendars = $calendars;
         $this->calendar = $calendar;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -191,10 +210,12 @@ class EventType extends AbstractType
                 'attr' => array('placeholder' => '25'),
                 'horizontal_input_wrapper_class' => 'col-lg-3',
                 )
-            )
-            ;
+            );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'app_event';

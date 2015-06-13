@@ -4,23 +4,32 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use PommProject\Foundation\Where;
 use AppBundle\Entity\Event;
 use AppBundle\Form\Type\EventType;
 use AppBundle\Form\Type\CalendarType;
-use AppBundle\Backend;
+use AppBundle\Backend\CalDAV\Calendar;
 
+/**
+ * Class BrowserController
+ *
+ * @package AppBundle\Controller
+ */
 class BrowserController extends Controller
 {
-    /*          EVENT         */
-
+    /**
+     * @return Response
+     */
     public function eventHomeAction()
     {
+        // @todo @tofix: SecurityContext is deprecated
         $tkn = $this->get('security.context')->getToken();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
+        $calendarBackend = new Calendar($this->get('pmanager'));
 
         $rawEvents = $calendarBackend->getAllCalendarObjects();
 
@@ -80,14 +89,20 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function eventCreateAction(Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
+        $calendarBackend = new Calendar($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
 
         $rawCalendars = $calendarBackend->getCalendarsForUser('principals/'.$username);
 
@@ -134,6 +149,11 @@ class BrowserController extends Controller
         //return new Response("eventCreateAction");
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function eventReadAction($slug)
     {
         $where = Where::create('slug = $*', [$slug]);
@@ -153,6 +173,7 @@ class BrowserController extends Controller
 
         $ownEvent = false;
 
+        // @todo @tofix: SecurityContext is deprecated
         $tkn = $this->get('security.context')->getToken();
         if (!$tkn instanceof AnonymousToken) {
             $usr = $tkn->getUser();
@@ -170,10 +191,17 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param Request $request
+     * @param string  $slug
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function eventUpdateAction(Request $request, $slug)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
@@ -196,7 +224,7 @@ class BrowserController extends Controller
         if ($form->isValid()) {
             $vevent = $event->getVObject();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'), null, $this->get('slugify'));
+            $calendarBackend = new Calendar($this->get('pmanager'), null, $this->get('slugify'));
 
             $calendarBackend->updateCalendarObject($rawEvent->calendarid, $rawEvent->uri, $vevent->serialize());
 
@@ -213,10 +241,16 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function eventDeleteAction($slug)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
@@ -237,7 +271,7 @@ class BrowserController extends Controller
             return $this->redirectToRoute('event_read', ['uri' => $slug]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
+        $calendarBackend = new Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendarObject($event->calendarid, $event->uri);
 
@@ -248,10 +282,14 @@ class BrowserController extends Controller
 
     /*          CALENDAR          */
 
+    /**
+     * @return Response
+     */
     public function calendarHomeAction()
     {
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
+        $calendarBackend = new Calendar($this->get('pmanager'));
 
+        // @todo @tofix: SecurityContext is deprecated
         $tkn = $this->get('security.context')->getToken();
 
         $calendars = $calendarBackend->getAllCalendars();
@@ -291,10 +329,17 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws AccessDeniedException
+     */
     public function calendarCreateAction(Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
 
         $form = $this->createForm(new CalendarType(), null, ['csrf_protection' => false]);
@@ -306,7 +351,7 @@ class BrowserController extends Controller
 
             $calendarUri = $this->generateCalendarUri();
 
-            $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'), null, $this->get('slugify'));
+            $calendarBackend = new Calendar($this->get('pmanager'), null, $this->get('slugify'));
 
             $raw = [
                 '{DAV:}displayname' => $values['displayname'],
@@ -315,6 +360,7 @@ class BrowserController extends Controller
 
             $principalUri = 'principals/'.$usr->getUsernameCanonical();
 
+            // @todo @tofix: method signature use only 3 parameters.
             $calendarBackend->createCalendar($principalUri, $calendarUri, $raw, $this->get('cocur_slugify'));
 
             $this->addFlash('success', 'Le calendrier "'.$values['displayname'].'" a bien été créé.');
@@ -330,6 +376,11 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function calendarReadAction($slug)
     {
         $where = Where::create('slug = $*', [$slug]);
@@ -344,6 +395,7 @@ class BrowserController extends Controller
 
         $ownCalendar = false;
 
+        // @todo @tofix: SecurityContext is deprecated
         $tkn = $this->get('security.context')->getToken();
         if (!$tkn instanceof AnonymousToken) {
             $usr = $tkn->getUser();
@@ -382,10 +434,17 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param Request $request
+     * @param string  $slug
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function calendarUpdateAction(Request $request, $slug)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
@@ -412,7 +471,7 @@ class BrowserController extends Controller
 
         if ($form->isValid()) {
             if ($previousName != $calendar->displayname) {
-                $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'), null, $this->get('slugify'));
+                $calendarBackend = new Calendar($this->get('pmanager'), null, $this->get('slugify'));
 
                 $calendar->slug = $calendarBackend->generateSlug($calendar->displayname, 'calendar');
             }
@@ -430,10 +489,16 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param string $slug
+     *
+     * @return RedirectResponse
+     */
     public function calendarDeleteAction($slug)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
+        // @todo @tofix: SecurityContext is deprecated
         $usr = $this->get('security.context')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
@@ -452,7 +517,7 @@ class BrowserController extends Controller
             return $this->redirectToRoute('calendar_read', ['slug' => $slug]);
         }
 
-        $calendarBackend = new Backend\CalDAV\Calendar($this->get('pmanager'));
+        $calendarBackend = new Calendar($this->get('pmanager'));
 
         $calendarBackend->deleteCalendar($calendar->uid);
 
@@ -461,7 +526,10 @@ class BrowserController extends Controller
         return $this->redirectToRoute('calendar_home');
     }
 
-    // thanks to: http://php.net/manual/fr/function.uniqid.php#94959
+    /**
+     * @return string
+     * @link http://php.net/manual/fr/function.uniqid.php#94959
+     */
     protected function generateCalendarUri()
     {
         return strtoupper(sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -486,6 +554,12 @@ class BrowserController extends Controller
         ));
     }
 
+    /**
+     * @param array  $data
+     * @param string $fieldName
+     *
+     * @return array
+     */
     protected function sortByStringField($data, $fieldName)
     {
         usort($data, function ($a, $b) use ($fieldName) {
@@ -495,6 +569,12 @@ class BrowserController extends Controller
         return $data;
     }
 
+    /**
+     * @param array  $data
+     * @param string $fieldName
+     *
+     * @return array
+     */
     protected function sortByDateField($data, $fieldName)
     {
         usort($data, function ($a, $b) use ($fieldName) {

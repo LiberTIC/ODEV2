@@ -4,27 +4,56 @@ namespace AppBundle\Backend\Users;
 
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
+use PommProject\ModelManager\Model\FlexibleEntity\FlexibleEntityInterface;
 use PommProject\Foundation\Where;
+use AppBundle\Service\PommManager;
+use AppBundle\Entity\User;
 
+/**
+ * Class UserManager
+ *
+ * @package AppBundle\Backend\Users
+ */
 class UserManager implements UserManagerInterface
 {
+    /**
+     * @var PommManager
+     */
     private $manager;
 
-    private $encoderFactory;
-
-    public function __construct($manager)
+    /**
+     * @param PommManager $manager
+     */
+    public function __construct(PommManager $manager)
     {
         $this->manager = $manager;
     }
 
-    public function createUser()
+    /**
+     * @param UserInterface $user
+     */
+    public function createPrincipals(UserInterface $user)
     {
-        $class = $this->getClass();
+        $username = $user->getUsername();
+        $usernameCanonical = $user->getUsernameCanonical();
+        $email = $user->getEmail();
 
-        return new $class();
+        $principal = ['uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
+        $this->manager->insertOne('public', 'principal', $principal);
+
+        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
+        $this->manager->insertOne('public', 'principal', $principal);
+
+        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
+        $this->manager->insertOne('public', 'principal', $principal);
     }
 
-    public function createFromDatabase($dbUser)
+    /**
+     * @param FlexibleEntityInterface $dbUser
+     *
+     * @return User
+     */
+    public function createFromDatabase(FlexibleEntityInterface $dbUser)
     {
         $user = $this->createUser();
 
@@ -37,11 +66,37 @@ class UserManager implements UserManagerInterface
         return $user;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteUser(UserInterface $user)
     {
         $this->manager->query('DELETE FROM users WHERE id = '.$user->getId());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function findUserByUsernameOrEmail($usernameOrEmail)
+    {
+        if (filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
+            return $this->findUserByEmail($usernameOrEmail);
+        }
+
+        return $this->findUserByUsername($usernameOrEmail);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findUserByEmail($email)
+    {
+        return $this->findUserBy(['email_canonical' => $email]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findUserBy(array $criteria)
     {
         $key = array_keys($criteria)[0];
@@ -58,30 +113,43 @@ class UserManager implements UserManagerInterface
         return $ret;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function createUser()
+    {
+        $class = $this->getClass();
+
+        return new $class();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClass()
+    {
+        return 'AppBundle\Entity\User';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findUserByUsername($username)
     {
         return $this->findUserBy(['username_canonical' => $username]);
     }
 
-    public function findUserByEmail($email)
-    {
-        return $this->findUserBy(['email_canonical' => $email]);
-    }
-
-    public function findUserByUsernameOrEmail($usernameOrEmail)
-    {
-        if (filter_var($usernameOrEmail, FILTER_VALIDATE_EMAIL)) {
-            return $this->findUserByEmail($usernameOrEmail);
-        }
-
-        return $this->findUserByUsername($usernameOrEmail);
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function findUserByConfirmationToken($token)
     {
         return $this->findUserByUsername(['confirmation_token' => $token]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findUsers()
     {
         $users = $this->manager->findAll('public', 'users');
@@ -94,16 +162,17 @@ class UserManager implements UserManagerInterface
         return $ret;
     }
 
-    public function getClass()
-    {
-        return 'AppBundle\Entity\User';
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function reloadUser(UserInterface $user)
     {
         return $this->findUserBy(['id' => $user->getId()]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateUser(UserInterface $user)
     {
         $this->updatePassword($user);
@@ -127,12 +196,9 @@ class UserManager implements UserManagerInterface
         }
     }
 
-    public function updateCanonicalFields(UserInterface $user)
-    {
-        $user->setUsernameCanonical(strtolower($user->getUsername()));
-        $user->setEmailCanonical(strtolower($user->getEmail()));
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function updatePassword(UserInterface $user)
     {
         if (0 !== strlen($password = $user->getPlainPassword())) {
@@ -154,19 +220,12 @@ class UserManager implements UserManagerInterface
         }
     }
 
-    public function createPrincipals($user)
+    /**
+     * {@inheritdoc}
+     */
+    public function updateCanonicalFields(UserInterface $user)
     {
-        $username = $user->getUsername();
-        $usernameCanonical = $user->getUsernameCanonical();
-        $email = $user->getEmail();
-
-        $principal = ['uri' => 'principals/'.$usernameCanonical, 'email' => $email, 'displayname' => $username, 'vcardurl' => null];
-        $this->manager->insertOne('public', 'principal', $principal);
-
-        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-read';
-        $this->manager->insertOne('public', 'principal', $principal);
-
-        $principal['uri'] = 'principals/'.$usernameCanonical.'/calendar-proxy-write';
-        $this->manager->insertOne('public', 'principal', $principal);
+        $user->setUsernameCanonical(strtolower($user->getUsername()));
+        $user->setEmailCanonical(strtolower($user->getEmail()));
     }
 }

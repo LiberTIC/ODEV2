@@ -2,15 +2,40 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sabre;
-use AppBundle;
+use Sabre\HTTP\Response as SabreResponse;
+use Sabre\HTTP\Request as SabreRequest;
+use Sabre\CalDAV\CalendarRoot;
+use Sabre\CalDAV\Principal\Collection;
+use Sabre\DAV\Server;
+// Plugins:
+use Sabre\DAV\Auth\Plugin as AuthPlugin;
+use Sabre\DAVACL\Plugin as ACLPlugin;
+use Sabre\CalDAV\ICSExportPlugin;
+use Sabre\CalDAV\Plugin as CalDAVPlugin;
+use Sabre\CalDAV\Subscriptions\Plugin as SubscriptionsPlugin;
+use Sabre\CalDAV\Schedule\Plugin as SchedulePlugin;
+use Sabre\DAV\Sync\Plugin as SyncPlugin;
+use Sabre\DAV\Browser\Plugin as BrowserPlugin;
 
+use AppBundle\Backend\CalDAV\Auth;
+use AppBundle\Backend\CalDAV\Calendar;
+use AppBundle\Backend\CalDAV\Principals;
+
+/**
+ * Class CalDAVController
+ *
+ * @package AppBundle\Controller
+ */
 class CalDAVController extends Controller
 {
+    /**
+     * @param Request $request
+     *
+     * @return StreamedResponse
+     */
     public function indexAction(Request $request)
     {
         date_default_timezone_set('Europe/Paris');
@@ -19,48 +44,39 @@ class CalDAVController extends Controller
 
         $pmanager = $this->get('pmanager');
 
-        #Backends
-        $authBackend = new AppBundle\Backend\CalDAV\Auth($pmanager);
-        $calendarBackend = new AppBundle\Backend\CalDAV\Calendar($pmanager, $this->generateUrl('event_read', [], true), $this->get('cocur_slugify'));
-        $principalBackend = new AppBundle\Backend\CalDAV\Principals($pmanager);
+        // Backends:
+        $authBackend = new Auth($pmanager);
+        $calendarBackend = new Calendar(
+            $pmanager, $this->generateUrl('event_read', [], true),
+            $this->get('cocur_slugify')
+        );
+        $principalBackend = new Principals($pmanager);
 
         $tree = [
-            new Sabre\CalDAV\Principal\Collection($principalBackend),
-            new Sabre\CalDAV\CalendarRoot($principalBackend, $calendarBackend),
+            new Collection($principalBackend),
+            new CalendarRoot($principalBackend, $calendarBackend),
         ];
-        $server = new Sabre\DAV\Server($tree);
+        $server = new Server($tree);
         $server->setBaseUri($baseUri);
 
-        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, 'SabreDAV');
-        $server->addPlugin($authPlugin);
-        $aclPlugin = new Sabre\DAVACL\Plugin();
-        $server->addPlugin($aclPlugin);
-
-        $icsPlugin = new \Sabre\CalDAV\ICSExportPlugin();
-        $server->addPlugin($icsPlugin);
-
-        $caldavPlugin = new Sabre\CalDAV\Plugin();
-        $server->addPlugin($caldavPlugin);
-
-        $server->addPlugin(
-            new Sabre\CalDAV\Subscriptions\Plugin()
-        );
-
-        $server->addPlugin(
-            new Sabre\CalDAV\Schedule\Plugin()
-        );
-
-        $server->addPlugin(new Sabre\DAV\Sync\Plugin());
-
-        $browser = new Sabre\DAV\Browser\Plugin();
-        $server->addPlugin($browser);
+        $server->addPlugin(new AuthPlugin($authBackend, 'SabreDAV'));
+        $server->addPlugin(new ACLPlugin());
+        $server->addPlugin(new ICSExportPlugin());
+        $server->addPlugin(new CalDAVPlugin());
+        $server->addPlugin(new SubscriptionsPlugin());
+        $server->addPlugin(new SchedulePlugin());
+        $server->addPlugin(new SyncPlugin());
+        $server->addPlugin(new BrowserPlugin());
 
         $callback = function () use ($server, $request) {
 
             /* These two lines fix a weird bug
                where SabreDAV would give the correct answer to a propfind */
             $url = $server->httpRequest->getUrl();
-            $server->httpRequest = new Sabre\HTTP\Request($request->getMethod(), $url, $request->headers->all(), $request->getContent());
+            $server->httpRequest = new SabreRequest(
+                $request->getMethod(), $url,
+                $request->headers->all(), $request->getContent()
+            );
 
             $server->exec();
 
@@ -72,7 +88,12 @@ class CalDAVController extends Controller
         return new StreamedResponse($callback);
     }
 
-    private function logIt($request, $response, $responseBody)
+    /**
+     * @param Request       $request
+     * @param SabreResponse $response
+     * @param string        $responseBody
+     */
+    private function logIt(Request $request, SabreResponse $response, $responseBody)
     {
         $this->get('logger')->info('------------------------ METHOD -------------------------');
         $this->get('logger')->info($request->getMethod());

@@ -3,19 +3,42 @@
 namespace AppBundle\Entity;
 
 use Sabre\VObject;
+use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VEvent;
+use Sabre\VObject\Reader;
 
+/**
+ * Class Event
+ *
+ * @package AppBundle\Entity
+ */
 class Event
 {
+    /**
+     * @var null
+     */
     public $calendar = null;
 
+    /**
+     * @var string
+     */
     public $calendarid = null;
 
+    /**
+     * @var string
+     */
     public $calendarname = null;
 
+    /**
+     * @var string
+     */
     public $slug = null;
 
-    // Modele disponible ici: https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md
 
+    /**
+     * @var array
+     * @link https://github.com/LiberTIC/ODEV2/blob/master/doc/Thibaud_Printemps2015/Modele_Evenement.md Model definition
+     */
     private $properties = [
 
         /* Nom et description */
@@ -65,6 +88,9 @@ class Event
         'price_children' => null,
     ];
 
+    /**
+     * @var array
+     */
     public static $convertTable = [
          /* Nom et description */
         'name' => 'SUMMARY',
@@ -113,6 +139,11 @@ class Event
         'price_children' => 'X-ODE-PRICE-CHILDREN',
     ];
 
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
     public function __get($name)
     {
         if ($name == 'calendar') {
@@ -122,6 +153,10 @@ class Event
         return $this->properties[$name];
     }
 
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
     public function __set($name, $value)
     {
         if ($name == 'calendar') {
@@ -140,6 +175,11 @@ class Event
         $this->properties[$name] = $value;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function __isset($name)
     {
         if ($name == 'calendar') {
@@ -149,39 +189,45 @@ class Event
         return array_key_exists($name, $this->properties);
     }
 
+    /**
+     * @return VCalendar
+     */
     public function getVObject()
     {
-        $vobject = new VObject\Component\VCalendar();
+        $vCal = new VCalendar();
 
-        $vobject->add(new VObject\Component\VEvent($vobject, 'VEVENT'));
+        $vCal->add(new VEvent($vCal, 'VEVENT'));
 
-        $uid = strtoupper(substr($vobject->VEVENT->UID->getValue(), 14)); // To remove the "sabre-vobject-" at the beginning
-        $vobject->VEVENT->__set('UID', $uid);
+        $uid = strtoupper(substr($vCal->VEVENT->UID->getValue(), 14)); // To remove the "sabre-vobject-" at the beginning
+        $vCal->VEVENT->__set('UID', $uid);
 
         foreach ($this->properties as $key => $value) {
             if ($value != null) {
                 $name = self::$convertTable[$key];
 
-                if (!$vobject->VEVENT->__isset($name)) {
-                    $vobject->VEVENT->add($name);
+                if (!$vCal->VEVENT->__isset($name)) {
+                    $vCal->VEVENT->add($name);
                 }
 
-                $vobject->VEVENT->__set($name, $value);
+                $vCal->VEVENT->__set($name, $value);
             }
         }
 
-        return $vobject;
+        return $vCal;
     }
 
+    /**
+     * @param mixed $calendarData
+     */
     public function loadFromCalData($calendarData)
     {
-        $vCal = VObject\Reader::read($calendarData);
+        $vCal = Reader::read($calendarData);
 
-        $vevent = $vCal->VEVENT;
+        $vEvent = $vCal->VEVENT;
 
         foreach (self::$convertTable as $jsonName => $icalName) {
-            if ($vevent->$icalName != null) {
-                $value = $vevent->$icalName->getParts();
+            if ($vEvent->$icalName != null) {
+                $value = $vEvent->$icalName->getParts();
                 if (count($value) == 1 && !is_array($this->properties[$jsonName])) {
                     $value = $value[0];
                 }
@@ -190,14 +236,19 @@ class Event
         }
     }
 
-    public static function extractData($vobject)
+    /**
+     * @param VCalendar $vCal
+     *
+     * @return array
+     */
+    public static function extractData($vCal)
     {
-        $vevent = $vobject->VEVENT;
+        $vEvent = $vCal->VEVENT;
 
         $lobject = [];
 
         foreach (self::$convertTable as $jsonName => $icalName) {
-            if ($data = $vevent->__get($icalName)) {
+            if ($data = $vEvent->__get($icalName)) {
                 $parts = $data->getParts();
                 if (sizeof($parts) == 1) {
                     $parts = $parts[0];
