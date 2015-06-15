@@ -1,205 +1,169 @@
-## Rest API
+### `GET` /api/ ###
 
-*Note: Currently, API only handles json, but new formats should be implemented in a not so distant future*
-
-*Note: For future developement: http://williamdurand.fr/2012/08/02/rest-apis-with-symfony2-the-right-way/*
-
-### Calendar
-------------
-
-**List calendars**
-
-```
-GET /api/calendar/list
-```
-
-Return the list of all calendar of the server. Response is formatted as follow:
-
-```
-{
-    "count": 14,
-    "calendars": [
-        {
-            "uri": "default",
-            "displayname": "default",
-            "links": [
-                {
-                    "rel": "self",
-                    "href": "http://localhost:8000/api/calendar/default"
-                }
-            ]
-        },
-        {
-            "uri": "somecalendar",
-            "displayname": "Some Calendar",
-            "links": [
-                {
-                    "rel": "self",
-                    "href": "http://localhost:8000/api/calendar/somecalendar"
-                }
-            ]
-        },
-        ...
-    ]
-}
-```
-
-**Get calendar by uri**
-
-```
-GET /api/calendar/{uri}
-```
-
-Return the calendar corresponding the given uri. Response is formatted as follow:
-
-```
-{
-    "calendar": {
-        "displayname": "default",
-        "uri": "default",
-        "synctoken": 1337,
-        "description": "Bla bla bla",
-        "links": [
-            { "rel": "self", "href": "http://localhost:8000/api/calendar/default" },
-            { "rel": "events", "href": "http://localhost:8000/api/calendar/default/events/" },
-            { "rel": "owner", "href": "not implemented yet" }
-        ]
-    }
-}
-```
-
-**List events of a calendar**
-
-```
-GET /api/calendar/{uri}/events/
-```
-
-Return the list of all events of a calendar. Response is formatted as follow:
-
-```
-{
-    "count": 34,
-    "events": [
-        {
-            "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
-            "calendaruri": "default",
-            "etag": "e1c27a9442524e5641f8039216420454",
-            "links": [
-                {
-                    "rel": "self",
-                    "href": "http://localhost:8000/api/event/9D515E5D-E1D7-4982-A125-A32E74C7BD55"
-                },
-                {
-                    "rel": "calendar",
-                    "href": "http://localhost:8000/api/calendar/default"
-                }
-            ]
-        },
-        {
-            "uri": "697588A2-2660-4460-9B63-63B0FA70480C",
-            "calendaruri": "default",
-            "etag": "8e56913f6e36c0ad12c24f6eeb651c3c",
-            ...
-        },
-        ...
-    ]
-}
-```
+_Index of the API_
 
 
+### `GET` /api/calendar/ ###
+
+_Redirect to /api/calendar/list_
 
 
-### Events
------------
+### `POST` /api/calendar/ ###
 
-**List events**
+_Create a new calendar_
 
-```
-GET /api/event/list
-```
+#### Requirements ####
 
-Return the list of all events of the server. Response is formatted as follow:
+**displayname**
 
-```
-{
-    "count": 23,
-    "events": [
-        {
-            "uri": "94857AE8-45FD-46FE-9857-C62086A05EE4",
-            "calendaruri": "default",
-            "etag": "e94073062a3cef2a0879244b8733e3fc",
-            "links": [
-                {
-                    "rel": "self",
-                    "href": "http://localhost:8000/api/event/94857AE8-45FD-46FE-9857-C62086A05EE4"
-                },
-                {
-                    "rel": "calendar",
-                    "href": "http://localhost:8000/api/calendar/default"
-                }
-            ]
-        },
-        ...
-    ]
-}
-```
+  - Type: string
+  - Description: The name of the calendar
+**username**
+
+  - Type: string
+  - Description: The name of the owner of the calendar
+
+#### Parameters ####
+
+description:
+
+  * type: string
+  * required: false
+  * description: The description of the calendar
 
 
-**Get event by its uri**
+### `GET` /api/calendar/list/ ###
 
-```
-GET /api/event/{uriEvent}
-```
+_List all calendars_
 
-Return the event corresponding the given uri. Response is formatted as follow:
 
-```
-{
-    "event": {
-        "uri": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
-        "calendaruri": "default",
-        "etag": "e1c27a9442524e5641f8039216420454",
-        "links": [
-            {
-                "rel": "self",
-                "href": "http://localhost:8000/api/event/9D515E5D-E1D7-4982-A125-A32E74C7BD55"
-            },
-            {
-                "rel": "calendar",
-                "href": "http://localhost:8000/api/calendar/default"
-            }
-        ],
-        "lobject": [
-            "name": "Concert de Shakaponk",
-            "id": "9D515E5D-E1D7-4982-A125-A32E74C7BD55",
-            "date_start": "20150528",
-            "date_end": "20150529",
-            "date_created": "20150527T112944Z",
-            "location_name": "Stereolux\n4 Boulevard L\u00e9on Bureau\n44200 Nantes",
-            "geo": [
-                "47.205021",
-                "-1.563285"
-            ],
-            "url": "projet-ode.fr/event/8dc771d6d13a1e3096a99743c56881a9",
-            ...
-        ],
-        "vobject": [
-            "vcalendar",
-            [
-                [
-                    "version",
-                    [],
-                    "text",
-                    "2.0"
-                ],
-                ...
-            ],
-            ...
-        ]
-    }
-}
-```
+### `GET` /api/calendar/{uri} ###
 
-*Note1: Vobject use the [jCal](http://tools.ietf.org/html/rfc7265) format*
+_Retrieve the calendar with the given uri_
 
-*Note2: Vobject can be parsed thanks to [Sabre-Vobject](https://github.com/fruux/sabre-vobject)*
+#### Requirements ####
+
+**uri**
+
+  - Type: string
+  - Description: The uri of the calendar
+
+
+### `PUT` /api/calendar/{uri} ###
+
+_Update the calendar with the given uri_
+
+#### Requirements ####
+
+**uri**
+
+  - Type: string
+  - Description: The uri of the calendar
+
+#### Parameters ####
+
+displayname:
+
+  * type: string
+  * required: false
+  * description: The name of the calendar
+
+description:
+
+  * type: string
+  * required: false
+  * description: The description of the calendar
+
+
+### `DELETE` /api/calendar/{uri} ###
+
+_Delete the calendar with the given uri_
+
+#### Requirements ####
+
+**uri**
+
+  - Type: string
+  - Description: The uri of the calendar
+
+
+### `GET` /api/calendar/{uri}/events/ ###
+
+_List all events of a calendar_
+
+#### Requirements ####
+
+**uri**
+
+  - Type: string
+  - Description: The uri of the calendar
+
+
+### `GET` /api/event/ ###
+
+_Redirect to /api/event/list_
+
+
+### `POST` /api/event/ ###
+
+_Create a new event_
+
+#### Requirements ####
+
+**calendar_uri**
+
+  - Type: string
+  - Description: The uri of the calendar
+**event_data**
+
+  - Type: array
+  - Description: All the fields of the new event
+
+
+### `GET` /api/event/list/ ###
+
+_List all events_
+
+
+### `GET` /api/event/{uriEvent} ###
+
+_Retrieve the event with the given uri_
+
+#### Requirements ####
+
+**uriEvent**
+
+  - Type: string
+  - Description: The uri of the event
+
+
+### `PUT` /api/event/{uriEvent} ###
+
+_Update the event with the given uri_
+
+#### Requirements ####
+
+**uriEvent**
+
+  - Type: string
+  - Description: The uri of the event
+
+#### Parameters ####
+
+some_property:
+
+  * type: string
+  * required: false
+  * description: Some property to update
+
+
+### `DELETE` /api/event/{uriEvent} ###
+
+_Delete the event with the given uri_
+
+#### Requirements ####
+
+**uriEvent**
+
+  - Type: string
+  - Description: The uri of the event
