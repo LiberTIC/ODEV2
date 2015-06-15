@@ -23,6 +23,8 @@ You can find more information on how to go live [here](doc/GoingLive.md)
 
 You can find more information about the API [here](doc/RestAPI.md)
 
+Or you can just connect to http://{yourwebsite}/api/doc
+
 ## Qualité & tests
 
 ```bash
