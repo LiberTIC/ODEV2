@@ -25,8 +25,6 @@ class DefaultController extends Controller
      */
     public function testAction()
     {
-        // @todo @tofix: missing converter service?
-        $this->get('converter')->convert('icalendar', 'json', null);
 
         return new Response('');
     }
