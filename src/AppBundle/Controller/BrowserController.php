@@ -26,8 +26,7 @@ class BrowserController extends Controller
      */
     public function eventHomeAction()
     {
-        // @todo @tofix: SecurityContext is deprecated
-        $tkn = $this->get('security.context')->getToken();
+        $tkn = $this->get('security.token_storage')->getToken();
 
         $calendarBackend = new Calendar($this->get('pmanager'));
 
@@ -98,8 +97,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
         $calendarBackend = new Calendar($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
@@ -173,8 +171,7 @@ class BrowserController extends Controller
 
         $ownEvent = false;
 
-        // @todo @tofix: SecurityContext is deprecated
-        $tkn = $this->get('security.context')->getToken();
+        $tkn = $this->get('security.token_storage')->getToken();
         if (!$tkn instanceof AnonymousToken) {
             $usr = $tkn->getUser();
             $username = $usr->getUsernameCanonical();
@@ -201,8 +198,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
         $username = $usr->getUsernameCanonical();
 
         $where = Where::create('slug = $*', [$slug]);
@@ -250,8 +246,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
 
@@ -289,8 +284,7 @@ class BrowserController extends Controller
     {
         $calendarBackend = new Calendar($this->get('pmanager'));
 
-        // @todo @tofix: SecurityContext is deprecated
-        $tkn = $this->get('security.context')->getToken();
+        $tkn = $this->get('security.token_storage')->getToken();
 
         $calendars = $calendarBackend->getAllCalendars();
 
@@ -339,8 +333,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
 
         $form = $this->createForm(new CalendarType(), null, ['csrf_protection' => false]);
 
@@ -360,8 +353,7 @@ class BrowserController extends Controller
 
             $principalUri = 'principals/'.$usr->getUsernameCanonical();
 
-            // @todo @tofix: method signature use only 3 parameters.
-            $calendarBackend->createCalendar($principalUri, $calendarUri, $raw, $this->get('cocur_slugify'));
+            $calendarBackend->createCalendar($principalUri, $calendarUri, $raw);
 
             $this->addFlash('success', 'Le calendrier "'.$values['displayname'].'" a bien été créé.');
 
@@ -395,8 +387,7 @@ class BrowserController extends Controller
 
         $ownCalendar = false;
 
-        // @todo @tofix: SecurityContext is deprecated
-        $tkn = $this->get('security.context')->getToken();
+        $tkn = $this->get('security.token_storage')->getToken();
         if (!$tkn instanceof AnonymousToken) {
             $usr = $tkn->getUser();
             $username = $usr->getUsernameCanonical();
@@ -444,8 +435,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
 
@@ -498,8 +488,7 @@ class BrowserController extends Controller
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
 
-        // @todo @tofix: SecurityContext is deprecated
-        $usr = $this->get('security.context')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
 
         $where = Where::create('slug = $*', [$slug]);
 
