@@ -3,7 +3,7 @@
 namespace AppBundle\Backend\CalDAV;
 
 use Sabre\DAV;
-use Sabre\HTTP\URLUtil;
+use Sabre\Uri;
 use Sabre\DAVACL\PrincipalBackend\AbstractBackend;
 use Sabre\DAV\PropPatch;
 use PommProject\Foundation\Where;
@@ -62,8 +62,7 @@ class Principals extends AbstractBackend
 
         foreach ($dbPrincipals as $dbPrincipal) {
             // Checking if the principal is in the prefix
-            // @todo: splitPath is @deprecated, use Sabre\Uri\split().
-            list($rowPrefix) = URLUtil::splitPath($dbPrincipal->uri);
+            list($rowPrefix,$basename) = Uri\split($dbPrincipal->uri);
             if ($rowPrefix !== $prefixPath) {
                 continue;
             }
