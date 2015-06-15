@@ -4,22 +4,47 @@ namespace AppBundle\Backend\CalDAV;
 
 use Sabre\CalDAV;
 use Sabre\CalDAV\Backend\AbstractBackend;
-use Sabre\CalDAV\Backend\SyncSupport;
-use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SchedulingSupport;
-use Sabre\VObject;
+use Sabre\CalDAV\Backend\SubscriptionSupport;
+use Sabre\CalDAV\Backend\SyncSupport;
+use Sabre\CalDAV\Plugin;
+use Sabre\DAV\Exception as DAVException;
+use Sabre\DAV\Exception\BadRequest;
+use Sabre\DAV\PropPatch;
+use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\DateTimeParser;
+use Sabre\VObject\Reader;
+use Sabre\VObject\Recur\EventIterator;
+use Cocur\Slugify\Slugify;
 use PommProject\Foundation\Where;
-use Cocur\Slugify\Slugify as Slugify;
+use PommProject\ModelManager\Model\FlexibleEntity\FlexibleEntityInterface;
+use PommProject\ModelManager\Model\CollectionIterator;
+use AppBundle\Service\PommManager;
 use AppBundle\Entity\Event;
 
+/**
+ * Class Calendar.
+ */
 class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport
 {
+    /**
+     * @var PommManager
+     */
     protected $manager;
 
+    /**
+     * @var Slugify
+     */
     protected $slugify;
 
+    /**
+     * @var string
+     */
     protected $pathForUrl;
 
+    /**
+     * @var array
+     */
     public $propertyMap = [
         '{DAV:}displayname' => 'displayname',
         '{urn:ietf:params:xml:ns:caldav}calendar-description' => 'description',
@@ -28,6 +53,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         '{http://apple.com/ns/ical/}calendar-color' => 'calendarcolor',
     ];
 
+    /**
+     * @param PommManager $manager
+     * @param string      $pathForUrl
+     * @param Slugify     $slugify
+     */
     public function __construct($manager, $pathForUrl = null, Slugify $slugify = null)
     {
         $this->manager = $manager;
@@ -37,6 +67,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     /* CALENDAR */
 
+    /**
+     * @param string $calendarId
+     *
+     * @return FlexibleEntityInterface|null
+     */
     public function getCalendarById($calendarId)
     {
         $calendar = $this->manager->findById('public', 'calendar', $calendarId);
@@ -44,6 +79,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendar;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCalendarsForUser($principalUri)
     {
         $where = Where::create('principaluri = $*', [$principalUri]);
@@ -57,10 +95,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                 'id' => $calendar->uid,
                 'uri' => $calendar->uri,
                 'principaluri' => $calendar->principaluri,
-                '{'.CalDAV\Plugin::NS_CALENDARSERVER.'}getctag' => 'http://sabre.io/ns/sync/'.($calendar->synctoken ?: '0'),
+                '{'.Plugin::NS_CALENDARSERVER.'}getctag' => 'http://sabre.io/ns/sync/'.($calendar->synctoken ?: '0'),
                 '{http://sabredav.org/ns}sync-token' => $calendar->synctoken ?: '0',
-                '{'.CalDAV\Plugin::NS_CALDAV.'}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet($calendar->components),
-                '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->transparent ? 'transparent' : 'opaque'),
+                '{'.Plugin::NS_CALDAV.'}supported-calendar-component-set' => new CalDAV\Xml\Property\SupportedCalendarComponentSet($calendar->components),
+                '{'.Plugin::NS_CALDAV.'}schedule-calendar-transp' => new CalDAV\Xml\Property\ScheduleCalendarTransp($calendar->transparent ? 'transparent' : 'opaque'),
             ];
 
             foreach ($this->propertyMap as $xmlName => $dbName) {
@@ -73,6 +111,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $raws;
     }
 
+    /**
+     * @return CollectionIterator|null
+     */
     public function getAllCalendars()
     {
         $calendars = $this->manager->findAll('public', 'calendar');
@@ -80,6 +121,10 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendars;
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws DAVException
+     */
     public function createCalendar($principalUri, $calendarUri, array $properties)
     {
         $values = [
@@ -96,11 +141,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $values['components'] = ['VEVENT','VTODO'];
         } else {
             if (!($properties[$sccs] instanceof CalDAV\Xml\Property\SupportedCalendarComponentSet)) {
-                throw new DAV\Exception('The '.$sccs.' property must be of type: \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet');
+                throw new DAVException('The '.$sccs.' property must be of type: \Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet');
             }
             $values['components'] = $properties[$sccs]->getValue();
         }
-        $transp = '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp';
+        $transp = '{'.Plugin::NS_CALDAV.'}schedule-calendar-transp';
         if (isset($properties[$transp])) {
             $values['transparent'] = $properties[$transp]->getValue() === 'transparent';
         }
@@ -116,7 +161,16 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendar->uid;
     }
 
-    // Get the next calendarSlug possible with the name (Example: truc, truc-1, truc-2, etc..)
+    /**
+     * Generate a unique calendarSlug, duplicates become *-n, as in foo, foo-1, foo-2, etc.
+     *
+     * @param $str
+     * @param $table
+     *
+     * @todo: this is not ACID-compliant & not scalable, we need a SQL procedure instead
+     *
+     * @return string
+     */
     public function generateSlug($str, $table)
     {
         $calendarUri = $this->slugify->slugify($str);
@@ -131,10 +185,13 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendarUri.($i == 0 ? '' : '-'.$i);
     }
 
-    public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $propPatch)
+    /**
+     * {@inheritdoc}
+     */
+    public function updateCalendar($calendarId, PropPatch $propPatch)
     {
         $supportedProperties = array_keys($this->propertyMap);
-        $supportedProperties[] = '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp';
+        $supportedProperties[] = '{'.Plugin::NS_CALDAV.'}schedule-calendar-transp';
 
         $manager = $this->manager;
 
@@ -142,7 +199,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $newValues = [];
             foreach ($mutations as $propertyName => $propertyValue) {
                 switch ($propertyName) {
-                    case '{'.CalDAV\Plugin::NS_CALDAV.'}schedule-calendar-transp' :
+                    case '{'.Plugin::NS_CALDAV.'}schedule-calendar-transp' :
                         $fieldName = 'transparent';
                         $newValues[$fieldName] = $propertyValue->getValue() === 'transparent';
                         break;
@@ -173,6 +230,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         });
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteCalendar($calendarId)
     {
         $this->manager->query('DELETE FROM calendarchange WHERE calendarid = '.$calendarId);
@@ -182,8 +242,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $this->manager->query('DELETE FROM calendar WHERE uid = '.$calendarId);
     }
 
-    /* CALENDAR OBJECTS */
-
+    /**
+     * {@inheritdoc}
+     */
     public function getCalendarObjects($calendarId)
     {
         $where = Where::create('calendarid = $*', [$calendarId]);
@@ -207,6 +268,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $raws;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCalendarObject($calendarId, $objectUri)
     {
         $where = Where::create('calendarid = $*', [$calendarId])
@@ -234,6 +298,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $raw;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMultipleCalendarObjects($calendarId, array $uris)
     {
         $where = Where::createWhereIn('uri', $uris)
@@ -259,6 +326,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $raws;
     }
 
+    /**
+     * @return CollectionIterator|null
+     */
     public function getAllCalendarObjects()
     {
         $calendarObjects = $this->manager->findAll('public', 'calendarobject');
@@ -266,9 +336,14 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $calendarObjects;
     }
 
+    /**
+     * We mangle the calendar-data, so the result of a subsequent GET to this object is not
+     * the exact same as this request body. This is why we don't return anything here (no ETag).
+     * {@inheritdoc}
+     */
     public function createCalendarObject($calendarId, $objectUri, $calendarData)
     {
-        $vCal = VObject\Reader::read($calendarData);
+        $vCal = Reader::read($calendarData);
 
         $slug = $this->generateSlug($vCal->VEVENT->SUMMARY->getValue(), 'calendarobject');
 
@@ -292,28 +367,36 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         ];
 
         $this->addChange($calendarId, $objectUri, 1);
-
-        $calendar = $this->manager->insertOne('public', 'calendarobject', $values);
+        $this->manager->insertOne('public', 'calendarobject', $values);
     }
 
+    /**
+     * @param $vCal
+     * @param $slug
+     */
     protected function addURL($vCal, $slug)
     {
         $url = $this->pathForUrl.'/'.$slug;
         $vCal->VEVENT->add('URL', $url, ['VALUE' => 'URI']);
     }
 
-    /* Apple Calendar use a custom property: X-APPLE-STRUCTURED-LOCATION
+    /**
+     * Apple Calendar use a custom property: X-APPLE-STRUCTURED-LOCATION
      * Even if they also add a LOCATION property, they should also add a GEO property
      * They don't do it, so we do it.
+     *
+     * @param VCalendar $vCal
+     * @return void
      */
-    protected function extractAppleGeo($vCal)
+    protected function extractAppleGeo(VCalendar $vCal)
     {
         $struct = $vCal->VEVENT->__get('X-APPLE-STRUCTURED-LOCATION');
 
         if ($struct == null) {
             return;
         }
-
+        // X-APPLE-STRUCTURED-LOCATION returns a "geo:" prefixed string,
+        // we omit that prefix.
         $geo = substr($struct->getValue(), 4);
 
         if ($vCal->VEVENT->__get('GEO') == null) {
@@ -323,6 +406,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function updateCalendarObject($calendarId, $objectUri, $calendarData)
     {
         $where = Where::create('calendarid = $*', [$calendarId])
@@ -336,7 +422,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $object = $calendarobjects->get(0);
 
-        $vCal = VObject\Reader::read($calendarData);
+        $vCal = Reader::read($calendarData);
 
         $this->extractAppleGeo($vCal);
 
@@ -351,14 +437,23 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             $object->slug = $this->generateSlug($object->extracted_data['name'], 'calendarobject');
         }
 
-        $this->manager->updateOne('public', 'calendarobject', $object, ['lastmodified', 'etag', 'calendardata', 'extracted_data', 'size', 'slug']);
+        $this->manager->updateOne('public', 'calendarobject', $object,
+            ['lastmodified', 'etag', 'calendardata', 'extracted_data', 'size', 'slug']);
 
         $this->addChange($calendarId, $objectUri, 2);
     }
 
+    /**
+     * not used yet.
+     * @param string $calendarData
+     *
+     * @return array
+     *
+     * @throws BadRequest
+     */
     protected function getDenormalizedData($calendarData)
     {
-        $vObject = VObject\Reader::read($calendarData);
+        $vObject = Reader::read($calendarData);
         $componentType = null;
         $component = null;
         $firstOccurence = null;
@@ -372,7 +467,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
             }
         }
         if (!$componentType) {
-            throw new \Sabre\DAV\Exception\BadRequest('Calendar objects must have a VJOURNAL, VEVENT or VTODO component');
+            throw new BadRequest('Calendar objects must have a VJOURNAL, VEVENT or VTODO component');
         }
         if ($componentType === 'VEVENT') {
             $firstOccurence = $component->DTSTART->getDateTime()->getTimeStamp();
@@ -382,7 +477,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                     $lastOccurence = $component->DTEND->getDateTime()->getTimeStamp();
                 } elseif (isset($component->DURATION)) {
                     $endDate = clone $component->DTSTART->getDateTime();
-                    $endDate->add(VObject\DateTimeParser::parse($component->DURATION->getValue()));
+                    $endDate->add(DateTimeParser::parse($component->DURATION->getValue()));
                     $lastOccurence = $endDate->getTimeStamp();
                 } elseif (!$component->DTSTART->hasTime()) {
                     $endDate = clone $component->DTSTART->getDateTime();
@@ -392,7 +487,7 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
                     $lastOccurence = $firstOccurence;
                 }
             } else {
-                $it = new VObject\Recur\EventIterator($vObject, (string) $component->UID);
+                $it = new EventIterator($vObject, (string) $component->UID);
                 $maxDate = new \DateTime(self::MAX_DATE);
                 if ($it->isInfinite()) {
                     $lastOccurence = $maxDate->getTimeStamp();
@@ -417,6 +512,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteCalendarObject($calendarId, $objectUri)
     {
         $this->manager->query('DELETE FROM calendarobject WHERE uri = \''.$objectUri.'\' AND calendarid = '.$calendarId);
@@ -424,6 +522,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $this->addChange($calendarId, $objectUri, 3);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCalendarObjectByUID($principalUri, $uid)
     {
         $object = $this->manager->findById('public', 'calendarobject', $uid);
@@ -439,6 +540,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
     /* CHANGES */
 
+    /**
+     * {@inheritdoc}
+     */
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
     {
 
@@ -499,6 +603,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         return $result;
     }
 
+    /**
+     * @param $calendarId
+     * @param $objectUri
+     * @param $operation
+     */
     protected function addChange($calendarId, $objectUri, $operation)
     {
         $calendar = $this->manager->findById('public', 'calendar', $calendarId);
@@ -516,57 +625,72 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $this->manager->query($sql);
     }
 
-    /* OTHER */
-
+    /**
+     * Method called at /calendars/admin/ in browser
+     * {@inheritdoc}
+     */
     public function getSubscriptionsForUser($principalUri)
     {
 
-        //Method called at /calendars/admin/ in browser
         return [];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createSubscription($principalUri, $uri, array $properties)
     {
-
-        //echo "cs";
         return 'null';
     }
 
-    public function updateSubscription($subscriptionId, \Sabre\DAV\PropPatch $propPatch)
+    /**
+     * {@inheritdoc}
+     */
+    public function updateSubscription($subscriptionId, PropPatch $propPatch)
     {
-
-        //echo "us";
+        return;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteSubscription($subscriptionId)
     {
-
-        //echo "ds";
+        return;
     }
 
+    /**
+     * Method called on Sync by Calendar Client
+     * {@inheritdoc}
+     */
     public function getSchedulingObject($principalUri, $objectUri)
     {
-
-        //Method called by Apple Calendar Client
         return [];
     }
 
+    /**
+     * Method called on Sync by Calendar Client
+     * {@inheritdoc}
+     */
     public function getSchedulingObjects($principalUri)
     {
 
-        //Method called by Apple Calendar Client
         return [];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteSchedulingObject($principalUri, $objectUri)
     {
-
-        //echo "dso";
+        return;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createSchedulingObject($principalUri, $objectUri, $objectData)
     {
-
-        //echo "cso";
+        return;
     }
 }
