@@ -2,6 +2,7 @@
 api_index:
     path:     /
     defaults: { _controller: AppBundle:API:index }
+    methods:  [GET]
 
 api_calendar_index:
     path:     /calendar/

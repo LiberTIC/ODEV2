@@ -65,3 +65,11 @@ genemu_form:
 mopa_bootstrap:
     form:
         render_optional_text: false
+
+nelmio_api_doc:
+    sandbox:
+        body_format:
+            formats: [json]
+        request_format:
+            formats:
+                json: application/json

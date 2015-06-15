@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use PommProject\Foundation\Where;
 use Sabre\VObject;
 use AppBundle\Backend\CalDAV\Calendar as CalendarBackend;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use AppBundle\Entity\Event;
 
@@ -26,6 +27,10 @@ class APIController extends Controller
     /**
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Index of the API"
+     * )
      */
     public function indexAction()
     {
@@ -49,6 +54,10 @@ class APIController extends Controller
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @ApiDoc(
+     *  description="Redirect to /api/calendar/list"
+     * )
      */
     public function indexCalendarAction()
     {
@@ -58,6 +67,30 @@ class APIController extends Controller
     /**
      * @param Request $request
      * @return Response
+     *
+     * @ApiDoc(
+     *  description="Create a new calendar",
+     *  requirements={
+     *      {
+     *          "name"="displayname",
+     *          "dataType"="string",    
+     *          "description"="The name of the calendar",
+     *      },
+     *      {
+     *          "name"="username",
+     *          "dataType"="string",
+     *          "description"="The name of the owner of the calendar"
+     *      }
+     *  },
+     *  parameters={
+     *      {
+     *          "name"="description",
+     *          "dataType"="string",
+     *          "required"=false,
+     *          "description"="The description of the calendar"
+     *      },
+     *  }
+     * )
      */
     public function createCalendarAction(Request $request)
     {
@@ -69,13 +102,19 @@ class APIController extends Controller
             $params = json_decode($content,true);
         }
 
+
+        if (!isset($params['displayname']) || !isset($params['description']) || !isset($params['username'])) {
+            return $this->buildError(400,'Missing parameters');
+        }
+
+
         $calendarBackend = new CalendarBackend($this->get('pmanager'), null, $this->get('slugify'));
 
         $calendarUri = $calendarBackend->generateCalendarUri();
 
         $raw = [
             '{DAV:}displayname' => $params['displayname'],
-            '{urn:ietf:params:xml:ns:caldav}calendar-description' => $params['description'],
+            '{urn:ietf:params:xml:ns:caldav}calendar-description' => $params['description'] ?: "",
         ];
 
         $principalUri = 'principals/'.$params['username'];
@@ -88,6 +127,10 @@ class APIController extends Controller
     /**
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="List all calendars"
+     * )
      */
     public function listCalendarAction()
     {
@@ -115,6 +158,17 @@ class APIController extends Controller
      *
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Retrieve the calendar with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uri",
+     *          "dataType"="string",
+     *          "description"="The uri of the calendar",
+     *      }
+     *  },
+     * )
      */
     public function getCalendarAction($uri)
     {
@@ -147,6 +201,31 @@ class APIController extends Controller
      * @param string $uri
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Update the calendar with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uri",
+     *          "dataType"="string",    
+     *          "description"="The uri of the calendar",
+     *      },
+     *  },
+     *  parameters={
+     *      {
+     *          "name"="displayname",
+     *          "dataType"="string",
+     *          "required"=false,
+     *          "description"="The name of the calendar"
+     *      },
+     *      {
+     *          "name"="description",
+     *          "dataType"="string",
+     *          "required"=false,
+     *          "description"="The description of the calendar"
+     *      }
+     *  }
+     * )
      */
     public function updateCalendarAction(Request $request, $uri)
     {
@@ -188,6 +267,17 @@ class APIController extends Controller
      * @param string $uri
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Delete the calendar with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uri",
+     *          "dataType"="string",
+     *          "description"="The uri of the calendar",
+     *      }
+     *  },
+     * )
      */
     public function deleteCalendarAction($uri)
     {
@@ -213,6 +303,17 @@ class APIController extends Controller
      *
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="List all events of a calendar",
+     *  requirements={
+     *      {
+     *          "name"="uri",
+     *          "dataType"="string",
+     *          "description"="The uri of the calendar",
+     *      }
+     *  },
+     * )
      */
     public function listCalendarEventAction($uri)
     {
@@ -253,6 +354,10 @@ class APIController extends Controller
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @ApiDoc(
+     *  description="Redirect to /api/event/list"
+     * )
      */
     public function indexEventAction()
     {
@@ -263,6 +368,22 @@ class APIController extends Controller
      * @param Request $request
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Create a new event",
+     *  requirements={
+     *      {
+     *          "name"="calendar_uri",
+     *          "dataType"="string",    
+     *          "description"="The uri of the calendar",
+     *      },
+     *      {
+     *          "name"="event_data",
+     *          "dataType"="array",
+     *          "description"="All the fields of the new event"
+     *      }
+     *  }
+     * )
      */
     public function createEventAction(Request $request)
     {
@@ -271,6 +392,10 @@ class APIController extends Controller
         if (!empty($content))
         {
             $params = json_decode($content,true);
+        }
+
+        if (!isset($params['calendar_uri']) || !isset($params['event_data'])) {
+            return $this->buildError(400,'Missing parameters');
         }
 
         $calendarBackend = new CalendarBackend($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
@@ -304,6 +429,10 @@ class APIController extends Controller
     /**
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="List all events"
+     * )
      */
     public function listEventAction()
     {
@@ -334,6 +463,17 @@ class APIController extends Controller
      *
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Retrieve the event with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uriEvent",
+     *          "dataType"="string",
+     *          "description"="The uri of the event",
+     *      }
+     *  },
+     * )
      */
     public function getEventAction($uriEvent)
     {
@@ -373,6 +513,25 @@ class APIController extends Controller
      * @param string $uriEvent
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Update the event with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uriEvent",
+     *          "dataType"="string",
+     *          "description"="The uri of the event",
+     *      }
+     *  },
+     *  parameters={
+     *      {
+     *          "name"="some_property",
+     *          "dataType"="string",
+     *          "required"=false,
+     *          "description"="Some property to update"
+     *      }
+     *  }
+     * )
      */
     public function updateEventAction(Request $request, $uriEvent)
     {
@@ -408,6 +567,17 @@ class APIController extends Controller
      *
      * @return Response
      * @throws \Exception
+     *
+     * @ApiDoc(
+     *  description="Delete the event with the given uri",
+     *  requirements={
+     *      {
+     *          "name"="uriEvent",
+     *          "dataType"="string",
+     *          "description"="The uri of the event",
+     *      }
+     *  },
+     * )
      */
     public function deleteEventAction($uriEvent)
     {
