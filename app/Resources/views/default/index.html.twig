@@ -3,19 +3,20 @@
 {% set active="homepage" %}
 
 {% block body %}
-    Homepage.
+    
+    <div class="page-header">
+        <h1>Bienvenue sur ODE v2</h1>
+    </div>
 
-    <ul>
-        {% if not auth_rem %}
-            <li>
-                <a href="{{ path("fos_user_security_login") }}">
-                    Se connecter
-                </a>
-            </li>
-        {% else %}
-            <li>
+
+    {% if auth_rem %}
+
+        <p>Vous êtes connecté sous le pseudo "{{ app.security.getToken().getUser().getUsername() }}"</p>
+
+        <ul>
+             <li>
                 <a href="{{ path("fos_user_profile_show") }}">
-                    Accéder au profil
+                    Accéder à votre profil
                 </a>
             </li>
             <li>
@@ -23,6 +24,31 @@
                     Se déconnecter
                 </a>
             </li>
-        {% endif %}
-    </ul>
+        </ul>
+
+        <br/>
+        <br/>
+
+        <p>Pour vous connecter depuis un client calendrier, utilisez les informations suivantes:</p>
+
+        <ul>
+            <li><b>Nom d'utilisateur:</b> {{ app.security.getToken().getUser().getUsername()}}</li>
+            <li><b>Mot de passe:</b> <i>{Votre mot de passe}</i></li>
+            <li><b>Addresse du serveur:</b> {{ url('caldav') }}/principals/{{ app.security.getToken().getUser().getUsernameCanonical()}}</li>
+        </ul>
+
+    {% else %}
+
+        <p>Vous n'êtes pas connecté</p>
+
+        <ul>
+            <li>
+                <a href="{{ path("fos_user_security_login") }}">
+                    Se connecter
+                </a>
+            </li>
+        </ul>
+
+    {% endif %}
+
 {% endblock %}
