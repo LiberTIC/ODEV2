@@ -220,7 +220,7 @@ class BrowserController extends Controller
         if ($form->isValid()) {
             $vevent = $event->getVObject();
 
-            $calendarBackend = new Calendar($this->get('pmanager'), null, $this->get('slugify'));
+            $calendarBackend = new Calendar($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
 
             $calendarBackend->updateCalendarObject($rawEvent->calendarid, $rawEvent->uri, $vevent->serialize());
 
@@ -342,9 +342,9 @@ class BrowserController extends Controller
         if ($form->isValid()) {
             $values = $form->getData();
 
-            $calendarUri = $this->generateCalendarUri();
-
             $calendarBackend = new Calendar($this->get('pmanager'), null, $this->get('slugify'));
+
+            $calendarUri = $calendarBackend->generateCalendarUri();
 
             $raw = [
                 '{DAV:}displayname' => $values['displayname'],
@@ -513,34 +513,6 @@ class BrowserController extends Controller
         $this->addFlash('success', 'Le calendrier "'.$calendar->displayName.'" a bien été supprimé.');
 
         return $this->redirectToRoute('calendar_home');
-    }
-
-    /**
-     * @return string
-     * @link http://php.net/manual/fr/function.uniqid.php#94959
-     */
-    protected function generateCalendarUri()
-    {
-        return strtoupper(sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-
-            // 32 bits for "time_low"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-
-            // 16 bits for "time_mid"
-            mt_rand(0, 0xffff),
-
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
-            mt_rand(0, 0x0fff) | 0x4000,
-
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3fff) | 0x8000,
-
-            // 48 bits for "node"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        ));
     }
 
     /**

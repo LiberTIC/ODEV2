@@ -186,6 +186,35 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     }
 
     /**
+     * @return string
+     * @link http://php.net/manual/fr/function.uniqid.php#94959
+     */
+    public function generateCalendarUri()
+    {
+        return strtoupper(sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+
+            // 32 bits for "time_low"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+
+            // 16 bits for "time_mid"
+            mt_rand(0, 0xffff),
+
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 4
+            mt_rand(0, 0x0fff) | 0x4000,
+
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            mt_rand(0, 0x3fff) | 0x8000,
+
+            // 48 bits for "node"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        ));
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function updateCalendar($calendarId, PropPatch $propPatch)
@@ -381,6 +410,16 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     }
 
     /**
+     * @param $vCal
+     * @param $slug
+     */
+    protected function updateURL($vCal, $slug)
+    {
+        $url = $this->pathForUrl.'/'.$slug;
+        $vCal->VEVENT->URL->setValue($url);
+    }
+
+    /**
      * Apple Calendar use a custom property: X-APPLE-STRUCTURED-LOCATION
      * Even if they also add a LOCATION property, they should also add a GEO property
      * They don't do it, so we do it.
@@ -426,6 +465,11 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
 
         $this->extractAppleGeo($vCal);
 
+        if ($object->extracted_data['name'] != $vCal->VEVENT->SUMMARY) {
+            $object->slug = $this->generateSlug($vCal->VEVENT->SUMMARY, 'calendarobject');
+            $this->updateURL($vCal,$object->slug);
+        }
+
         $calendarData = $vCal->serialize();
 
         $object->lastmodified = time();
@@ -433,9 +477,6 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
         $object->etag = md5($calendarData);
         $object->extracted_data = Event::extractData($vCal);
         $object->size = strlen($calendarData);
-        if ($object->extracted_data['name'] != $vCal->VEVENT->SUMMARY) {
-            $object->slug = $this->generateSlug($object->extracted_data['name'], 'calendarobject');
-        }
 
         $this->manager->updateOne('public', 'calendarobject', $object,
             ['lastmodified', 'etag', 'calendardata', 'extracted_data', 'size', 'slug']);

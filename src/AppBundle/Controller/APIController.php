@@ -4,8 +4,12 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use PommProject\Foundation\Where;
 use Sabre\VObject;
+use AppBundle\Backend\CalDAV\Calendar as CalendarBackend;
+
+use AppBundle\Entity\Event;
 
 /**
  * Class APIController
@@ -49,6 +53,36 @@ class APIController extends Controller
     public function indexCalendarAction()
     {
         return $this->redirectToRoute('api_calendar_list');
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    public function createCalendarAction(Request $request)
+    {
+
+        $params = array();
+        $content = $request->getContent();
+        if (!empty($content))
+        {
+            $params = json_decode($content,true);
+        }
+
+        $calendarBackend = new CalendarBackend($this->get('pmanager'), null, $this->get('slugify'));
+
+        $calendarUri = $calendarBackend->generateCalendarUri();
+
+        $raw = [
+            '{DAV:}displayname' => $params['displayname'],
+            '{urn:ietf:params:xml:ns:caldav}calendar-description' => $params['description'],
+        ];
+
+        $principalUri = 'principals/'.$params['username'];
+
+        $calendarUid = $calendarBackend->createCalendar($principalUri, $calendarUri, $raw);
+
+        return $this->buildResponse(['created' => $calendarUri]);
     }
 
     /**
@@ -109,6 +143,72 @@ class APIController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param string $uri
+     * @return Response
+     * @throws \Exception
+     */
+    public function updateCalendarAction(Request $request, $uri)
+    {
+        $where = Where::create('uri = $*', [$uri]);
+
+        $calendars = $this->get('pmanager')->findWhere('public', 'calendar', $where);
+
+        if ($calendars->count() == 0) {
+            return $this->buildError('404', 'The calendar with the given uri could not be found.');
+        }
+
+        $calendar = $calendars->get(0);
+
+        $params = array();
+        $content = $request->getContent();
+        if (!empty($content))
+        {
+            $params = json_decode($content,true);
+        }
+
+        $previousName = $calendar->displayname;
+
+        foreach ($params as $name => $value) {
+            $calendar->$name = $value;
+        }
+
+        if ($previousName != $calendar->displayname) {
+            $calendarBackend = new CalendarBackend($this->get('pmanager'), null, $this->get('slugify'));
+
+            $calendar->slug = $calendarBackend->generateSlug($calendar->displayname, 'calendar');
+        }
+
+        $this->get('pmanager')->updateOne('public','calendar',$calendar,['slug','displayname','description']);
+
+        return $this->buildResponse(['calendar' => 'updated']);
+    }
+
+    /**
+     * @param string $uri
+     * @return Response
+     * @throws \Exception
+     */
+    public function deleteCalendarAction($uri)
+    {
+        $where = Where::create('uri = $*', [$uri]);
+
+        $calendars = $this->get('pmanager')->findWhere('public', 'calendar', $where);
+
+        if ($calendars->count() == 0) {
+            return $this->buildError('404', 'The calendar with the given uri could not be found.');
+        }
+
+        $calendar = $calendars->get(0);
+
+        $calendarBackend = new CalendarBackend($this->get('pmanager'));
+
+        $calendarBackend->deleteCalendar($calendar->uid);
+
+        return $this->buildResponse(['calendar' => 'deleted']);
+    }
+
+    /**
      * @param string $uri
      *
      * @return Response
@@ -157,6 +257,48 @@ class APIController extends Controller
     public function indexEventAction()
     {
         return $this->redirectToRoute('api_event_list');
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws \Exception
+     */
+    public function createEventAction(Request $request)
+    {
+        $params = array();
+        $content = $request->getContent();
+        if (!empty($content))
+        {
+            $params = json_decode($content,true);
+        }
+
+        $calendarBackend = new CalendarBackend($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
+
+        $calendarUri = $params['calendar_uri'];
+
+        $where = Where::create('uri = $*',[$calendarUri]);
+        $rawCalendars = $this->get('pmanager')->findWhere('public','calendar',$where);
+
+        if ($rawCalendars->count() == 0) {
+            return $this->buildError('400','CalendarUri given does not correspond to any calendar in the database');
+        }
+
+        $calendar = $rawCalendars->get(0);
+
+        $calendarId = $calendar->uid;
+
+        $event = new Event();
+
+        foreach($params['event_data'] as $name => $value) {
+            $event->$name = $value;
+        }
+
+        $vevent = $event->getVObject();
+
+        $calendarBackend->createCalendarObject($calendarId,$vevent->VEVENT->UID.'.ics',$vevent->serialize());
+
+        return $this->buildResponse(['created' => $vevent->VEVENT->UID->getValue()]);
     }
 
     /**
@@ -224,6 +366,62 @@ class APIController extends Controller
             ];
 
         return $this->buildResponse(['event' => $ret]);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $uriEvent
+     * @return Response
+     * @throws \Exception
+     */
+    public function updateEventAction(Request $request, $uriEvent)
+    {
+        $rawEvent = $this->get('pmanager')->findById('public', 'calendarobject', $uriEvent);
+
+        if ($rawEvent == null) {
+            return $this->buildError('404', 'The event with the given uri could not be found.');
+        }
+
+        $params = array();
+        $content = $request->getContent();
+        if (!empty($content))
+        {
+            $params = json_decode($content,true);
+        }
+
+        $event = new Event();
+        $event->loadFromCalData($rawEvent->calendarData);
+
+        foreach ($params as $name => $value) {
+            $event->__set($name,$value);
+        }
+
+        $calendarBackend = new CalendarBackend($this->get('pmanager'), $this->generateUrl('event_read', [], true), $this->get('slugify'));
+
+        $calendarBackend->updateCalendarObject($rawEvent->calendarid,$rawEvent->uri,$event->getVObject()->serialize());
+
+        return $this->buildResponse(['event' => 'updated']);
+    }
+
+    /**
+     * @param string $uriEvent
+     *
+     * @return Response
+     * @throws \Exception
+     */
+    public function deleteEventAction($uriEvent)
+    {
+        $event = $this->get('pmanager')->findById('public', 'calendarobject', $uriEvent);
+
+        if ($event == null) {
+            return $this->buildError('404', 'The event with the given uri could not be found.');
+        }
+
+        $calendarBackend = new CalendarBackend($this->get('pmanager'));
+
+        $calendarBackend->deleteCalendarObject($event->calendarid, $event->uri);
+
+        return $this->buildResponse(['event' => 'deleted']);
     }
 
     /* END */

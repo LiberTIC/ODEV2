@@ -8,6 +8,11 @@ api_calendar_index:
     defaults: { _controller: AppBundle:API:indexCalendar }
     methods:  [GET]
 
+api_calendar_create:
+    path:     /calendar/
+    defaults: { _controller: AppBundle:API:createCalendar }
+    methods:  [POST]
+
 api_calendar_list:
     path:     /calendar/list/
     defaults: { _controller: AppBundle:API:listCalendar }
@@ -17,6 +22,16 @@ api_calendar_get:
     path:     /calendar/{uri}
     defaults: { _controller: AppBundle:API:getCalendar }
     methods:  [GET]
+
+api_calendar_update:
+    path:     /calendar/{uri}
+    defaults: { _controller: AppBundle:API:updateCalendar }
+    methods:  [PUT]
+
+api_calendar_delete:
+    path:     /calendar/{uri}
+    defaults: { _controller: AppBundle:API:deleteCalendar }
+    methods:  [DELETE]
 
 api_calendar_event_list:
     path:     /calendar/{uri}/events/
@@ -28,6 +43,11 @@ api_event_index:
     defaults: { _controller: AppBundle:API:indexEvent }
     methods:  [GET]
 
+api_event_create:
+    path:     /event/
+    defaults: { _controller: AppBundle:API:createEvent }
+    methods:  [POST]
+
 api_event_list:
     path:     /event/list/
     defaults: { _controller: AppBundle:API:listEvent }
@@ -37,3 +57,13 @@ api_event_get:
     path:     /event/{uriEvent}
     defaults: { _controller: AppBundle:API:getEvent }
     methods:  [GET]
+
+api_event_update:
+    path:     /event/{uriEvent}
+    defaults: { _controller: AppBundle:API:updateEvent }
+    methods:  [PUT]
+
+api_event_delete:
+    path:     /event/{uriEvent}
+    defaults: { _controller: AppBundle:API:deleteEvent }
+    methods:  [DELETE]
