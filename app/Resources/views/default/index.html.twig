@@ -34,7 +34,7 @@
         <p>Pour vous connecter depuis un client calendrier, utilisez les informations suivantes:</p>
 
         <ul>
-            <li><b>Nom d'utilisateur:</b> {{ app.security.getToken().getUser().getUsername()}}</li>
+            <li><b>Nom d'utilisateur:</b> {{ app.security.getToken().getUser().getUsernameCanonical()}}</li>
             <li><b>Mot de passe:</b> <i>{Votre mot de passe}</i></li>
             <li><b>Addresse du serveur:</b> {{ url('caldav') }}/principals/{{ app.security.getToken().getUser().getUsernameCanonical()}}</li>
         </ul>
