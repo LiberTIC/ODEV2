@@ -55,7 +55,7 @@
         <h1>Evénement "{{ event.name }}"
         {% if ownEvent %}
             <a href='{{ path("event_update",{"slug": event.slug}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a href='{{ path("event_delete",{"slug": event.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+            <a href='{{ path("event_delete",{"slug": event.slug,"v":"calendar_read","u":calendar.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
         {% endif %}
         </h1>
     </div>

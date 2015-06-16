@@ -71,7 +71,7 @@
                     <a href='{{ path("event_read",{"slug": event.slug}) }}' class="btn btn-info"><span class="glyphicon glyphicon-eye-open"></span></a>
                     {% if ownCalendar %}
                         <a href='{{ path("event_update",{"slug": event.slug}) }}' class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href='{{ path("event_delete",{"slug": event.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                        <a href='{{ path("event_delete",{"slug": event.slug,"v":"calendar_read","u":calendar.slug}) }}' class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
                     {% endif %}
                 </td>
             </tr>

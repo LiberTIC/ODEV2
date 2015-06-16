@@ -242,9 +242,12 @@ class BrowserController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function eventDeleteAction($slug)
+    public function eventDeleteAction(Request $request, $slug)
     {
         $this->denyAccessUnlessGranted('ROLE_USER', null, 'Unable to access this page!');
+
+        $v = $request->query->get('v');
+        $u = $request->query->get('u');
 
         $usr = $this->get('security.token_storage')->getToken()->getUser();
 
@@ -253,6 +256,8 @@ class BrowserController extends Controller
         $events = $this->get('pmanager')->findWhere('public', 'calendarobject', $where);
 
         if ($events->count() == 0) {
+            if ($v == "calendar_read")
+                return $this->redirectToRoute('calendar_read',['slug' => $u]);
             return $this->redirectToRoute('event_home');
         }
 
@@ -263,6 +268,8 @@ class BrowserController extends Controller
         if ($calendar->principaluri != 'principals/'.$usr->getUsernameCanonical()) {
             $this->addFlash('danger', 'Cet événement ne fait pas parti de vos calendriers.');
 
+            if ($v == "calendar_read")
+                return $this->redirectToRoute('calendar_read',['slug' => $u]);
             return $this->redirectToRoute('event_read', ['uri' => $slug]);
         }
 
@@ -272,6 +279,8 @@ class BrowserController extends Controller
 
         $this->addFlash('success', 'L\'événement a bien été supprimé.');
 
+        if ($v == "calendar_read")
+                return $this->redirectToRoute('calendar_read',['slug' => $u]);
         return $this->redirectToRoute('event_home');
     }
 
