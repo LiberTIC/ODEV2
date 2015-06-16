@@ -40,6 +40,7 @@ class APIController extends Controller
                 'author' => 'Thibaud Courtoison',
                 'links' => array(
                     ['rel' => 'github', 'href' => 'https://github.com/LiberTIC/ODEV2'],
+                    ['rel' => 'api-documentation', 'href'=>$this->generateUrl('nelmio_api_doc_index',[], true)],
                     ['rel' => 'documentation', 'href' => 'https://github.com/LiberTIC/ODEV2/blob/master/doc/RestAPI.md'],
                     ['rel' => 'list-of-calendars', 'href' => $this->generateUrl('api_calendar_list', [], true)],
                     ['rel' => 'list-of-events', 'href' => $this->generateUrl('api_event_list', [], true)],
