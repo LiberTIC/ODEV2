@@ -12,9 +12,9 @@ ODEv2 se base sur l'extension CalDAV du protocol HTTP. Pour cela, nous utilisons
 
 ## Backend
 
-Pour le backend, nous avons décider d'utiliser PostgreSQL avec le [Pomm Project](https://github.com/pomm-project) et son [Bundle pour Symfony2](https://github.com/pomm-project/pomm-bundle).
+Pour le backend, nous avons décidé d'utiliser PostgreSQL avec le [Pomm Project](https://github.com/pomm-project) et son [Bundle pour Symfony2](https://github.com/pomm-project/pomm-bundle).
 
-Nous avons mis à disposition un fichier SQL pour préparer une base de données au projet. Cependant, libre à vous de l'adapter.
+Nous avons mis à disposition un [fichier SQL](../ODE.sql) pour préparer une base de données au projet. Cependant, libre à vous de l'adapter.
 
 Pour utiliser Pomm, nous utilisons un Service Symfony: [PommManager](../src/AppBundle/Service/PommManager.php), que nous avons créé pour l'occasion. Ce service vous permettra d'effectuer des requêtes en toute simplicité.
 
@@ -24,11 +24,11 @@ Pour adapter SabreDAV à PostgreSQL, nous avons implémenté plusieurs interface
 * [Principals](../src/AppBundle/Backend/CalDAV/Principals.php): pour gérer les "principals" (notion propre à CalDAV)
 * [Calendar](../src/AppBundle/Backend/CalDAV/Calendar.php): pour gérer les calendriers, les évènements et les abonnements.
 
-Cette dernière classe est la plus importante du projet. En effet, elle décrit la majorité des fonctions importantes tels que créer, modifier, supprimer un calendrier, un évènement, etc.
+Cette dernière classe est la plus importante du projet. En effet, elle décrit la majorité des fonctions importantes tels que créer, modifier, supprimer un calendrier, un évènement, etc. Cette classe, bien qu'utilisée par SabreDAV, est aussi utilisée par le reste de l'application, notamment dans les controlleurs.
 
 `Note: A dater du 16 Juin 2015, certaines des fonctionnalités de ces implémentations ne sont pas fini. Ce qui n'empèche pas d'avoir un calendrier fonctionnel, mais ne permet pas quelques fonctions tel que la délégation.`
 
-En ce qui concerne la gestion des utilisateurs sur le site, nous utilisons [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) avec un UserManager [à notre sauce](src/AppBundle/Backend/Users/UserManager.php) qui récupère les données depuis la base postgreSQL.
+En ce qui concerne la gestion des utilisateurs sur le site, nous utilisons [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) avec un UserManager [à notre sauce](../src/AppBundle/Backend/Users/UserManager.php) qui récupère les données depuis la base postgreSQL.
 
 ## Service
 
