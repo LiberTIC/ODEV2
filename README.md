@@ -1,6 +1,6 @@
 # ODEV2
 
-###/!\ Les documents ont été déplacé dans le dossier /doc ! /!\
+###/!\ Les documents ont été déplacés dans le dossier /doc ! /!\
 
 
 ## Installation (development):
