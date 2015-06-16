@@ -175,6 +175,9 @@ class Calendar extends AbstractBackend implements SyncSupport, SubscriptionSuppo
     {
         $calendarUri = $this->slugify->slugify($str);
 
+        if ($calendarUri == "")
+            $calendarUri = 'null';
+
         $i = -1;
         do {
             $i++;
