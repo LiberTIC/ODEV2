@@ -17,5 +17,6 @@
 - [ ] Draft events and private events / issue: [#11](../../../issues/11)
 - [ ] OAuth2 / issue: [#12](../../../issues/12)
 - [ ] Using PostgreSQL procedures / issue: [#13](../../../issues/13)
+- [ ] Overriding FOS User Bundle / issue: [#14](../../../issues/14)
 
 ### Road to 2.2
