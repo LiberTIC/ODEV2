@@ -2,6 +2,7 @@
 
 ###/!\ Les documents ont été déplacés dans le dossier /doc ! /!\
 
+## [TODO list](doc/TODO_list.md)
 
 ## Installation (development):
 
