@@ -71,7 +71,7 @@ class CalDAVController extends Controller
         $callback = function () use ($server, $request) {
 
             /* These two lines fix a weird bug
-               where SabreDAV would give the correct answer to a propfind */
+               where SabreDAV wouldn't give the correct answer to a propfind */
             $url = $server->httpRequest->getUrl();
             $server->httpRequest = new SabreRequest(
                 $request->getMethod(), $url,
