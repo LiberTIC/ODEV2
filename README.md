@@ -14,6 +14,10 @@ cd ODEV2
 make
 make install
 # import ODE.SQL in your PostgreSQL instance
+pgsql
+\i sql/roles.sql
+\i sql/ODE.sql
+\q
 php app/console server:run
 ```
 
