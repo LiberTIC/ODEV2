@@ -13,6 +13,7 @@ cd ODEV2
 # about requirements and configuration of Apache2, MySQL & PHP5.
 make
 make install
+# import ODE.SQL in your PostgreSQL instance
 php app/console server:run
 ```
 
