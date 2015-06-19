@@ -1,10 +1,17 @@
 # ODEV2
 
-###/!\ Les documents ont été déplacés dans le dossier /doc ! /!\
+## Requirements
 
-## [TODO list](doc/TODO_list.md)
+- PHP >= 5.3.3
+- PostgreSQL
+- PHP's Composer (package manager) needs 1GO of RAM
 
 ## Installation (development):
+
+Install [composer](https://getcomposer.org/doc/00-intro.md)
+
+Then:
+
 
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
@@ -51,6 +58,8 @@ Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
 ## Analyse du projet Open Data Events
 
 Ce dépôt conserve les documents et l'analyse de la v1 et ceux du prototype de la v2, ainsi que les compte-rendus des réunions de janvier-février 2015 
+
+## [TODO list](doc/TODO_list.md)
 
 ## Liens utiles
 
