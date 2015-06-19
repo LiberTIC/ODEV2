@@ -48,7 +48,6 @@
         "behat/web-api-extension":      "~1.0@dev",
         "knplabs/friendly-contexts":    "dev-master",
         "behatch/contexts":             "*"
-
     },
     "scripts": {
         "post-root-package-install": [
