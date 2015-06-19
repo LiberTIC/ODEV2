@@ -60,7 +60,7 @@ all: .git/hook/pre-commit vendor/autoload.php check help
 
 vendor/autoload.php:
 	@composer self-update
-	@composer install --optimize-autoloader
+	@composer install --prefer-dist --optimize-autoloader
 
 .git/hook/pre-commit:
 	@curl -s -o .git/hooks/pre-commit https://raw.githubusercontent.com/polypodes/Build-and-Deploy/master/hooks/pre-commit
