@@ -59,6 +59,7 @@ endif
 all: .git/hook/pre-commit vendor/autoload.php check help
 
 vendor/autoload.php:
+	@composer -v >/dev/null 2>&1 || { echo >&2 "This Makefile requires composer but it's not installed or not in your PATH. Please checkout the install doc: https://getcomposer.org/doc/00-intro.md and install it the 'globally' way. Aborting."; exit 1; }
 	@composer self-update
 	@composer install --prefer-dist --optimize-autoloader
 
