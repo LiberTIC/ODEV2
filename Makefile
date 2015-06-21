@@ -18,6 +18,9 @@
 #    },
 
 
+# To list all tasks:
+# me@myserver$~: make -qp | awk -F":" "/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split(\$1,A,/ /);for(i in A)print A[i]}"
+
 # Usage:
 
 # me@myserver$~: make help
@@ -31,15 +34,20 @@
 ############################################################################
 # Vars
 
-# some lines may be useless for now, but these are nice tricks:
+# PostgreSQL connection params
+DB_LASTDUMP := $(shell if [ -d ./dumps ] ; then ls -Art ./dumps | tail -n 1 ; fi)
+DB_HOST	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_host1' | sed 's/db_host1: //' | sed 's/^ *//;s/ *$$//' ; fi)
+DB_PORT	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_port1' | sed 's/db_port1: //' | sed 's/^ *//;s/ *$$//' ; fi)
+DB_NAME     := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_name1' | sed 's/db_name1: //' | sed 's/^ *//;s/ *$$//' ; fi)
+DB_USER	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_user1' | sed 's/db_user1: //' | sed 's/^ *//;s/ *$$//' ; fi)
+DB_PASSWORD := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_password1' | sed 's/db_password1: //' | sed 's/null//' | sed 's/^ *//;s/ *$$//' ; fi)
+DB_VARS     := -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}
+# Pathes
 PWD         := $(shell pwd)
-# Retrieve db connection params, triming white spaces
-DB_USER	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'database_user' | sed 's/database_user: //' | sed 's/^ *//;s/ *$$//' ; fi)
-DB_PASSWORD := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'database_password' | sed 's/database_password: //' | sed 's/null//' | sed 's/^ *//;s/ *$$//' ; fi)
-DB_NAME     := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'database_name' | sed 's/database_name: //' | sed 's/^ *//;s/ *$$//' ; fi)
 VENDOR_PATH := $(PWD)/vendor
 BIN_PATH    := $(PWD)/bin
 WEB_PATH    := $(PWD)/web
+# Other vars
 NOW         := $(shell date +%Y-%m-%d--%H-%M-%S)
 REPO        := "https://github.com/LiberTIC/ODEV2.git"
 BRANCH      := 'master'
@@ -58,6 +66,19 @@ endif
 
 all: .git/hook/pre-commit vendor/autoload.php check help
 
+help:
+	@echo "\n${GREEN}Usual tasks:${RESETC}\n"
+	@echo "\tTo prepare install:\tmake"
+	@echo "\tTo install:\t\tmake install"
+	@echo "\tTo update from git:\tmake update"
+	@echo "\tTo reinstall:\t\tmake reinstall\t(will dump & erase your database)\n\n"
+
+	@echo "${GREEN}Other specific tasks:${RESETC}\n"
+	@echo "\tTo check code quality:\tmake quality"
+	@echo "\tTo fix code style:\tmake cs-fix"
+	@echo "\tTo clear all caches:\tmake clear"
+	@echo "\tTo run tests:\t\tmake tests\t(will dump & erase your database)\n"
+
 vendor/autoload.php:
 	@composer -v >/dev/null 2>&1 || { echo >&2 "This Makefile requires composer but it's not installed or not in your PATH. Please checkout the install doc: https://getcomposer.org/doc/00-intro.md and install it the 'globally' way. Aborting."; exit 1; }
 	@composer self-update
@@ -68,71 +89,75 @@ vendor/autoload.php:
 	@chmod +x .git/hooks/pre-commit
 
 ############################################################################
-# Specific, project-related sf2 tasks:
+# Database related tasks
 
-integration:
+pgCreateRole:
 	@echo
-	@cd integration
-	@gulp build
-	@cd ../
+	@echo "Creating role ${DB_NAME} using doc/postgresql/role.sql..."
+	@psql --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires psql but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	psql -h ${DB_HOST} -p ${DB_PORT} -f ./doc/postgresql/role.sql
+	@echo "done"
+
+createDb:
+	@echo
+	@echo "Create PostgreSQL database ${DB_NAME}..."
+	@createDb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires createDb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	createDb -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
+	@echo "done"
+
+pgInit:
+	@echo
+	@echo "Initializing ${DB_NAME} db tables using ./doc/pstgresql/init.dump..."
+	@pg_restore --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_restore but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	pg_restore ${DB_VARS} -O -d ${DB_NAME} ./doc/postgresql/init.dump
+	@echo "done"
 
 dumps:
-	@echo "Creating dump folder for SQL exports..."
+	@echo
+	@echo "Creating db dumps folder..."
 	@mkdir ./dumps
+	@echo "done"
 
-mysqldump: dumps
-	@echo "Dumping existing db into ./dumps ..."
-	@mysqldump --user=${DB_USER} --password=${DB_PASSWORD} ${DB_NAME} > dumps/${NOW}.sql 2>/dev/null
+pgDump: dumps
+	@echo
+	@echo "Dumping existing ${DB_NAME} db into ./dumps ..."
+	@pg_dump --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_dump but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	pg_dump ${DB_VARS} -Fc -d ${DB_NAME} -f ./dumps/${NOW}.dump
+	@echo "done"
 
-mysqlinfo: dumps
-	@echo "mysql --user=${DB_USER} --password=${DB_PASSWORD} ${DB_NAME}"
+pgRestore:
+	@echo
+	@echo "Restoring existing ${DB_NAME} db using last ./dumps/${DB_LASTDUMP}..."
+	@pg_restore --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_restore but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	pg_restore ${DB_VARS} -O -d ${DB_NAME} ./dumps/${DB_LASTDUMP}
+	@echo "done"
 
-data: vendor/autoload.php
-#	@echo "Install initial datas..."
-#	@php app/console dbal:data:initialize --purge
+dropDb: pgDump
+	@echo
+	@echo "Drop database ${DB_NAME}..."
+	@dropdb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires dropdb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	dropdb ${DB_VARS} ${DB_NAME}
+	@echo "done"
 
-fixtures: vendor/autoload.php
-#	@echo "Install fixtures in db..."
-#	@php app/console dbal:fixtures:load --purge
+installDb: createDb pgInit
+
+resetDb: dropDb installDb
+
+connect: psqlcheck
+	@echo
+	@echo "Connection to psql..."
+	@psql --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires psql but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	psql ${DB_VARS} ${DB_NAME}
+
 
 ############################################################################
-# Generic sf2 tasks:
-
-help:
-	@echo "\n${GREEN}Usual tasks:${RESETC}\n"
-	@echo "\tTo prepare install:\tmake"
-	@echo "\tTo install:\t\tmake install"
-	@echo "\tTo update from git:\tmake update"
-	@echo "\tTo reinstall:\t\tmake reinstall (will erase all your datas)\n\n"
-
-	@echo "${GREEN}Other specific tasks:${RESETC}\n"
-	@echo "\tTo check code quality:\tmake quality"
-	@echo "\tTo fix code style:\tmake cs-fix"
-	@echo "\tTo clear all caches:\tmake clear"
-	@echo "\tTo run tests:\t\tmake tests (will erase all your datas)\n"
+# PHP-related tasks:
 
 check:
 	@php app/check.php
 
 pull:
 	@git pull origin $(BRANCH)
-
-
-dropDb: vendor/autoload.php mysqldump
-	@echo
-	@echo "Drop database..."
-	@php app/console doctrine:database:drop --force
-
-createDb: vendor/autoload.php
-	@echo
-	@echo "Create database..."
-	@php app/console doctrine:database:create
-	@php app/console doctrine:schema:update --force
-
-schemaDb: vendor/autoload.php mysqldump
-	@echo
-	@echo "Configure database schema..."
-	@php app/console doctrine:schema:update --force
 
 assets:
 	@echo "\nPublishing assets..."
@@ -152,7 +177,7 @@ behavior: vendor/autoload.php
 	@echo "Run behavior tests..."
 	@bin/behat --lang=fr  "@AcmeDemoBundle"
 
-unit: vendor/autoload.php
+unit: vendor/autoload.php pdepend
 	@echo "Run unit tests..."
 	@php bin/phpunit -c build/phpunit.xml -v
 
@@ -172,13 +197,15 @@ dry-fix:
 
 cs-fix:
 	@bin/phpcbf --standard=PSR2 src
-	@bin/php-cs-fixer fix . --config=sf23 -vv
+	@bin/php-cs-fixer fix src --config=sf23 -vv
 
 #quality must remain quiet, as far as it's used in a pre-commit hook validation
 quality: sniff dry-fix
 
 build:
 	@mkdir -p build/pdepend
+
+tests: reinstall quality behavior unit codecoverage
 
 # packagist-based dev tools to add to your composer.json. See http://phpqatools.org
 stats: quality build
@@ -189,9 +216,8 @@ stats: quality build
 	@bin/pdepend --summary-xml=build/pdepend/summary.xml --jdepend-chart=build/pdepend/jdepend.svg --overview-pyramid=build/pdepend/pyramid.svg src
 
 update: vendor/autoload.php
-#	@$(MAKE) explain
+	@$(MAKE) explain
 	@$(MAKE) pull
-#	@$(MAKE) schemaDb
 	@$(MAKE) clear
 	@$(MAKE) done
 
@@ -209,23 +235,16 @@ done:
 
 # Tasks sets:
 
-all: vendor/autoload.php check
+install: installDb clear done
 
-prepareDb: createDb schemaDb
+reinstall: resetDb install
 
-purgeDb: dropDb createDb schemaDb
-
-install: prepareDb data assets clear done
-
-reinstall: dropDb install
-
-tests: reinstall fixtures behavior unit codecoverage
 
 ############################################################################
 # .PHONY tasks list
+.PHONY: all install reinstall help check pull assets clear explain
+.PHONY: pgCreateRole createDb pgInit pgDump pgRestore dropDb installDb resetDb connect
+.PHONY: behavior unit codecoverage continuous sniff dry-fix cs-fix quality build tests
+.PHONY:	stats update robot unrobot done
 
-.PHONY: integration data fixtures help check all pull dropDb createDb myqldump
-.PHONY: schemaDb assets clear explain behavior unit codecoverage
-.PHONY: continuous sniff dry-fix cs-fix quality stats deploy done prepareDb purgeDb
-.PHONY: install reinstall test update robot unrobot
 # vim:ft=make

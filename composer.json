@@ -9,7 +9,8 @@
         }
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4.4",
+        "ext-pgsql": "*",
         "symfony/symfony": "2.6.*",
         "twig/extensions": "~1.0",
         "symfony/assetic-bundle": "~2.3",
