@@ -36,6 +36,7 @@
     "require-dev": {
         "sensio/generator-bundle":      "~2.3",
         "phpunit/phpunit":              "~4.6",
+        "phpdocumentor/phpdocumentor":  "2.*",
         "squizlabs/php_codesniffer":    "2.0.x-dev",
         "sebastian/phpcpd":             "*",
         "phploc/phploc" :               "*",

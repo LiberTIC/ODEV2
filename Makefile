@@ -202,6 +202,11 @@ cs-fix:
 #quality must remain quiet, as far as it's used in a pre-commit hook validation
 quality: sniff dry-fix
 
+phpdoc:
+	@echo "Generate PHP documentation in doc/api/ folder..."
+	bin/phpdoc -d ./src -t ./doc/api
+	@echo "done: have a look at doc/api/index.html"
+
 build:
 	@mkdir -p build/pdepend
 
@@ -244,7 +249,7 @@ reinstall: resetDb install
 # .PHONY tasks list
 .PHONY: all install reinstall help check pull assets clear explain
 .PHONY: pgCreateRole createDb pgInit pgDump pgRestore dropDb installDb resetDb connect
-.PHONY: behavior unit codecoverage continuous sniff dry-fix cs-fix quality build tests
+.PHONY: behavior unit codecoverage continuous sniff dry-fix cs-fix quality phpdoc build tests
 .PHONY:	stats update robot unrobot done
 
 # vim:ft=make

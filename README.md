@@ -61,6 +61,14 @@ Or you can just connect to http://{yourwebsite}/api/doc in order to check the fu
 make quality
 ```
 
+## Code documentation (phpdoc)
+
+```bash
+make phpdoc
+open api/doc/index.html
+```
+
+
 ## License, Copyright & Contributeurs
 
 (c) 2015 LiberTIC
