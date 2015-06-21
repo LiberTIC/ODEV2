@@ -2,9 +2,9 @@
 
 Open Data Events (ODE) is about open-data calendars and public events.
 
-It is an open-data calendar server and a web plateform that allow everyone to import, expose and share events with an open-data licence. It exposes a CalDAV server endpoint, a full website, and a REST API.
+It consists in a CalDAV server endpoint, a full website, and a REST API.
 
-ODE is created to propose an alternative to closed-source, closed-data or vendor locking online calendars services.
+ODE is created to propose an alternative to closed-source, closed-data or vendor locking online calendars services. It allows everyone to maintain its own calendar service, to import, expose and share events information.
 
 ## Requirements
 
