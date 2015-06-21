@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "928e010eea36cfd201971b470e9b45f2",
+    "hash": "34dbbe9b76c7bd75cc6d05113dfd3116",
     "packages": [
         {
             "name": "cocur/slugify",
@@ -1028,24 +1028,24 @@
         },
         {
             "name": "nelmio/api-doc-bundle",
-            "version": "2.9.0",
+            "version": "dev-master",
             "target-dir": "Nelmio/ApiDocBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioApiDocBundle.git",
-                "reference": "de31760fd84a45fadbb4fe24db050b5e29ea70d1"
+                "reference": "7c8b01021522cb429e5127a4c9175efa44a9cb69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/de31760fd84a45fadbb4fe24db050b5e29ea70d1",
-                "reference": "de31760fd84a45fadbb4fe24db050b5e29ea70d1",
+                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/7c8b01021522cb429e5127a4c9175efa44a9cb69",
+                "reference": "7c8b01021522cb429e5127a4c9175efa44a9cb69",
                 "shasum": ""
             },
             "require": {
                 "michelf/php-markdown": "~1.4",
-                "symfony/console": "~2.1",
-                "symfony/framework-bundle": "~2.1",
-                "symfony/twig-bundle": "~2.1"
+                "symfony/console": "~2.3",
+                "symfony/framework-bundle": "~2.3",
+                "symfony/twig-bundle": "~2.3"
             },
             "conflict": {
                 "jms/serializer": "<0.12",
@@ -1056,12 +1056,14 @@
                 "friendsofsymfony/rest-bundle": "~1.0",
                 "jms/serializer-bundle": ">=0.11",
                 "sensio/framework-extra-bundle": "~3.0",
-                "symfony/browser-kit": "~2.1",
-                "symfony/css-selector": "~2.1",
-                "symfony/form": "~2.1",
+                "symfony/browser-kit": "~2.3",
+                "symfony/css-selector": "~2.3",
+                "symfony/finder": "~2.3",
+                "symfony/form": "~2.3",
+                "symfony/phpunit-bridge": "~2.7",
                 "symfony/serializer": "~2.7@dev",
-                "symfony/validator": "~2.1",
-                "symfony/yaml": "~2.1"
+                "symfony/validator": "~2.3",
+                "symfony/yaml": "~2.3"
             },
             "suggest": {
                 "dunglas/api-bundle": "For making use of resources definitions of DunglasApiBundle.",
@@ -1102,7 +1104,7 @@
                 "documentation",
                 "rest"
             ],
-            "time": "2015-05-16 17:16:14"
+            "time": "2015-06-18 13:30:13"
         },
         {
             "name": "pomm-project/cli",
@@ -6759,6 +6761,7 @@
         "pomm-project/pomm-bundle": 20,
         "mopa/bootstrap-bundle": 20,
         "twbs/bootstrap": 20,
+        "nelmio/api-doc-bundle": 20,
         "squizlabs/php_codesniffer": 20,
         "phpmd/phpmd": 0,
         "fabpot/php-cs-fixer": 0,

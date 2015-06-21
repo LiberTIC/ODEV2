@@ -1,18 +1,29 @@
 # ODEV2
 
+Open Data Events (ODE) is about open-data calendars and public events.
+
+It is an open-data calendar server and a web plateform that allow everyone to import, expose and share events with an open-data licence. It exposes a CalDAV server endpoint, a full website, and a REST API.
+
+ODE is created to propose an alternative to closed-source, closed-data or vendor locking online calendars services.
+
 ## Requirements
 
 - PHP >= 5.4.4
-- ext-pgsql PHP extension, for PostgreSQL
-- PHP's package manager `Composer` internally increases the memory_limit to 1G
+- Postgresql 9.x. Mac OS X users, you may want to install it easely using [postgresApp](http://postgresapp.com/)
+- ext-pgsql PHP extension
+- [composer](https://getcomposer.org/doc/00-intro.md#globally) installed and available in your PATH
 
-## ODE Installation:
+### RAM
 
-Make sure [composer](https://getcomposer.org/doc/00-intro.md#globally), is installed and present in your PATH
+PHP's package manager, `composer`, internally increases the memory_limit to 1G. To get the current memory_limit value, run:
 
-Make sure to have a working instance of [PostgreSQL](http://www.postgresql.org/). Mac OS X users, you may want to install it easely using [postgresApp](http://postgresapp.com/).
+```bash
+php -r "echo ini_get('memory_limit').PHP_EOL;"
+```
 
-Then use a terminal and type this commands:
+If `composer` shows memory errors on some commands [check out this documentation](https://getcomposer.org/doc/articles/troubleshooting.md#memory-limit-errors).
+
+## Web App Installation:
 
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
@@ -26,7 +37,7 @@ php app/console server:run
 
 Then open http://127.0.0.1:8000
 
-An Apache2 vhost configuration file is given in example in `./doc`
+An Apache2 vhost configuration file is given in example in `./doc/GoingLive.md`
 
 ## Database tasks (included in the `make install`)
 
@@ -49,25 +60,29 @@ make connect        # Connects you to psql
 
 You can find more information on how to go live [here](doc/GoingLive.md)
 
-## Use of REST API
-
-You can find more information about the API [here](doc/RestAPI.md)
-
-Or you can just connect to http://{yourwebsite}/api/doc in order to check the full API documentation
-
 ## Quality & tests
 
 ```bash
 make quality
 ```
 
-## Code documentation (phpdoc)
+## Documentation
+
+PHP code documentation (via [phpdoc](http://phpdoc.org/))
 
 ```bash
 make phpdoc
 open api/doc/index.html
 ```
 
+REST API documentation (via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle))
+
+```bash
+php app/console server:run
+open http://127.0.0.1:8000/api/doc
+```
+
+Note that the REST API documentation provides a sandbox mode in order to test API methods.
 
 ## License, Copyright & Contributeurs
 
