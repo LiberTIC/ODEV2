@@ -1,5 +1,6 @@
 # TO DO List
 
+TODO for the TODOlist : move all this list items into Github's issues and milestones!
 
 ### Road to 2.0
 
