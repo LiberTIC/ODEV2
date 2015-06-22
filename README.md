@@ -35,7 +35,7 @@ make install
 php app/console server:run
 ```
 
-Then open http://127.0.0.1:8000
+Then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0.1:8000
 
 An Apache2 vhost configuration file is given in example in `./doc/GoingLive.md`
 
@@ -68,18 +68,18 @@ make quality
 
 ## Documentation
 
-PHP code documentation (via [phpdoc](http://phpdoc.org/))
+PHP code documentation (via [phpdoc](http://phpdoc.org/)) to be read in a web browser
 
 ```bash
 make phpdoc
-open api/doc/index.html
+open|xdg-open api/doc/index.html
 ```
 
-REST API documentation (via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle))
+REST API documentation (via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle))  be read in a web browser
 
 ```bash
 php app/console server:run
-open http://127.0.0.1:8000/api/doc
+open|xdg-open http://127.0.0.1:8000/api/doc
 ```
 
 Note that the REST API documentation provides a sandbox mode in order to test API methods.
