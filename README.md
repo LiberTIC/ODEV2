@@ -6,6 +6,16 @@ It consists in a CalDAV server endpoint, a full website, and a REST API.
 
 ODE is created to propose an alternative to closed-source, closed-data or vendor locking online calendars services. It allows everyone to maintain its own calendar service, to import, expose and share events information.
 
+## License, Copyright & Contributeurs
+
+(c) 2015 LiberTIC
+
+Licence: [MIT (X11)](http://en.wikipedia.org/wiki/MIT_License)
+
+Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
+
+[Contributors](https://github.com/LiberTIC/ODEV2/graphs/contributors)
+
 ## Requirements
 
 - PHP >= 5.4.4
@@ -13,9 +23,9 @@ ODE is created to propose an alternative to closed-source, closed-data or vendor
 - ext-pgsql PHP extension
 - [composer](https://getcomposer.org/doc/00-intro.md#globally) installed and available in your PATH
 
-### RAM
+### Resources
 
-PHP's package manager, `composer`, internally increases the memory_limit to 1G. To get the current memory_limit value, run:
+RAM: PHP's package manager, `composer`, internally increases the memory_limit to 1G. To get the current memory_limit value, run:
 
 ```bash
 php -r "echo ini_get('memory_limit').PHP_EOL;"
@@ -25,21 +35,30 @@ If `composer` shows memory errors on some commands [check out this documentation
 
 ## Web App Installation:
 
+The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.
+
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
 cd ODEV2
-# The install process warns you
-# about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.
 make
 make install
+```
+
+# Quick run
+
+Locally, you may use the PHP Built-in web server to run ODE:
+
+```bash
 php app/console server:run
 ```
 
 Then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0.1:8000
 
-An Apache2 vhost configuration file is given in example in `./doc/GoingLive.md`
+## Installation for production environment
 
-## Database tasks (included in the `make install`)
+You can find more information (Apache2 vhost configuration, etC.) on how to go live [here](doc/GoingLive.md)
+
+## Database daily tasks (included in the `make install`)
 
 `make install` already performs the role and database creation through SQL scripts and initial data: __you do not need to run these commands at first install__. By the way, all PostgreSQL related Makefile commands are explicit, in order to let you tweak them, to fit better with your environment.
 
@@ -56,10 +75,6 @@ make resetDb        # Drops and re-init ODE db
 make connect        # Connects you to psql 
 ```
 
-## Installation for production environment
-
-You can find more information on how to go live [here](doc/GoingLive.md)
-
 ## Quality & tests
 
 ```bash
@@ -68,14 +83,18 @@ make quality
 
 ## Documentation
 
-PHP code documentation (via [phpdoc](http://phpdoc.org/)) to be read in a web browser
+### PHP code documentation
+
+via [phpdoc](http://phpdoc.org/), to be read in a web browser
 
 ```bash
 make phpdoc
 open|xdg-open api/doc/index.html
 ```
 
-REST API documentation (via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle))  be read in a web browser
+### REST API documentation 
+
+via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle),  be read in a web browser
 
 ```bash
 php app/console server:run
@@ -83,16 +102,6 @@ open|xdg-open http://127.0.0.1:8000/api/doc
 ```
 
 Note that the REST API documentation provides a sandbox mode in order to test API methods.
-
-## License, Copyright & Contributeurs
-
-(c) 2015 LiberTIC
-
-Licence: [MIT (X11)](http://en.wikipedia.org/wiki/MIT_License)
-
-Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
-
-[Contributeurs](https://github.com/LiberTIC/ODEV2/graphs/contributors)
 
 ## Analyse du projet Open Data Events v1
 
