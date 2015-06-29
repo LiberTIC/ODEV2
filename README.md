@@ -80,11 +80,11 @@ Then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0.1:8
 
 You can find more information (Apache2 vhost configuration, etC.) on how to go live [here](doc/GoingLive.md)
 
-## Database daily tasks (included in the `make install`)
+## Database daily tasks
 
 The `Makefile` is to be used in your (local) webserver environment. Note that a D special, Docker-related `Makefile` also exists in the `docker` folder. 
 
-Database init: `make install` already performs the role and database creation through SQL scripts and initial data: __you do not need to run these commands at first install__. By the way, all PostgreSQL related Makefile commands are explicit, in order to let you tweak them, to fit better with your environment.
+Database init: `make install` already performs the role and database creation through SQL scripts and initial data: __you do not need to run these commands below at first install__. By the way, all PostgreSQL related Makefile commands are explicit, in order to let you tweak them, to fit better with your environment.
 
 Available PostgreSQL related commands:
 
