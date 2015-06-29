@@ -14,3 +14,8 @@ services:
     pmanager:
         class: AppBundle\Service\PommManager
         arguments: ["@pomm"]
+
+    app.response_listener:
+        class: AppBundle\EventListener\Kernel\ResponseListener
+        tags:
+              - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
