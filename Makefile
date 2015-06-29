@@ -102,14 +102,13 @@ createDb:
 	@echo
 	@echo "Create PostgreSQL database ${DB_NAME}..."
 	@createdb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires createdb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	createdb -U postgres -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
+	createdb -T template0 -E UTF8 -U postgres -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
 	@echo "done"
 
 pgInit:
 	@echo
-	@echo "Initializing ${DB_NAME} db tables using ./doc/postgresql/init.dump..."
-	@pg_restore -U postgres --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_restore but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	pg_restore ${DB_VARS} -O -d ${DB_NAME} ./doc/postgresql/init.dump
+	@echo "Initializing ${DB_NAME} db tables using ./doc/postgresql/ode.sql..."
+	psql -U postgres ${DB_VARS} -d ${DB_NAME} -f ./doc/postgresql/ode.sql
 	@echo "done"
 
 dumps:
