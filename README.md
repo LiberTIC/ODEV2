@@ -19,7 +19,7 @@ Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
 ## Requirements
 
 - PHP >= 5.4.4
-- Postgresql 9.x. Mac OS X users, you may want to install it easely using [postgresApp](http://postgresapp.com/)
+- Postgresql 9.x.
 - ext-pgsql PHP extension
 - [composer](https://getcomposer.org/doc/00-intro.md#globally) installed and available in your PATH
 
@@ -35,19 +35,29 @@ If `composer` shows memory errors on some commands [check out this documentation
 
 ## Docker Installation and Run
 
-Make sure your [Docker](https://www.docker.com) local installation is OK,
-then use the `docker/Makefile` tasks:
+The `docker/docker-compose.yml` file already configure and install a working stack: Nginx web server, PHP-FPM, Postgresql, etc. A dedicated `Makefile` run the all needed operations. 
+
+Make sure your [Docker](https://www.docker.com) local installation is OK, with both `docker` and `docker-compose` available commands, then call the `docker/Makefile` tasks:
 
 ```bash
 cd docker
-make 
-make install
-make run
+make               <-- build containers from images
+make install       <-- database init (to be run once only) + run
+```
+
+That's it.
+
+Once database is OK, next containers reboots only require this:
+
+```bash
+make run           <-- = docker-compose -up -d
 ```
 
 ## (Manuel) Web App Installation:
 
-The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.
+The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.: Make sure you can install them locally or in a Vagrant box, or consider using Docker, that already bundles the whole stack in containers (see above). 
+
+Mac OS X users, you may want to install Postgresql easely, using [postgresApp](http://postgresapp.com/)
 
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
@@ -72,7 +82,9 @@ You can find more information (Apache2 vhost configuration, etC.) on how to go l
 
 ## Database daily tasks (included in the `make install`)
 
-`make install` already performs the role and database creation through SQL scripts and initial data: __you do not need to run these commands at first install__. By the way, all PostgreSQL related Makefile commands are explicit, in order to let you tweak them, to fit better with your environment.
+The `Makefile` is to be used in your (local) webserver environment. Note that a D special, Docker-related `Makefile` also exists in the `docker` folder. 
+
+Database init: `make install` already performs the role and database creation through SQL scripts and initial data: __you do not need to run these commands at first install__. By the way, all PostgreSQL related Makefile commands are explicit, in order to let you tweak them, to fit better with your environment.
 
 Available PostgreSQL related commands:
 
