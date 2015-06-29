@@ -101,8 +101,8 @@ pgCreateRole:
 createDb:
 	@echo
 	@echo "Create PostgreSQL database ${DB_NAME}..."
-	@createDb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires createDb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	createDb -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
+	@createdb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires createdb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
+	createdb -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
 	@echo "done"
 
 pgInit:
