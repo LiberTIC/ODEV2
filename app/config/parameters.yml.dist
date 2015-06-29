@@ -8,6 +8,6 @@ parameters:
 
     db_host1: 127.0.0.1
     db_port1: 5432
-    db_name1: ODE
-    db_user1: ODE
-    db_password1: ODEpassword
+    db_name1: ode
+    db_user1: ode
+    db_password1: ode

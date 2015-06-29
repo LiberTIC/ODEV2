@@ -41,7 +41,7 @@ DB_PORT	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config
 DB_NAME     := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_name1' | sed 's/db_name1: //' | sed 's/^ *//;s/ *$$//' ; fi)
 DB_USER	    := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_user1' | sed 's/db_user1: //' | sed 's/^ *//;s/ *$$//' ; fi)
 DB_PASSWORD := $(shell if [ -f app/config/parameters.yml ] ; then cat app/config/parameters.yml | grep 'db_password1' | sed 's/db_password1: //' | sed 's/null//' | sed 's/^ *//;s/ *$$//' ; fi)
-DB_VARS     := -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}
+DB_VARS     := -h ${DB_HOST} -p ${DB_PORT}
 # Pathes
 PWD         := $(shell pwd)
 VENDOR_PATH := $(PWD)/vendor
@@ -95,21 +95,20 @@ pgCreateRole:
 	@echo
 	@echo "Creating role ${DB_NAME} using doc/postgresql/role.sql..."
 	@psql --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires psql but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	psql -h ${DB_HOST} -p ${DB_PORT} -f ./doc/postgresql/role.sql
+	psql -U postgres -h ${DB_HOST} -p ${DB_PORT} -f ./doc/postgresql/role.sql
 	@echo "done"
 
 createDb:
 	@echo
 	@echo "Create PostgreSQL database ${DB_NAME}..."
 	@createdb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires createdb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	createdb -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
+	createdb -T template0 -E UTF8 -U postgres -h ${DB_HOST} -p ${DB_PORT} ${DB_NAME}
 	@echo "done"
 
 pgInit:
 	@echo
-	@echo "Initializing ${DB_NAME} db tables using ./doc/pstgresql/init.dump..."
-	@pg_restore --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_restore but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	pg_restore ${DB_VARS} -O -d ${DB_NAME} ./doc/postgresql/init.dump
+	@echo "Initializing ${DB_NAME} db tables using ./doc/postgresql/ode.sql..."
+	psql -U postgres ${DB_VARS} -d ${DB_NAME} -f ./doc/postgresql/ode.sql
 	@echo "done"
 
 dumps:
@@ -122,21 +121,21 @@ pgDump: dumps
 	@echo
 	@echo "Dumping existing ${DB_NAME} db into ./dumps ..."
 	@pg_dump --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_dump but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	pg_dump ${DB_VARS} -Fc -d ${DB_NAME} -f ./dumps/${NOW}.dump
+	pg_dump -U postgres ${DB_VARS} -Fc -d ${DB_NAME} -f ./dumps/${NOW}.dump
 	@echo "done"
 
 pgRestore:
 	@echo
 	@echo "Restoring existing ${DB_NAME} db using last ./dumps/${DB_LASTDUMP}..."
 	@pg_restore --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires pg_restore but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	pg_restore ${DB_VARS} -O -d ${DB_NAME} ./dumps/${DB_LASTDUMP}
+	pg_restore -U postgres ${DB_VARS} -O -d ${DB_NAME} ./dumps/${DB_LASTDUMP}
 	@echo "done"
 
 dropDb: pgDump
 	@echo
 	@echo "Drop database ${DB_NAME}..."
 	@dropdb --version >/dev/null 2>&1 || { echo >&2 "This Makefile requires dropdb but it's not installed or not in your PATH. Please checkout the install doc: http://www.postgresql.org. Aborting."; exit 1; }
-	dropdb ${DB_VARS} ${DB_NAME}
+	dropdb -U postgres ${DB_VARS} ${DB_NAME}
 	@echo "done"
 
 installDb: createDb pgInit
