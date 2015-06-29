@@ -33,7 +33,19 @@ php -r "echo ini_get('memory_limit').PHP_EOL;"
 
 If `composer` shows memory errors on some commands [check out this documentation](https://getcomposer.org/doc/articles/troubleshooting.md#memory-limit-errors).
 
-## Web App Installation:
+## Docker Installation and Run
+
+Make sure your [Docker](https://www.docker.com) local installation is OK,
+then use the `docker/Makefile` tasks:
+
+```bash
+cd docker
+make 
+make install
+make run
+```
+
+## (Manuel) Web App Installation:
 
 The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.
 
@@ -44,7 +56,7 @@ make
 make install
 ```
 
-# Quick run
+## (Manual) Web App Quick run
 
 Locally, you may use the PHP Built-in web server to run ODE:
 
@@ -103,21 +115,21 @@ open|xdg-open http://127.0.0.1:8000/api/doc
 
 Note that the REST API documentation provides a sandbox mode in order to test API methods.
 
-## Analyse du projet Open Data Events v1
+## v1 Analyzis & Memo
 
-Ce dépôt conserve dans le répertoire `./doc` les documents et l'analyse de la v1 et ceux du prototype de la v2, ainsi que les compte-rendus des réunions de janvier à juin 2015 
+The `./doc` conserve (french) documentation & analyse about "v1" ODE project and "v2" prototype, included more 2015 meeting notes. 
 
 ## [TODO list](doc/TODO_list.md)
 
-## Liens utiles
+## Useful Links
 
-- [Présentation du projet initial](http://fr.slideshare.net/libertic/lancement-projet-ode-culture) (slideshare.net)
-- [Plan de travail de la journée de juin 2014 organisée à Stereolux](http://www.stereolux.org/labo-arts-techs/ouverture-des-donnees-evenementielles-lancement-officiel-du-site-10-06-2014)
-- [sources de la v1](https://github.com/LiberTIC/ODE): Python, Dango, Pyramid
-- [prototype de la v2](https://github.com/polypodes/CalDAVClientPrototype): Symfony2, CalendarServer
-- [Sources de jquery-oembed-all](https://github.com/nfl/jquery-oembed-all)
+- (fr) [Présentation du projet initial](http://fr.slideshare.net/libertic/lancement-projet-ode-culture) (slideshare.net)
+- (fr) [Plan de travail de la journée de juin 2014 organisée à Stereolux](http://www.stereolux.org/labo-arts-techs/ouverture-des-donnees-evenementielles-lancement-officiel-du-site-10-06-2014)
+- (fr) [v1 source code](https://github.com/LiberTIC/ODE): Python, Dango, Pyramid
+- [v2 prototype source code](https://github.com/polypodes/CalDAVClientPrototype), based on Symfony2 + Apple CalendarServer
+- [jquery-oembed-all source code](https://github.com/nfl/jquery-oembed-all)
 
-## Discutons !
+## Let's chat!
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/LiberTIC/ODEV2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
