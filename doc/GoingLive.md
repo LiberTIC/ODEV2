@@ -136,13 +136,18 @@ find ~/releases -type d -exec chmod 750 {} \;
 find ~/releases -type f -exec chmod 640 {} \;
 ```
 
-Change app/cache and app/log permission
+Change app/cache and app/logs permission
 
 ```bash
 sudo chmod -R 750 app/cache
-sudo chmod -R 750 app/log
+sudo chmod -R 750 app/logs
 ```
-
+an other possibility is to use ACL :
+```bash
+$ HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+$ sudo setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+$ sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX app/cache app/logs
+```
 Clear the cache for the prod environment
 
 ```bash
