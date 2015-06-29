@@ -4,15 +4,6 @@ application:
         - ../:/var/www/symfony
         - logs/symfony:/var/www/symfony/app/logs
     tty: true
-db:
-    image: mysql
-    ports:
-        - 3306:3306
-    environment:
-        MYSQL_ROOT_PASSWORD: root
-        MYSQL_DATABASE: symfony
-        MYSQL_USER: root
-        MYSQL_PASSWORD: root
 php:
     image: symfony/php-fpm
     expose:
@@ -20,7 +11,6 @@ php:
     volumes_from:
         - application
     links:
-        - db
         - postgres
 nginx:
     image: symfony/nginx

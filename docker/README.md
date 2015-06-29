@@ -51,7 +51,6 @@ This results in the following running containers:
         Name                      Command               State              Ports
         -------------------------------------------------------------------------------------------
         docker_application_1   /bin/bash                        Up
-        docker_db_1            /entrypoint.sh mysqld            Up      0.0.0.0:3306->3306/tcp
         docker_elk_1           /usr/bin/supervisord -n -c ...   Up      0.0.0.0:81->80/tcp
         docker_nginx_1         nginx                            Up      443/tcp, 0.0.0.0:80->80/tcp
         docker_php_1           php5-fpm -F                      Up      9000/tcp
