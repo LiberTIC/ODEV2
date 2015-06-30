@@ -15,22 +15,25 @@ namespace AppBundle\EventListener\Kernel;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
+/**
+ * Class ResponseListener
+ *
+ * @package AppBundle\EventListener\Kernel
+ */
 class ResponseListener
 {
 
+    /**
+     * @param FilterResponseEvent $event
+     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();
-        $response->headers->set('X-Proudly-Crafted-By', 'twitter.com/libertic, lespolypodes.com and friends'); // It's nerdy, I know that.
+        $response->headers->set('X-Proudly-Crafted-By', 'twitter.com/libertic, lespolypodes.com & friends'); // It's nerdy, I know that.
         $response->headers->set('X-Open-Source', 'https://github.com/LiberTIC/ODEV2');
-        $response->headers->set('Server', 'It’s a honeypot.');
-
+        $response->headers->set('Server', "It's a honeypot.");
 
         $event->setResponse($response);
-
-
     }
-
-
 
 }
