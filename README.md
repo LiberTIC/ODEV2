@@ -76,7 +76,7 @@ And then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0
 
 ## Installation for production environment
 
-You can find more information (Apache2 vhost configuration, etC.) on how to go live [here](doc/GoingLive.md)
+You can find more informations (Apache2 vhost configuration example, etc.) on how to go live [here](doc/GoingLive.md)
 
 ## Database daily tasks
 
@@ -123,7 +123,7 @@ php app/console server:run
 open|xdg-open http://127.0.0.1:8000/api/doc
 ```
 
-Note that the REST API documentation provides a sandbox mode in order to test API methods.
+Note that the REST API documentation provides a sandbox mode in order to test all provided API methods.
 
 ## v1 Analyzis & Memo
 
