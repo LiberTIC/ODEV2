@@ -19,7 +19,7 @@ Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
 ## Requirements
 
 - PHP >= 5.4.4
-- Postgresql 9.x.
+- Postgresql 9.2 with [JSON type support](http://www.postgresql.org/docs/9.2/static/datatype-json.html)
 - ext-pgsql PHP extension
 - [composer](https://getcomposer.org/doc/00-intro.md#globally) installed and available in your PATH
 
