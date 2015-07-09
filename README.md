@@ -33,7 +33,7 @@ php -r "echo ini_get('memory_limit').PHP_EOL;"
 
 If `composer` shows memory errors on some commands [check out this documentation](https://getcomposer.org/doc/articles/troubleshooting.md#memory-limit-errors).
 
-## Docker Installation and Run
+## Installation, option 1: the Docker way
 
 The `docker/docker-compose.yml` file already configure and install a working stack: Nginx web server, PHP-FPM, Postgresql, etc. A dedicated `Makefile` run the all needed operations. 
 
@@ -53,7 +53,7 @@ Once database is OK, next containers reboots only require this:
 make run           <-- = docker-compose -up -d
 ```
 
-## (Manuel) Web App Installation:
+## Installation, option 2: Using the Makefile
 
 The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.: Make sure you can install them locally or in a Vagrant box, or consider using Docker, that already bundles the whole stack in containers (see above). 
 
@@ -66,15 +66,13 @@ make
 make install
 ```
 
-## (Manual) Web App Quick run
-
-Locally, you may use the PHP Built-in web server to run ODE:
+Locally, you may then use the PHP Built-in web server to run ODE:
 
 ```bash
 php app/console server:run
 ```
 
-Then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0.1:8000
+And then `open` (OS X) or `xdg-open` (GNU/Linux) the working URL: http://127.0.0.1:8000
 
 ## Installation for production environment
 
