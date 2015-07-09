@@ -19,8 +19,8 @@ Made in Nantes, France @ [Les Polypodes](http://lespolypodes.com)
 ## Requirements
 
 - PHP >= 5.4.4
-- Postgresql 9.2 with [JSON type support](http://www.postgresql.org/docs/9.2/static/datatype-json.html)
-- ext-pgsql PHP extension
+- PostgreSQL 9.2 with [JSON type support](http://www.postgresql.org/docs/9.2/static/datatype-json.html)
+- PostgreSQL's [ext-pgsql PHP extension](http://php.net/manual/pgsql.installation.php)
 - [composer](https://getcomposer.org/doc/00-intro.md#globally) installed and available in your PATH
 
 ### Resources
@@ -57,7 +57,7 @@ make run           <-- = docker-compose -up -d
 
 The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.: Make sure you they are already available and running in you environment. 
 
-Mac OS X users, you may want to install Postgresql easely, using [postgresApp](http://postgresapp.com/)
+Mac OS X users, you may want to install PostgreSQL easely, using [postgresApp](http://postgresapp.com/)
 
 ```bash
 git clone https://github.com/LiberTIC/ODEV2.git
