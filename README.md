@@ -55,7 +55,7 @@ make run           <-- = docker-compose -up -d
 
 ## Installation, option 2: Using the Makefile
 
-The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.: Make sure you can install them locally or in a Vagrant box, or consider using Docker, that already bundles the whole stack in containers (see above). 
+The install process warns you about requirements and configuration of Apache2, PHP5, PostgreSQL, etc.: Make sure you they are already available and running in you environment. 
 
 Mac OS X users, you may want to install Postgresql easely, using [postgresApp](http://postgresapp.com/)
 
