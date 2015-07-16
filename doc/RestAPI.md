@@ -114,6 +114,7 @@ _Create a new event_
 
   - Type: string
   - Description: The uri of the calendar
+
 **event_data**
 
   - Type: array
