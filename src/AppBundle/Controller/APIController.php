@@ -603,7 +603,7 @@ class APIController extends Controller
      * @return Response
      * @throws \Exception
      */
-    public function buildResponse($data)
+    public function buildResponse($data, $code=200)
     {
         $format = 'json';
         $formats = $this->get('request')->getAcceptableContentTypes();
@@ -617,7 +617,7 @@ class APIController extends Controller
         $format = $format == 'html' ? 'json' : $format; // Set html behavior as json behavior
 
         if ($format == 'json') {
-            $response = new Response(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            $response = new Response(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), $code);
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
@@ -641,6 +641,6 @@ class APIController extends Controller
     {
         $error = ['error' => ['code' => $code, 'message' => $message]];
 
-        return $this->buildResponse($error);
+        return $this->buildResponse($error, $code);
     }
 }
