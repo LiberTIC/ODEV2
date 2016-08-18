@@ -6,7 +6,9 @@ It consists in a CalDAV server endpoint, a full website, and a REST API.
 
 ODE is created to propose an alternative to closed-source, closed-data or vendor locking online calendars services. It allows everyone to maintain its own calendar service, to import, expose and share events information.
 
-__Demo__ : [projet-ode.org](http://projet-ode.org/)
+__Demo__ : ~~[projet-ode.org](http://projet-ode.org/)~~
+
+[Project history (fr)](http://dandale.org/Evenements/wiki/doku.php?id=agenda:outils_disponibles)
 
 ## License, Copyright & Contributeurs
 
